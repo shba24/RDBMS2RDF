@@ -1,11 +1,11 @@
-package  catalog;
-import chainexception.*;
+package catalog;
 
-public class Catalogrelexists extends ChainException{
+import chainexception.ChainException;
 
-   public Catalogrelexists(Exception err, String name)
-	{
-	       super(err, name);
-	}
+public class Catalogrelexists extends ChainException {
+
+  public Catalogrelexists(Exception err, String name) {
+    super(err, name);
+  }
 }
 

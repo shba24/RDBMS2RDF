@@ -1,14 +1,21 @@
 package tests;
 
-import java.io.*;
-import java.util.*;
-import java.lang.*;
-
-import heap.*;
-import bufmgr.*;
-import diskmgr.*;
-import global.*;
-import btree.*;
+import btree.BT;
+import btree.BTFileScan;
+import btree.BTreeFile;
+import btree.IntegerKey;
+import btree.KeyClass;
+import btree.KeyDataEntry;
+import btree.StringKey;
+import global.AttrType;
+import global.GlobalConst;
+import global.PageId;
+import global.RID;
+import global.SystemDefs;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Random;
 
 /**
  * Note that in JAVA, methods can't be overridden to be more private.
@@ -24,16 +31,14 @@ class BTDriver implements GlobalConst {
   public int postfix = 0;
   public int keyType;
   public BTFileScan scan;
-
+  public int deleteFashion;
   protected String dbpath;
   protected String logpath;
-  public int deleteFashion;
 
   public void runTests() {
     Random random = new Random();
     dbpath = "BTREE" + random.nextInt() + ".minibase-db";
     logpath = "BTREE" + random.nextInt() + ".minibase-log";
-
 
     SystemDefs sysdef = new SystemDefs(dbpath, 5000, 5000, "Clock");
     System.out.println("\n" + "Running " + " tests...." + "\n");
@@ -88,8 +93,6 @@ class BTDriver implements GlobalConst {
 
     System.out.print("\n" + "..." + " Finished ");
     System.out.println(".\n\n");
-
-
   }
 
   private void menu() {
@@ -122,11 +125,9 @@ class BTDriver implements GlobalConst {
     System.out.println("[17]  Open which file (input an integer for the file name): ");
     System.out.println("[18]  Destroy which file (input an integer for the file name): ");
 
-
     System.out.println("\n[19]  Quit!");
     System.out.print("Hi, make your choice :");
   }
-
 
   protected void runAllTests() {
     PageId pageno = new PageId();
@@ -172,14 +173,18 @@ class BTDriver implements GlobalConst {
           case 4:
             System.out.println("Please input the page number: ");
             num = GetStuff.getChoice();
-            if (num < 0) break;
+            if (num < 0) {
+              break;
+            }
             BT.printPage(new PageId(num), keyType);
             break;
           case 5:
             keyType = AttrType.attrInteger;
             System.out.println("Please input the integer key to insert: ");
             key = GetStuff.getChoice();
-            if (key < 0) break;
+            if (key < 0) {
+              break;
+            }
             pageno.pid = key;
             rid = new RID(pageno, key);
             file.insert(new IntegerKey(key), rid);
@@ -188,7 +193,9 @@ class BTDriver implements GlobalConst {
             keyType = AttrType.attrInteger;
             System.out.println("Please input the integer key to delete: ");
             key = GetStuff.getChoice();
-            if (key < 0) break;
+            if (key < 0) {
+              break;
+            }
             pageno.pid = key;
             rid = new RID(pageno, key);
             file.Delete(new IntegerKey(key), rid);
@@ -199,7 +206,9 @@ class BTDriver implements GlobalConst {
             keyType = AttrType.attrInteger;
             System.out.println("Please input the number of keys to insert: ");
             n = GetStuff.getChoice();
-            if (n <= 0) break;
+            if (n <= 0) {
+              break;
+            }
             test1(n);
             break;
           case 8:
@@ -208,7 +217,9 @@ class BTDriver implements GlobalConst {
             keyType = AttrType.attrInteger;
             System.out.println("Please input the number of keys to insert: ");
             n = GetStuff.getChoice();
-            if (n <= 0) break;
+            if (n <= 0) {
+              break;
+            }
             test2(n);
             break;
           case 9:
@@ -217,7 +228,9 @@ class BTDriver implements GlobalConst {
             keyType = AttrType.attrInteger;
             System.out.println("Please input the number of keys to insert: ");
             n = GetStuff.getChoice();
-            if (n <= 0) break;
+            if (n <= 0) {
+              break;
+            }
             test3(n);
             break;
           case 10:
@@ -228,8 +241,12 @@ class BTDriver implements GlobalConst {
             n = GetStuff.getChoice();
             System.out.println("Please input the number of keys to delete: ");
             m = GetStuff.getChoice();
-            if (n <= 0 || m < 0) break;
-            if (m > n) m = n;
+            if (n <= 0 || m < 0) {
+              break;
+            }
+            if (m > n) {
+              m = n;
+            }
             test4(n, m);
             break;
           case 11:
@@ -238,8 +255,9 @@ class BTDriver implements GlobalConst {
             lowkeyInt = GetStuff.getChoice();
             System.out.println("Please input the HIGHER integer key(>=0) ");
             hikeyInt = GetStuff.getChoice();
-            if (hikeyInt < 0 || lowkeyInt < 0)
+            if (hikeyInt < 0 || lowkeyInt < 0) {
               break;
+            }
             for (key = lowkeyInt; key <= hikeyInt; key++) {
               pageno.pid = key;
               rid = new RID(pageno, key);
@@ -255,21 +273,25 @@ class BTDriver implements GlobalConst {
             System.out.println("Please input the HIGHER integer key (null if -2): ");
             hikeyInt = GetStuff.getChoice();
             hikey = new IntegerKey(hikeyInt);
-            if (lowkeyInt == -3)
+            if (lowkeyInt == -3) {
               lowkey = null;
-            if (hikeyInt == -2)
+            }
+            if (hikeyInt == -2) {
               hikey = null;
-            if (hikeyInt == -1 || lowkeyInt == -1)
+            }
+            if (hikeyInt == -1 || lowkeyInt == -1) {
               break;
+            }
             scan = file.new_scan(lowkey, hikey);
             break;
 
           case 13:
             entry = scan.get_next();
-            if (entry != null)
+            if (entry != null) {
               System.out.println("SCAN RESULT: " + entry.key + " " + entry.data);
-            else
+            } else {
               System.out.println("AT THE END OF SCAN!");
+            }
             break;
           case 14:
             scan.delete_current();
@@ -282,8 +304,12 @@ class BTDriver implements GlobalConst {
             n = GetStuff.getChoice();
             System.out.println("Please input the number of keys to delete: ");
             m = GetStuff.getChoice();
-            if (n <= 0 || m < 0) break;
-            if (m > n) m = n;
+            if (n <= 0 || m < 0) {
+              break;
+            }
+            if (m > n) {
+              m = n;
+            }
             test5(n, m);
             break;
           case 16:
@@ -306,19 +332,15 @@ class BTDriver implements GlobalConst {
           case 19:
             break;
         }
-
-
       } catch (Exception e) {
         e.printStackTrace();
         System.out.println("       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         System.out.println("       !!         Something is wrong                    !!");
         System.out.println("       !!     Is your DB full? then exit. rerun it!     !!");
         System.out.println("       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
       }
     }
   }
-
 
   void test1(int n)
       throws Exception {
@@ -336,16 +358,11 @@ class BTDriver implements GlobalConst {
         rid = new RID(pageno, i);
 
         file.insert(key, rid);
-
       }
-
     } catch (Exception e) {
       throw e;
     }
-
-
   }
-
 
   void test2(int n)
       throws Exception {
@@ -364,14 +381,11 @@ class BTDriver implements GlobalConst {
         rid = new RID(pageno, n - i);
 
         file.insert(key, rid);
-
       }
-
     } catch (Exception e) {
       throw e;
     }
   }
-
 
   void test3(int n)
       throws Exception {
@@ -390,19 +404,22 @@ class BTDriver implements GlobalConst {
       for (int i = 0; i < n; i++) {
 
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
-
 
       KeyClass key;
       RID rid = new RID();
@@ -413,14 +430,11 @@ class BTDriver implements GlobalConst {
         rid = new RID(pageno, k[i]);
 
         file.insert(key, rid);
-
       }
-
     } catch (Exception e) {
       throw e;
     }
   }
-
 
   void test4(int n, int m)
       throws Exception {
@@ -438,19 +452,22 @@ class BTDriver implements GlobalConst {
       int tmp;
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
-
 
       KeyClass key;
       RID rid = new RID();
@@ -461,19 +478,22 @@ class BTDriver implements GlobalConst {
         rid = new RID(pageno, k[i]);
 
         file.insert(key, rid);
-
       }
 
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
@@ -491,13 +511,10 @@ class BTDriver implements GlobalConst {
           System.out.println("*********************************************************");
         }
       }
-
-
     } catch (Exception e) {
       throw e;
     }
   }
-
 
   void test5(int n, int m)
       throws Exception {
@@ -517,19 +534,22 @@ class BTDriver implements GlobalConst {
       int tmp;
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
-
 
       KeyClass key;
       RID rid = new RID();
@@ -540,19 +560,22 @@ class BTDriver implements GlobalConst {
         rid = new RID(pageno, k[i]);
 
         file.insert(key, rid);
-
       }
 
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
       }
       for (int i = 0; i < n; i++) {
         random = (ran.nextInt()) % n;
-        if (random < 0) random = -random;
+        if (random < 0) {
+          random = -random;
+        }
         tmp = k[i];
         k[i] = k[random];
         k[random] = tmp;
@@ -569,18 +592,12 @@ class BTDriver implements GlobalConst {
           System.out.println("*     You insert a record, But you failed to delete it. *");
           System.out.println("*********************************************************");
         }
-
       }
-
-
     } catch (Exception e) {
       throw e;
     }
   }
-
-
 }
-
 
 /**
  * To get the integer off the command line
@@ -629,5 +646,4 @@ public class BTTest implements GlobalConst {
       Runtime.getRuntime().exit(1);
     }
   }
-
 }

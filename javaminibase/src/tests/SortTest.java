@@ -1,16 +1,18 @@
 package tests;
 
-import java.io.*;
-
-import global.*;
-import bufmgr.*;
-import diskmgr.*;
-import heap.*;
-import iterator.*;
-import index.*;
-
+import global.AttrType;
+import global.GlobalConst;
+import global.RID;
+import global.SystemDefs;
+import global.TupleOrder;
+import heap.Heapfile;
+import heap.Tuple;
+import iterator.FileScan;
+import iterator.FldSpec;
+import iterator.RelSpec;
+import iterator.Sort;
+import java.io.IOException;
 import java.util.Random;
-
 
 class SORTDriver extends TestDriver
     implements GlobalConst {
@@ -52,7 +54,6 @@ class SORTDriver extends TestDriver
   private static short REC_LEN1 = 32;
   private static short REC_LEN2 = 160;
   private static int SORTPGNUM = 12;
-
 
   public SORTDriver() {
     super("sorttest");
@@ -201,7 +202,6 @@ class SORTDriver extends TestDriver
       e.printStackTrace();
     }
 
-
     int count = 0;
     t = null;
     String outval = null;
@@ -264,7 +264,6 @@ class SORTDriver extends TestDriver
 
     return status;
   }
-
 
   protected boolean test2() {
     System.out.println("------------------------ TEST 2 --------------------------");
@@ -346,7 +345,6 @@ class SORTDriver extends TestDriver
       e.printStackTrace();
     }
 
-
     int count = 0;
     t = null;
     String outval = null;
@@ -407,7 +405,6 @@ class SORTDriver extends TestDriver
 
     return status;
   }
-
 
   protected boolean test3() {
     System.out.println("------------------------ TEST 3 --------------------------");
@@ -504,7 +501,6 @@ class SORTDriver extends TestDriver
       e.printStackTrace();
     }
 
-
     Sort sort = null;
     try {
       sort = new Sort(attrType, (short) 4, attrSize, fscan, 3, order[0], 4, SORTPGNUM);
@@ -512,7 +508,6 @@ class SORTDriver extends TestDriver
       status = FAIL;
       e.printStackTrace();
     }
-
 
     count = 0;
     t = null;
@@ -601,7 +596,6 @@ class SORTDriver extends TestDriver
       status = FAIL;
       e.printStackTrace();
     }
-
 
     count = 0;
     t = null;
@@ -741,7 +735,6 @@ class SORTDriver extends TestDriver
       }
     }
 
-
     // create an iterator by open a file scan
     FldSpec[] projlist = new FldSpec[2];
     RelSpec rel = new RelSpec(RelSpec.outer);
@@ -759,7 +752,6 @@ class SORTDriver extends TestDriver
       e.printStackTrace();
     }
 
-
     // Sort input files
     Sort sort1 = null;
     Sort sort2 = null;
@@ -770,7 +762,6 @@ class SORTDriver extends TestDriver
       status = FAIL;
       e.printStackTrace();
     }
-
 
     int count = 0;
     Tuple t1 = null;

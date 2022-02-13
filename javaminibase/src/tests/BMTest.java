@@ -1,13 +1,12 @@
 package tests;
 
-import java.io.*;
-import java.util.*;
-import java.lang.*;
-
-import global.*;
-import bufmgr.*;
-import diskmgr.*;
-import chainexception.*;
+import chainexception.ChainException;
+import diskmgr.Page;
+import global.Convert;
+import global.GlobalConst;
+import global.PageId;
+import global.SystemDefs;
+import java.io.IOException;
 
 //Note that in JAVA, methods can't be overridden to be more private.
 //Therefore, the declaration of all private functions are now declared
@@ -34,7 +33,6 @@ class BMDriver extends TestDriver implements GlobalConst {
    * calls the runTests function in TestDriver
    */
   public boolean runTests() {
-
 
     System.out.print("\n" + "Running " + testName() + " tests...." + "\n");
 
@@ -88,7 +86,6 @@ class BMDriver extends TestDriver implements GlobalConst {
     try {
       Runtime.getRuntime().exec(remove_logcmd);
       Runtime.getRuntime().exec(remove_dbcmd);
-
     } catch (IOException e) {
       System.err.println("" + e);
     }
@@ -129,7 +126,6 @@ class BMDriver extends TestDriver implements GlobalConst {
     return _passAll;
   }
 
-
   /**
    * overrides the test1 function in TestDriver.  It tests some
    * simple normal buffer manager operations.
@@ -160,7 +156,6 @@ class BMDriver extends TestDriver implements GlobalConst {
       e.printStackTrace();
       return false;
     }
-
 
     // Unpin that first page... to simplify our loop.
     try {
@@ -215,10 +210,11 @@ class BMDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  - Read that something back from each one\n" +
           "   (because we're buffering, this is where " +
           "most of the writes happen)\n");
+    }
 
     for (pid.pid = firstPid.pid; status == OK && pid.pid < lastPid.pid;
          pid.pid = pid.pid + 1) {
@@ -262,8 +258,9 @@ class BMDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  - Free the pages again\n");
+    }
 
     for (pid.pid = firstPid.pid; pid.pid < lastPid.pid;
          pid.pid = pid.pid + 1) {
@@ -275,15 +272,14 @@ class BMDriver extends TestDriver implements GlobalConst {
         System.err.print("*** Error freeing page " + pid.pid + "\n");
         e.printStackTrace();
       }
-
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  Test 1 completed successfully.\n");
+    }
 
     return status;
   }
-
 
   /**
    * overrides the test2 function in TestDriver.  It tests whether illeagal
@@ -439,12 +435,12 @@ class BMDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  Test 2 completed successfully.\n");
+    }
 
     return status;
   }
-
 
   /**
    * overrides the test3 function in TestDriver.  It exercises some of the internal
@@ -477,8 +473,9 @@ class BMDriver extends TestDriver implements GlobalConst {
         e.printStackTrace();
       }
 
-      if (status == OK)
+      if (status == OK) {
         pids[index] = pid;
+      }
 
       if (status == OK) {
 
@@ -563,8 +560,9 @@ class BMDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  Test 3 completed successfully.\n");
+    }
 
     return status;
   }

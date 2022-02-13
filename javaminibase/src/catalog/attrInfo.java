@@ -5,13 +5,13 @@
 //-------------------------------------
 
 package catalog;
-import global.*;
+
+import global.AttrType;
 
 // attrInfo class used for creating relations
-public class attrInfo
-{
-  public String   attrName;           // attribute name
+public class attrInfo {
+  public String attrName;           // attribute name
   public AttrType attrType;           // INTEGER, FLOAT, or STRING
-  public int      attrLen = 0;        // length
+  public int attrLen = 0;        // length
 }; 
 

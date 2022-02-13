@@ -1,17 +1,12 @@
 package diskmgr;
-import chainexception.*;
 
+import chainexception.ChainException;
 
 public class FileEntryNotFoundException extends ChainException {
 
-  public FileEntryNotFoundException(Exception e, String name)
-  { 
-    super(e, name); 
+  public FileEntryNotFoundException(Exception e, String name) {
+    super(e, name);
   }
-
-  
-
-
 }
 
 

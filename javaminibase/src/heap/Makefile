@@ -21,6 +21,9 @@ tuple:Tuple.java
 scan:Scan.java
 	$(JAVAC) Scan.java
 
+quadruple:Quadruple.java
+	$(JAVAC) Quadruple.java
+
 together:*.java
 	$(JAVAC) *.java
 

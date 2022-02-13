@@ -1,17 +1,23 @@
 package tests;
 
-import java.io.*;
-
-import global.*;
-import bufmgr.*;
-import diskmgr.*;
-import heap.*;
-import iterator.*;
-import index.*;
-import btree.*;
-
+import btree.BTreeFile;
+import btree.IntegerKey;
+import btree.StringKey;
+import global.AttrOperator;
+import global.AttrType;
+import global.GlobalConst;
+import global.IndexType;
+import global.RID;
+import global.SystemDefs;
+import heap.Heapfile;
+import heap.Scan;
+import heap.Tuple;
+import index.IndexScan;
+import iterator.CondExpr;
+import iterator.FldSpec;
+import iterator.RelSpec;
+import java.io.IOException;
 import java.util.Random;
-
 
 class IndexDriver extends TestDriver
     implements GlobalConst {
@@ -52,7 +58,6 @@ class IndexDriver extends TestDriver
   private static int LARGE = 1000;
   private static short REC_LEN1 = 32;
   private static short REC_LEN2 = 160;
-
 
   public IndexDriver() {
     super("indextest");
@@ -245,12 +250,21 @@ class IndexDriver extends TestDriver
     // start index scan
     IndexScan iscan = null;
     try {
-      iscan = new IndexScan(new IndexType(IndexType.B_Index), "test1.in", "BTreeIndex", attrType, attrSize, 2, 2, projlist, null, 2, true);
+      iscan = new IndexScan(new IndexType(IndexType.B_Index),
+          "test1.in",
+          "BTreeIndex",
+          attrType,
+          attrSize,
+          2,
+          2,
+          projlist,
+          null,
+          2,
+          true);
     } catch (Exception e) {
       status = FAIL;
       e.printStackTrace();
     }
-
 
     int count = 0;
     t = null;
@@ -315,7 +329,6 @@ class IndexDriver extends TestDriver
     return status;
   }
 
-
   protected boolean test2() {
     System.out.println("------------------------ TEST 2 --------------------------");
 
@@ -373,7 +386,6 @@ class IndexDriver extends TestDriver
     String key = null;
     Tuple temp = null;
 
-
     FldSpec[] projlist = new FldSpec[2];
     RelSpec rel = new RelSpec(RelSpec.outer);
     projlist[0] = new FldSpec(rel, 1);
@@ -393,12 +405,21 @@ class IndexDriver extends TestDriver
     // start index scan
     IndexScan iscan = null;
     try {
-      iscan = new IndexScan(new IndexType(IndexType.B_Index), "test1.in", "BTreeIndex", attrType, attrSize, 2, 2, projlist, expr, 2, false);
+      iscan = new IndexScan(new IndexType(IndexType.B_Index),
+          "test1.in",
+          "BTreeIndex",
+          attrType,
+          attrSize,
+          2,
+          2,
+          projlist,
+          expr,
+          2,
+          false);
     } catch (Exception e) {
       status = FAIL;
       e.printStackTrace();
     }
-
 
     int count = 0;
     t = null;
@@ -470,12 +491,21 @@ class IndexDriver extends TestDriver
     // start index scan
     iscan = null;
     try {
-      iscan = new IndexScan(new IndexType(IndexType.B_Index), "test1.in", "BTreeIndex", attrType, attrSize, 2, 2, projlist, expr, 2, false);
+      iscan = new IndexScan(new IndexType(IndexType.B_Index),
+          "test1.in",
+          "BTreeIndex",
+          attrType,
+          attrSize,
+          2,
+          2,
+          projlist,
+          expr,
+          2,
+          false);
     } catch (Exception e) {
       status = FAIL;
       e.printStackTrace();
     }
-
 
     count = 16; // because starting from dsilva
     t = null;
@@ -538,7 +568,6 @@ class IndexDriver extends TestDriver
 
     return status;
   }
-
 
   protected boolean test3() {
     System.out.println("------------------------ TEST 3 --------------------------");
@@ -702,12 +731,21 @@ class IndexDriver extends TestDriver
     // start index scan
     IndexScan iscan = null;
     try {
-      iscan = new IndexScan(new IndexType(IndexType.B_Index), "test3.in", "BTIndex", attrType, attrSize, 4, 4, projlist, expr, 3, false);
+      iscan = new IndexScan(new IndexType(IndexType.B_Index),
+          "test3.in",
+          "BTIndex",
+          attrType,
+          attrSize,
+          4,
+          4,
+          projlist,
+          expr,
+          3,
+          false);
     } catch (Exception e) {
       status = FAIL;
       e.printStackTrace();
     }
-
 
     t = null;
     int iout = 0;
