@@ -1,14 +1,10 @@
 package bufmgr;
-import chainexception.*;
 
-public class InvalidFrameNumberException extends ChainException{
+import chainexception.ChainException;
 
-  
-  public InvalidFrameNumberException(Exception e, String name)
-  { super(e, name); }
- 
+public class InvalidFrameNumberException extends ChainException {
 
-
+  public InvalidFrameNumberException(Exception e, String name) {super(e, name);}
 }
 
 

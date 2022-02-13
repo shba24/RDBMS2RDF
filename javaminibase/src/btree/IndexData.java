@@ -1,33 +1,49 @@
 package btree;
-import global.*;
- 
-/**  IndexData: It extends the DataClass.
- *   It defines the data "pageNo" for index node in B++ tree.
+
+import global.PageId;
+
+/**
+ * IndexData: It extends the DataClass.
+ * It defines the data "pageNo" for index node in B++ tree.
  */
 public class IndexData extends DataClass {
   private PageId pageId;
 
+  /**
+   * Class constructor
+   *
+   * @param pageNo the page number
+   */
+  IndexData(PageId pageNo) {pageId = new PageId(pageNo.pid);}
+
+  /**
+   * Class constructor
+   *
+   * @param pageNo the page number
+   */
+  IndexData(int pageNo) {pageId = new PageId(pageNo);}
+
+  ;
+
   public String toString() {
-     return (new Integer(pageId.pid)).toString();
+    return (new Integer(pageId.pid)).toString();
   }
 
-  /** Class constructor
-   *  @param     pageNo  the page number
+  ;
+
+  /**
+   * get a copy of the pageNo
+   *
+   * @return the reference of the copy
    */
-  IndexData(PageId  pageNo) { pageId = new PageId(pageNo.pid);};  
+  protected PageId getData() {return new PageId(pageId.pid);}
 
-  /** Class constructor
-   *  @param     pageNo  the page number
+  ;
+
+  /**
+   * set the pageNo
    */
-  IndexData(int  pageNo) { pageId = new PageId(pageNo);};  
+  protected void setData(PageId pageNo) {pageId = new PageId(pageNo.pid);}
 
-
-  /** get a copy of the pageNo
-  *  @return the reference of the copy 
-  */
-  protected PageId getData() {return new PageId(pageId.pid); };
-
-  /** set the pageNo 
-   */ 
-  protected void setData(PageId pageNo) {pageId= new PageId(pageNo.pid);};
+  ;
 }   

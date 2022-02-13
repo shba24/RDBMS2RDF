@@ -1,14 +1,14 @@
 package tests;
 
-import java.io.*;
-import java.util.*;
-import java.lang.*;
-
-import heap.*;
-import bufmgr.*;
-import diskmgr.*;
-import global.*;
-import chainexception.*;
+import chainexception.ChainException;
+import global.Convert;
+import global.GlobalConst;
+import global.RID;
+import global.SystemDefs;
+import heap.Heapfile;
+import heap.Scan;
+import heap.Tuple;
+import java.io.IOException;
 
 /**
  * Note that in JAVA, methods can't be overridden to be more private.
@@ -20,9 +20,8 @@ class HFDriver extends TestDriver implements GlobalConst {
 
   private final static boolean OK = true;
   private final static boolean FAIL = false;
-
-  private int choice;
   private final static int reclen = 32;
+  private int choice;
 
   public HFDriver() {
     super("hptest");
@@ -30,7 +29,6 @@ class HFDriver extends TestDriver implements GlobalConst {
     //choice = 2000;   // big enough for file to occupy > 1 directory page
     //choice = 5;
   }
-
 
   public boolean runTests() {
 
@@ -249,8 +247,9 @@ class HFDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.println("  Test 1 completed successfully.\n");
+    }
 
     return status;
   }
@@ -301,8 +300,12 @@ class HFDriver extends TestDriver implements GlobalConst {
 
         if (!done && status == OK) {
           boolean odd = true;
-          if (i % 2 == 1) odd = true;
-          if (i % 2 == 0) odd = false;
+          if (i % 2 == 1) {
+            odd = true;
+          }
+          if (i % 2 == 0) {
+            odd = false;
+          }
           if (odd) {       // Delete the odd-numbered ones.
             try {
               status = f.deleteRecord(rid);
@@ -384,10 +387,10 @@ class HFDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.println("  Test 2 completed successfully.\n");
+    }
     return status;
-
   }
 
   protected boolean test3() {
@@ -475,7 +478,6 @@ class HFDriver extends TestDriver implements GlobalConst {
     if (status == OK && SystemDefs.JavabaseBM.getNumUnpinnedBuffers()
         != SystemDefs.JavabaseBM.getNumBuffers()) {
 
-
       System.out.println("t3, Number of unpinned buffers: "
           + SystemDefs.JavabaseBM.getNumUnpinnedBuffers() + "\n");
       System.err.println("t3, getNumbfrs: " + SystemDefs.JavabaseBM.getNumBuffers() + "\n");
@@ -541,7 +543,6 @@ class HFDriver extends TestDriver implements GlobalConst {
             e.printStackTrace();
           }
 
-
           if ((rec.ival != i) || (rec.fval != (float) i * 7)
               || (rec2.ival != i) || (rec2.fval != i * 7)) {
             System.err.println("*** Record " + i
@@ -553,16 +554,15 @@ class HFDriver extends TestDriver implements GlobalConst {
             status = FAIL;
             break;
           }
-
         }
         i += 2;     // Because we deleted the odd ones...
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.println("  Test 3 completed successfully.\n");
+    }
     return status;
-
   }
 
   //deal with variable size records.  it's probably easier to re-write
@@ -570,7 +570,6 @@ class HFDriver extends TestDriver implements GlobalConst {
   protected boolean test5() {
     return true;
   }
-
 
   protected boolean test4() {
 
@@ -717,8 +716,9 @@ class HFDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.println("  Test 4 completed successfully.\n");
+    }
     return (status == OK);
   }
 
@@ -815,7 +815,6 @@ class DummyRecord {
     setIntRec(data);
     setFloRec(data);
     setStrRec(data);
-
   }
 
   /**

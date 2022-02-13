@@ -1,12 +1,17 @@
 package tests;
 //From db_driver.C
 
-import java.io.*;
-import java.util.*;
-import java.lang.*;
-
-import diskmgr.*;
-import global.*;
+import diskmgr.DuplicateEntryException;
+import diskmgr.FileEntryNotFoundException;
+import diskmgr.FileNameTooLongException;
+import diskmgr.InvalidRunSizeException;
+import diskmgr.OutOfSpaceException;
+import diskmgr.Page;
+import global.Convert;
+import global.GlobalConst;
+import global.PageId;
+import global.SystemDefs;
+import java.io.IOException;
 
 /**
  * Note that in JAVA, methods can't be overridden to be more private.
@@ -23,7 +28,6 @@ class DBDriver extends TestDriver implements GlobalConst {
   public DBDriver() {
     super("dbtest");
   }
-
 
   public boolean runTests() {
 
@@ -137,7 +141,6 @@ class DBDriver extends TestDriver implements GlobalConst {
       }
     }
 
-
     if (status == OK) {
       System.out.print("  - Write something on some of them\n");
       for (int i = 0; i < 20 && status == OK; ++i) {
@@ -180,11 +183,11 @@ class DBDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  Test 1 completed successfully.\n");
+    }
 
     return status;
-
   }
 
   protected boolean test2() {
@@ -196,7 +199,6 @@ class DBDriver extends TestDriver implements GlobalConst {
 
     PageId pgid = new PageId();
     pgid.pid = 0;
-
 
     System.out.print("  - Delete some of the file entries\n");
     for (int i = 0; i < 3 && status == OK; ++i) {
@@ -228,7 +230,6 @@ class DBDriver extends TestDriver implements GlobalConst {
     if (status == OK) {
       System.out.print("  - Read stuff back from pages we wrote in test 1\n");
 
-
       for (int i = 0; i < 20 && status == OK; ++i) {
         Page pg = new Page();
         try {
@@ -255,13 +256,13 @@ class DBDriver extends TestDriver implements GlobalConst {
           System.err.print("*** Data read does not match what " +
               "was written on page " +
               (runStart.pid + i) + "\n");
-
         }
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  Test 2 completed successfully.\n");
+    }
 
     //final cleaning up before we leave the test
     PageId tmp = new PageId();
@@ -299,7 +300,6 @@ class DBDriver extends TestDriver implements GlobalConst {
       if (status == OK) {
         status = FAIL;
         System.err.println("The expected exception was not thrown\n");
-
       } else {
         status = OK;
       }
@@ -385,7 +385,6 @@ class DBDriver extends TestDriver implements GlobalConst {
         status = OK;
       }
     }
-
 
     if (status == OK) {
       System.out.print("  - Try to add a file entry whose name is too long\n");
@@ -481,8 +480,9 @@ class DBDriver extends TestDriver implements GlobalConst {
       }
     }
 
-    if (status == OK)
+    if (status == OK) {
       System.out.print("  Test 3 completed successfully.\n");
+    }
 
     return status;
   }
@@ -732,7 +732,6 @@ class DBDriver extends TestDriver implements GlobalConst {
       }
     }
 
-
     if (status == OK) {
       System.out.print("  - At this point, all pages should be claimed.  " +
           "Try to allocateone more.\n");
@@ -822,7 +821,6 @@ class DBDriver extends TestDriver implements GlobalConst {
     }
     try {
       SystemDefs.JavabaseDB.DBDestroy();
-
     } catch (IOException e) {
       System.err.println(" DB already destroyed");
     }

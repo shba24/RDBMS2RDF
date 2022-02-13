@@ -1,13 +1,12 @@
 package diskmgr;
-import chainexception.*;
+
+import chainexception.ChainException;
 
 public class InvalidPageNumberException extends ChainException {
-  
-  
-  public InvalidPageNumberException(Exception ex, String name) 
-    { 
-      super(ex, name); 
-    }
+
+  public InvalidPageNumberException(Exception ex, String name) {
+    super(ex, name);
+  }
 }
 
 

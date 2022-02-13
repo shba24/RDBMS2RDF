@@ -1,9 +1,9 @@
 package iterator;
 
-import chainexception.*;
-import java.lang.*;
+import chainexception.ChainException;
 
 public class IteratorBMException extends ChainException {
-  public IteratorBMException(String s){super(null,s);}
-  public IteratorBMException(Exception prev, String s){ super(prev,s);}
+  public IteratorBMException(String s) {super(null, s);}
+
+  public IteratorBMException(Exception prev, String s) {super(prev, s);}
 }
