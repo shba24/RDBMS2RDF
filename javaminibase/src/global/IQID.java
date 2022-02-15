@@ -1,5 +1,8 @@
 package global;
 
+/**
+ * Interface for specifying the behavior of the quadruple ID.
+ */
 public interface IQID {
     PageId getPageNo();
 
