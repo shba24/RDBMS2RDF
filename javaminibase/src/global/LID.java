@@ -34,15 +34,16 @@ public class LID implements ILID {
      * @param lid
      */
     public LID(LID lid) {
-        this.pageNo = lid.pageNo;
-        this.slotNo = lid.slotNo;
-        this.labelType = lid.labelType;
+        this.pageNo = lid.getPageNo();
+        this.slotNo = lid.getSlotNo();
+        this.labelType = lid.getLabelType();
 
         if(this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
-            this.entityID = lid.entityID;
+            this.entityID = lid.getEntityID();
         } else if(this.labelType == LabelType.PREDICATE) {
-            this.predicateID = lid.predicateID;
+            this.predicateID = lid.getPredicateID();
         }
+
     }
 
     /**
@@ -153,14 +154,14 @@ public class LID implements ILID {
      */
     @Override
     public void copyLid(LID lid) {
-        this.pageNo = lid.pageNo;
-        this.slotNo = lid.slotNo;
-        this.labelType = lid.labelType;
+        this.pageNo = lid.getPageNo();
+        this.slotNo = lid.getSlotNo();
+        this.labelType = lid.getLabelType();
 
         if(this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
-            this.entityID = lid.entityID;
+            this.entityID = lid.getEntityID();
         } else if(this.labelType == LabelType.PREDICATE) {
-            this.predicateID = lid.predicateID;
+            this.predicateID = lid.getPredicateID();
         }
     }
 
