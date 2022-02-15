@@ -29,6 +29,29 @@ public class PID implements IPID {
     this.lid=lid;
   }
 
+  @Override
+  public PageId getPageNo() {
+
+    return this.pageNo;
+  }
+
+  @Override
+  public void setPageNo(PageId pageId) {
+    this.pageNo=pageId;
+
+  }
+
+  @Override
+  public int getSlotNo() {
+
+    return this.slotNo;
+  }
+
+  @Override
+  public void setSlotNo(int slotNo) {
+    this.slotNo=slotNo;
+
+  }
 
   @Override
   public void copyPid(PID pid) {
@@ -49,7 +72,8 @@ public class PID implements IPID {
 
   @Override
   public LID returnLID() {
-    return null;
+
+    return this.lid;
   }
 
   @Override
@@ -59,29 +83,7 @@ public class PID implements IPID {
 
   }
 
-  @Override
-  public PageId getPageNo() {
 
-    return this.pageNo;
-  }
-
-  @Override
-  public void setPageNo(PageId pageId) {
-    this.pageNo=pageId;
-
-  }
-
-  @Override
-  public int getSlotNo() {
-
-    return slotNo;
-  }
-
-  @Override
-  public void setSlotNo(int slotNo) {
-    this.slotNo=slotNo;
-
-  }
 
   @Override
   public String toString() {

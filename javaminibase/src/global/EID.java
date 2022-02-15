@@ -28,6 +28,30 @@ public class EID implements IEID {
   }
 
   @Override
+  public PageId getPageNo() {
+
+    return this.pageNo;
+  }
+
+  @Override
+  public void setPageNo(PageId pageId) {
+    this.pageNo=pageId;
+
+  }
+
+  @Override
+  public int getSlotNo() {
+
+    return this.slotNo;
+  }
+
+  @Override
+  public void setSlotNo(int slotNo) {
+    this.slotNo=slotNo;
+
+  }
+
+  @Override
   public void copyPid(EID eid) {
     pageNo=eid.getPageNo();
     slotNo=eid.getSlotNo();
@@ -57,27 +81,5 @@ public class EID implements IEID {
 
   }
 
-  @Override
-  public PageId getPageNo() {
 
-    return this.pageNo;
-  }
-
-  @Override
-  public void setPageNo(PageId pageId) {
-    this.pageNo=pageId;
-
-  }
-
-  @Override
-  public int getSlotNo() {
-
-    return this.slotNo;
-  }
-
-  @Override
-  public void setSlotNo(int slotNo) {
-    this.slotNo=slotNo;
-
-  }
 }
