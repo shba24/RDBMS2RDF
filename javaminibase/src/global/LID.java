@@ -28,15 +28,15 @@ public class LID implements ILID {
     private PID predicateID;
 
     /**
-     * constructor to lid
+     * Default constructor. Nothing is being done in this constructor.
      */
     public LID() {
     }
 
     /**
-     * constructor with two fields
-     * @param pageNo - page number
-     * @param slotNo - slot number
+     * Constructor for initializing the label ID from the page ID and the slot number.
+     * @param pageNo
+     * @param slotNo
      */
     public LID(PageId pageNo, int slotNo) {
         this.pageNo = pageNo;
@@ -44,7 +44,7 @@ public class LID implements ILID {
     }
 
     /**
-     * create lid object
+     * Copy constructor to create a label ID object from another label ID object.
      * @param lid
      */
     public LID(LID lid) {
@@ -61,8 +61,8 @@ public class LID implements ILID {
     }
 
     /**
-     * gets page number
-     * @return
+     * Returns the page number associated with the label ID.
+     * @return the PageID object
      */
     @Override
     public PageId getPageNo() {
@@ -70,7 +70,7 @@ public class LID implements ILID {
     }
 
     /**
-     * sets the page number
+     * Set the page number associated with the label ID.
      * @param pageNo
      */
     @Override
@@ -79,8 +79,8 @@ public class LID implements ILID {
     }
 
     /**
-     * gets the slot number
-     * @return
+     * Returns the slot number associated with the label ID.
+     * @return the integer value of the slot number
      */
     @Override
     public int getSlotNo() {
@@ -88,7 +88,7 @@ public class LID implements ILID {
     }
 
     /**
-     * sets the slot number
+     * Set the slot number associated with the label ID.
      * @param slotNo
      */
     @Override
@@ -97,8 +97,8 @@ public class LID implements ILID {
     }
 
     /**
-     * gets the label type
-     * @return
+     * Return the LabelType enum associated with the label ID.
+     * @return the LabelType enum
      */
     @Override
     public LabelType getLabelType() {
@@ -106,7 +106,7 @@ public class LID implements ILID {
     }
 
     /**
-     * sets label type
+     * Set the LabelType enum for the label ID.
      * @param labelType
      */
     @Override
@@ -115,8 +115,8 @@ public class LID implements ILID {
     }
 
     /**
-     * gets entity id
-     * @return
+     * Returns the entity ID that this label ID is associated with.
+     * @return the entity ID (EID) object
      */
     @Override
     public EID getEntityID() {
@@ -124,7 +124,7 @@ public class LID implements ILID {
     }
 
     /**
-     * sets entity id
+     * Set the entity ID based on the entity that this label ID represents.
      * @param entityID
      */
     @Override
@@ -133,8 +133,8 @@ public class LID implements ILID {
     }
 
     /**
-     * gets predicate id
-     * @return
+     * Returns the predicate ID that this label ID is associated with.
+     * @return the predicate ID (PID) object
      */
     @Override
     public PID getPredicateID() {
@@ -142,7 +142,7 @@ public class LID implements ILID {
     }
 
     /**
-     * sets predicate id
+     * Set the predicate ID based on the predicate that this label ID represents.
      * @param predicateID
      */
     @Override
@@ -151,7 +151,8 @@ public class LID implements ILID {
     }
 
     /**
-     * Copy of lid
+     * Copy the state of the specified label ID. The implementation
+     * of this function should be the same as the copy constructor.
      * @param lid
      */
     @Override
@@ -161,9 +162,9 @@ public class LID implements ILID {
     }
 
     /**
-     * compares lid
+     * Check if the specified label ID and this label ID are equal.
      * @param lid
-     * @return
+     * @return boolean value indicating if they are equal
      */
     @Override
     public boolean equals(LID lid) {
@@ -171,8 +172,8 @@ public class LID implements ILID {
     }
 
     /**
-     * returns entity id
-     * @return
+     * Returns the entity ID that this label ID is associated with.
+     * @return the entity ID (EID) object
      */
     @Override
     public EID returnEID() {
@@ -180,8 +181,8 @@ public class LID implements ILID {
     }
 
     /**
-     * return predicate id
-     * @return
+     * Returns the predicate ID that this label ID is associated with.
+     * @return the predicate ID (PID) object
      */
     @Override
     public PID returnPID() {
@@ -203,6 +204,11 @@ public class LID implements ILID {
         Convert.setIntValue(pageNo.pid, offset + 4, array);
     }
 
+    /**
+     * Returns a string representation of the label ID.
+     *
+     * @return the string representation
+     */
     @Override
     public String toString() {
         return "LID{" +
