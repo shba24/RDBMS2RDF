@@ -34,16 +34,20 @@ public class LID implements ILID {
      * @param lid
      */
     public LID(LID lid) {
-        this.pageNo = lid.getPageNo();
+        this.pageNo =  new PageId();
+        this.pageNo.copyPageId(lid.pageNo);
         this.slotNo = lid.getSlotNo();
+
+        // will get a copy of the reference pointing to the singleton
         this.labelType = lid.getLabelType();
 
         if(this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
-            this.entityID = lid.getEntityID();
+            this.entityID = new EID();
+            this.entityID.copyEid(lid.getEntityID());
         } else if(this.labelType == LabelType.PREDICATE) {
-            this.predicateID = lid.getPredicateID();
+            this.predicateID = new PID();
+            this.predicateID.copyPid(lid.getPredicateID());
         }
-
     }
 
     /**
@@ -154,14 +158,19 @@ public class LID implements ILID {
      */
     @Override
     public void copyLid(LID lid) {
-        this.pageNo = lid.getPageNo();
+        this.pageNo =  new PageId();
+        this.pageNo.copyPageId(lid.pageNo);
         this.slotNo = lid.getSlotNo();
+
+        // will get a copy of the reference pointing to the singleton
         this.labelType = lid.getLabelType();
 
         if(this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
-            this.entityID = lid.getEntityID();
+            this.entityID = new EID();
+            this.entityID.copyEid(lid.getEntityID());
         } else if(this.labelType == LabelType.PREDICATE) {
-            this.predicateID = lid.getPredicateID();
+            this.predicateID = new PID();
+            this.predicateID.copyPid(lid.getPredicateID());
         }
     }
 
