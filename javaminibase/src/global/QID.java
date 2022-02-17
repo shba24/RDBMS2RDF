@@ -21,8 +21,7 @@ public class QID implements IQID {
      * @param slotNo
      */
     public QID(PageId pageNo, int slotNo) {
-        this.pageNo = new PageId();
-        this.pageNo.copyPageId(pageNo);
+        this.pageNo = new PageId(pageNo.pid);
         this.slotNo = slotNo;
     }
 
@@ -32,8 +31,7 @@ public class QID implements IQID {
      * @param qid
      */
     public QID(QID qid) {
-        this.pageNo = new PageId();
-        this.pageNo.copyPageId(qid.pageNo);
+        this.pageNo = new PageId(qid.pageNo.pid);
         this.slotNo = qid.getSlotNo();
     }
 
@@ -85,8 +83,7 @@ public class QID implements IQID {
      */
     @Override
     public void copyQid(QID qid) {
-        this.pageNo = new PageId();
-        this.pageNo.copyPageId(qid.pageNo);
+        this.pageNo = new PageId(qid.pageNo.pid);
         this.slotNo = qid.getSlotNo();
     }
 
