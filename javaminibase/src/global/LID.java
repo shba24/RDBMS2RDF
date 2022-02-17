@@ -34,7 +34,7 @@ public class LID implements ILID {
      * @param lid
      */
     public LID(LID lid) {
-        this.pageNo =  new PageId();
+        this.pageNo = new PageId();
         this.pageNo.copyPageId(lid.pageNo);
         this.slotNo = lid.getSlotNo();
 

@@ -85,7 +85,8 @@ public class QID implements IQID {
      */
     @Override
     public void copyQid(QID qid) {
-        this.pageNo = qid.getPageNo();
+        this.pageNo = new PageId();
+        this.pageNo.copyPageId(qid.pageNo);
         this.slotNo = qid.getSlotNo();
     }
 
