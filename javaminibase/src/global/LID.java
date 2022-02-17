@@ -34,7 +34,7 @@ public class LID implements ILID {
      * @param lid
      */
     public LID(LID lid) {
-        this.pageNo = new PageId(lid.pageNo.pid);
+        this.pageNo = new PageId(lid.getPageNo().pid);
         this.slotNo = lid.getSlotNo();
 
         // will get a copy of the reference pointing to the singleton
@@ -155,7 +155,7 @@ public class LID implements ILID {
      */
     @Override
     public void copyLid(LID lid) {
-        this.pageNo = new PageId(lid.pageNo.pid);
+        this.pageNo = new PageId(lid.getPageNo().pid);
         this.slotNo = lid.getSlotNo();
 
         // will get a copy of the reference pointing to the singleton
@@ -176,7 +176,7 @@ public class LID implements ILID {
      */
     @Override
     public boolean equals(LID lid) {
-        return (this.pageNo.pid == lid.pageNo.pid) && (this.slotNo == lid.slotNo);
+        return (this.pageNo.pid == lid.getPageNo().pid) && (this.slotNo == lid.slotNo);
     }
 
     /**

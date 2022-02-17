@@ -31,7 +31,7 @@ public class QID implements IQID {
      * @param qid
      */
     public QID(QID qid) {
-        this.pageNo = new PageId(qid.pageNo.pid);
+        this.pageNo = new PageId(qid.getPageNo().pid);
         this.slotNo = qid.getSlotNo();
     }
 
@@ -83,7 +83,7 @@ public class QID implements IQID {
      */
     @Override
     public void copyQid(QID qid) {
-        this.pageNo = new PageId(qid.pageNo.pid);
+        this.pageNo = new PageId(qid.getPageNo().pid);
         this.slotNo = qid.getSlotNo();
     }
 
@@ -110,7 +110,7 @@ public class QID implements IQID {
      */
     @Override
     public boolean equals(QID qid) {
-        return (this.pageNo.pid == qid.pageNo.pid) && (this.slotNo == qid.slotNo);
+        return (this.pageNo.pid == qid.getPageNo().pid) && (this.slotNo == qid.slotNo);
     }
 
     /**
