@@ -1,5 +1,8 @@
 package global;
 
+/**
+ * Interface for specifying the behaviour of label ID.
+ */
 public interface ILID {
     PageId getPageNo();
 

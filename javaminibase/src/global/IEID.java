@@ -1,6 +1,6 @@
 package global;
 
-import java.io.IOException;
+import java.io.*;
 
 public interface IEID {
 

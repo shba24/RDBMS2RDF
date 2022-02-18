@@ -1,6 +1,10 @@
+/**
+ * Implementation of the class for Predicate ID.
+ */
+
 package global;
 
-import java.io.IOException;
+import java.io.*;
 
 public class PID implements IPID {
 
@@ -12,16 +16,29 @@ public class PID implements IPID {
 
   private LabelType labelType;
 
-  /*default constructor of class
+  /**
+   * Default constructor. Nothing is being done in this constructor.
    */
   public PID(){}
 
+  /**
+   * Constructor for initializing the Predicate ID from the page ID and the slot number.
+   *
+   * @param pageNo
+   * @param slotNo
+   */
   public PID(PageId pageNo, int slotNo)
   {
     this.slotNo=slotNo;
     this.pageNo=pageNo;
   }
 
+
+  /**
+   * constructor to create a Predicate ID object from another label ID object.
+   *
+   * @param lid
+   */
   public PID(LID lid)
   {
     this.slotNo=lid.getSlotNo();
@@ -29,30 +46,69 @@ public class PID implements IPID {
     this.lid=lid;
   }
 
+
+  /**
+   * Copy constructor to create a Predicate ID object from another Predicate ID object.
+   *
+   * @param predicateID
+   */
+  public PID(PID predicateID) {
+      this.slotNo=predicateID.slotNo;
+      this.pageNo=predicateID.pageNo;
+      this.lid=predicateID.lid;
+      this.labelType=predicateID.labelType;
+  }
+
+  /**
+   * Returns the page number associated with the Predicate ID.
+   *
+   * @return the PageID object
+   */
   @Override
   public PageId getPageNo() {
 
     return this.pageNo;
   }
 
+  /**
+   * Set the page number associated with the Predicate ID.
+   *
+   * @param pageId object
+   */
   @Override
   public void setPageNo(PageId pageId) {
     this.pageNo=pageId;
 
   }
 
+  /**
+   * Returns the slot number associated with the Predicate ID.
+   *
+   * @return the integer value of the slot number
+   */
   @Override
   public int getSlotNo() {
 
     return this.slotNo;
   }
 
+  /**
+   * Set the slot number associated with the Predicate ID.
+   *
+   * @param slotNo
+   */
   @Override
   public void setSlotNo(int slotNo) {
     this.slotNo=slotNo;
 
   }
 
+  /**
+   * Copy the state of the specified Predicate ID. The implementation
+   * of this function should be the same as the copy constructor.
+   *
+   * @param pid
+   */
   @Override
   public void copyPid(PID pid) {
     pageNo=pid.getPageNo();
@@ -60,6 +116,12 @@ public class PID implements IPID {
 
   }
 
+  /**
+   * Check if the specified Predicate ID and this Predicate ID are equal.
+   *
+   * @param pid
+   * @return boolean value indicating if they are equal
+   */
   @Override
   public boolean equals(PID pid) {
 
@@ -70,19 +132,32 @@ public class PID implements IPID {
       return false;
   }
 
+  /**
+   * Returns the label ID that this Predicate ID is associated with.
+   *
+   * @return the label ID (LID) object
+   */
   @Override
   public LID returnLID() {
 
     return this.lid;
   }
 
+  /**
+   * Write the Predicate ID into a byte array at the specified offset.
+   * The first 4 bytes after the offset will store the slot number and
+   * the next 4 bytes will store the page ID.
+   *
+   * @param ary  the specified byte array
+   * @param offset the offset of byte array to write
+   * @throws java.io.IOException I/O errors
+   */
   @Override
   public void writeToByteArray(byte[] ary, int offset) throws java.io.IOException {
     Convert.setIntValue ( slotNo, offset, ary);
     Convert.setIntValue ( pageNo.pid, offset+4, ary);
 
   }
-
 
 
   @Override
