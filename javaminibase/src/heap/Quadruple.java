@@ -35,7 +35,7 @@ public class Quadruple {
     attrType[2] = new AttrType(AttrType.attrString);
     attrType[3] = new AttrType(AttrType.attrReal);
 
-    short[] attrSize = new short[4];
+    short[] attrSize = new short[3];
     attrSize[0] = GlobalConst.MAX_EID_OBJ_SIZE;
     attrSize[1] = GlobalConst.MAX_PID_OBJ_SIZE;
     attrSize[2] = GlobalConst.MAX_EID_OBJ_SIZE;
@@ -56,7 +56,11 @@ public class Quadruple {
    * @param aquadruple array of quadruples
    * @param offset     offset to add quadruples at
    */
-  public Quadruple(byte[] aquadruple, int offset) {
+  public Quadruple(byte[] aquadruple, int offset) throws Exception {
+    if (aquadruple.length > Tuple.max_size) {
+      throw new Exception("[Quadruple] Error, aquadruple byte " +
+          "array length exceeds max allowed size");
+    }
     tuple = new Tuple(aquadruple, offset, 4);
   }
 
