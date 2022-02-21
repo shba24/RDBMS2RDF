@@ -1,7 +1,5 @@
 package global;
 
-import global.*;
-
 /**
  * Implementation of the class for label ID.
  */
