@@ -1,7 +1,6 @@
 package global;
 
 import lombok.Data;
-import java.io.IOException;
 
 /**
  * Label
@@ -15,9 +14,7 @@ public class Label {
     /**
      * label name
      */
-    private String label;
-
-    private LabelType labelType;
+    private String labelName;
 
     /**
      * Constructor to label class
@@ -27,69 +24,30 @@ public class Label {
     }
 
     /**
-     * insert label and return LID
-     * @param label - label to be inserted
-     * @return
-     */
-    public LID insertLabel(Label label) {
-
-        Label newLabel = new Label();
-        newLabel.setLabel(label.label);
-        newLabel.setLabelType(label.labelType);
-
-        return newLabel.getLid();
-    }
-
-    /**
-     * Update label and return if success
-     * @param lid - lid of label to be updated
-     * @param newLabel - label object
-     * @return
-     */
-    public boolean updateLabel(LID lid, Label newLabel) {
-        if(this.getLid().equals(lid)) {
-            this.setLabel(newLabel.label);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Delete label with given lid and returns if success
-     * @param lid given lid
-     * @return
-     */
-    public boolean deleteLabel(LID lid) {
-        if(this.getLid().equals(lid)) {
-            this.setLabel("");
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Gets a label
      * @return
      */
-    public Label getLabel() {
-        return this;
+    public String getLabel() {
+        return this.getLabelName();
     }
 
     /**
      * sets the label
-     * @param label given label
+     * @param labelName given label
      * @return
      */
-    public Label setLabel(String label) {
+    public Label setLabel(String labelName) {
 
-        this.label = label;
-        return this;
+        Label newLabel = new Label();
+        newLabel.setLabelName(labelName);
+
+        return newLabel;
     }
 
     /**
      * print the label
      */
     public void print() {
-        System.out.println(this);
+        System.out.println(this.getLabel());
     }
 }

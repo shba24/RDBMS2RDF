@@ -1,30 +1,16 @@
 package global;
 
+import global.*;
+
+/**
+ * Implementation of the class for label ID.
+ */
 public class LID implements ILID {
 
-    /**
-     * page id
-     */
     private PageId pageNo;
-
-    /**
-     * slot number
-     */
     private int slotNo;
-
-    /**
-     * label type
-     */
     private LabelType labelType;
-
-    /**
-     * entity id
-     */
     private EID entityID;
-
-    /**
-     * predicate id
-     */
     private PID predicateID;
 
     /**
@@ -35,6 +21,7 @@ public class LID implements ILID {
 
     /**
      * Constructor for initializing the label ID from the page ID and the slot number.
+     *
      * @param pageNo
      * @param slotNo
      */
@@ -45,6 +32,7 @@ public class LID implements ILID {
 
     /**
      * Copy constructor to create a label ID object from another label ID object.
+     *
      * @param lid
      */
     public LID(LID lid) {
@@ -59,11 +47,11 @@ public class LID implements ILID {
         } else if(this.labelType == LabelType.PREDICATE) {
             this.predicateID = new PID(lid.getPredicateID());
         }
-
     }
 
     /**
      * Returns the page number associated with the label ID.
+     *
      * @return the PageID object
      */
     @Override
@@ -73,6 +61,7 @@ public class LID implements ILID {
 
     /**
      * Set the page number associated with the label ID.
+     *
      * @param pageNo
      */
     @Override
@@ -82,6 +71,7 @@ public class LID implements ILID {
 
     /**
      * Returns the slot number associated with the label ID.
+     *
      * @return the integer value of the slot number
      */
     @Override
@@ -91,6 +81,7 @@ public class LID implements ILID {
 
     /**
      * Set the slot number associated with the label ID.
+     *
      * @param slotNo
      */
     @Override
@@ -100,6 +91,7 @@ public class LID implements ILID {
 
     /**
      * Return the LabelType enum associated with the label ID.
+     *
      * @return the LabelType enum
      */
     @Override
@@ -109,6 +101,7 @@ public class LID implements ILID {
 
     /**
      * Set the LabelType enum for the label ID.
+     *
      * @param labelType
      */
     @Override
@@ -118,6 +111,7 @@ public class LID implements ILID {
 
     /**
      * Returns the entity ID that this label ID is associated with.
+     *
      * @return the entity ID (EID) object
      */
     @Override
@@ -127,6 +121,7 @@ public class LID implements ILID {
 
     /**
      * Set the entity ID based on the entity that this label ID represents.
+     *
      * @param entityID
      */
     @Override
@@ -136,6 +131,7 @@ public class LID implements ILID {
 
     /**
      * Returns the predicate ID that this label ID is associated with.
+     *
      * @return the predicate ID (PID) object
      */
     @Override
@@ -145,6 +141,7 @@ public class LID implements ILID {
 
     /**
      * Set the predicate ID based on the predicate that this label ID represents.
+     *
      * @param predicateID
      */
     @Override
@@ -155,6 +152,7 @@ public class LID implements ILID {
     /**
      * Copy the state of the specified label ID. The implementation
      * of this function should be the same as the copy constructor.
+     *
      * @param lid
      */
     @Override
@@ -174,6 +172,7 @@ public class LID implements ILID {
 
     /**
      * Check if the specified label ID and this label ID are equal.
+     *
      * @param lid
      * @return boolean value indicating if they are equal
      */
@@ -184,6 +183,7 @@ public class LID implements ILID {
 
     /**
      * Returns the entity ID that this label ID is associated with.
+     *
      * @return the entity ID (EID) object
      */
     @Override
@@ -193,6 +193,7 @@ public class LID implements ILID {
 
     /**
      * Returns the predicate ID that this label ID is associated with.
+     *
      * @return the predicate ID (PID) object
      */
     @Override
@@ -212,7 +213,21 @@ public class LID implements ILID {
     @Override
     public void writeToByteArray(byte[] array, int offset) throws java.io.IOException {
         Convert.setIntValue(slotNo, offset, array);
+        // 4 bytes ahead of slot no
         Convert.setIntValue(pageNo.pid, offset + 4, array);
+        // 8 bytes ahead of slot number and page ID
+        Convert.setCharValue(labelType.getAsChar(), offset + 4 + 4, array);
+
+        /*
+         TODO: Need to write the entity ID or the predicate ID to the byte array
+         once the member is available.
+         */
+
+        if(labelType == LabelType.SUBJECT || labelType == LabelType.OBJECT) {
+//            Convert.setIntValue(entityID.eid, offset + 4 + 4 + 1, array);
+        } else if(labelType == LabelType.PREDICATE) {
+//            Convert.setIntValue(predicateID.pid, offset + 4 + 4 + 1, array);
+        }
     }
 
     /**
