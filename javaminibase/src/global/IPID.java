@@ -5,9 +5,11 @@ import java.io.IOException;
 public interface IPID {
 
   PageId getPageNo();
+
   void setPageNo(PageId pageId);
 
   int getSlotNo();
+
   void setSlotNo(int slotNo);
 
 

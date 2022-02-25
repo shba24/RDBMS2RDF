@@ -18,18 +18,18 @@ public class EID implements IEID {
   /**
    * Default constructor. Nothing is being done in this constructor.
    */
-  public EID(){}
+  public EID() {
+  }
 
   /**
    * constructor to create a Entity ID object from another label ID object.
    *
    * @param lid
    */
-  public EID(LID lid)
-  {
-    this.slotNo=lid.getSlotNo();
-    this.pageNo=lid.getPageNo();
-    this.lid=lid;
+  public EID(LID lid) {
+    this.slotNo = lid.getSlotNo();
+    this.pageNo = lid.getPageNo();
+    this.lid = lid;
   }
 
   /**
@@ -38,10 +38,9 @@ public class EID implements IEID {
    * @param pageNo
    * @param slotNo
    */
-  public EID(PageId pageNo, int slotNo)
-  {
-    this.slotNo=slotNo;
-    this.pageNo=pageNo;
+  public EID(PageId pageNo, int slotNo) {
+    this.slotNo = slotNo;
+    this.pageNo = pageNo;
   }
 
   /**
@@ -50,10 +49,10 @@ public class EID implements IEID {
    * @param entityID
    */
   public EID(EID entityID) {
-    this.slotNo=entityID.slotNo;
-    this.pageNo=entityID.pageNo;
-    this.lid=entityID.lid;
-    this.labelType=entityID.labelType;
+    this.slotNo = entityID.slotNo;
+    this.pageNo = entityID.pageNo;
+    this.lid = entityID.lid;
+    this.labelType = entityID.labelType;
 
   }
 
@@ -76,7 +75,7 @@ public class EID implements IEID {
    */
   @Override
   public void setPageNo(PageId pageId) {
-    this.pageNo=pageId;
+    this.pageNo = pageId;
 
   }
 
@@ -98,20 +97,20 @@ public class EID implements IEID {
    */
   @Override
   public void setSlotNo(int slotNo) {
-    this.slotNo=slotNo;
+    this.slotNo = slotNo;
 
   }
 
   /**
-   * Copy the state of the specified Entity ID. The implementation
-   * of this function should be the same as the copy constructor.
+   * Copy the state of the specified Entity ID. The implementation of this function should be the
+   * same as the copy constructor.
    *
    * @param eid
    */
   @Override
   public void copyPid(EID eid) {
-    pageNo=eid.getPageNo();
-    slotNo=eid.getSlotNo();
+    pageNo = eid.getPageNo();
+    slotNo = eid.getSlotNo();
 
   }
 
@@ -123,11 +122,12 @@ public class EID implements IEID {
    */
   @Override
   public boolean equals(EID eid) {
-    if ((this.pageNo.pid==eid.pageNo.pid)
-            &&(this.slotNo==eid.slotNo))
+    if ((this.pageNo.pid == eid.pageNo.pid)
+        && (this.slotNo == eid.slotNo)) {
       return true;
-    else
+    } else {
       return false;
+    }
   }
 
   /**
@@ -142,9 +142,8 @@ public class EID implements IEID {
   }
 
   /**
-   * Write the Entity ID into a byte array at the specified offset.
-   * The first 4 bytes after the offset will store the slot number and
-   * the next 4 bytes will store the page ID.
+   * Write the Entity ID into a byte array at the specified offset. The first 4 bytes after the
+   * offset will store the slot number and the next 4 bytes will store the page ID.
    *
    * @param array  the specified byte array
    * @param offset the offset of byte array to write
@@ -153,8 +152,8 @@ public class EID implements IEID {
   @Override
   public void writeToByteArray(byte[] array, int offset) throws IOException {
 
-    Convert.setIntValue ( slotNo, offset, array);
-    Convert.setIntValue ( pageNo.pid, offset+4, array);
+    Convert.setIntValue(slotNo, offset, array);
+    Convert.setIntValue(pageNo.pid, offset + 4, array);
 
   }
 

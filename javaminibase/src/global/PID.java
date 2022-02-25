@@ -19,7 +19,8 @@ public class PID implements IPID {
   /**
    * Default constructor. Nothing is being done in this constructor.
    */
-  public PID(){}
+  public PID() {
+  }
 
   /**
    * Constructor for initializing the Predicate ID from the page ID and the slot number.
@@ -27,10 +28,9 @@ public class PID implements IPID {
    * @param pageNo
    * @param slotNo
    */
-  public PID(PageId pageNo, int slotNo)
-  {
-    this.slotNo=slotNo;
-    this.pageNo=pageNo;
+  public PID(PageId pageNo, int slotNo) {
+    this.slotNo = slotNo;
+    this.pageNo = pageNo;
   }
 
 
@@ -39,11 +39,10 @@ public class PID implements IPID {
    *
    * @param lid
    */
-  public PID(LID lid)
-  {
-    this.slotNo=lid.getSlotNo();
-    this.pageNo=lid.getPageNo();
-    this.lid=lid;
+  public PID(LID lid) {
+    this.slotNo = lid.getSlotNo();
+    this.pageNo = lid.getPageNo();
+    this.lid = lid;
   }
 
 
@@ -53,10 +52,10 @@ public class PID implements IPID {
    * @param predicateID
    */
   public PID(PID predicateID) {
-      this.slotNo=predicateID.slotNo;
-      this.pageNo=predicateID.pageNo;
-      this.lid=predicateID.lid;
-      this.labelType=predicateID.labelType;
+    this.slotNo = predicateID.slotNo;
+    this.pageNo = predicateID.pageNo;
+    this.lid = predicateID.lid;
+    this.labelType = predicateID.labelType;
   }
 
   /**
@@ -77,7 +76,7 @@ public class PID implements IPID {
    */
   @Override
   public void setPageNo(PageId pageId) {
-    this.pageNo=pageId;
+    this.pageNo = pageId;
 
   }
 
@@ -99,20 +98,20 @@ public class PID implements IPID {
    */
   @Override
   public void setSlotNo(int slotNo) {
-    this.slotNo=slotNo;
+    this.slotNo = slotNo;
 
   }
 
   /**
-   * Copy the state of the specified Predicate ID. The implementation
-   * of this function should be the same as the copy constructor.
+   * Copy the state of the specified Predicate ID. The implementation of this function should be the
+   * same as the copy constructor.
    *
    * @param pid
    */
   @Override
   public void copyPid(PID pid) {
-    pageNo=pid.getPageNo();
-    slotNo=pid.getSlotNo();
+    pageNo = pid.getPageNo();
+    slotNo = pid.getSlotNo();
 
   }
 
@@ -125,11 +124,12 @@ public class PID implements IPID {
   @Override
   public boolean equals(PID pid) {
 
-    if ((this.pageNo.pid==pid.pageNo.pid)
-            &&(this.slotNo==pid.slotNo))
+    if ((this.pageNo.pid == pid.pageNo.pid)
+        && (this.slotNo == pid.slotNo)) {
       return true;
-    else
+    } else {
       return false;
+    }
   }
 
   /**
@@ -144,18 +144,17 @@ public class PID implements IPID {
   }
 
   /**
-   * Write the Predicate ID into a byte array at the specified offset.
-   * The first 4 bytes after the offset will store the slot number and
-   * the next 4 bytes will store the page ID.
+   * Write the Predicate ID into a byte array at the specified offset. The first 4 bytes after the
+   * offset will store the slot number and the next 4 bytes will store the page ID.
    *
-   * @param ary  the specified byte array
+   * @param ary    the specified byte array
    * @param offset the offset of byte array to write
    * @throws java.io.IOException I/O errors
    */
   @Override
   public void writeToByteArray(byte[] ary, int offset) throws java.io.IOException {
-    Convert.setIntValue ( slotNo, offset, ary);
-    Convert.setIntValue ( pageNo.pid, offset+4, ary);
+    Convert.setIntValue(slotNo, offset, ary);
+    Convert.setIntValue(pageNo.pid, offset + 4, ary);
 
   }
 
@@ -163,10 +162,10 @@ public class PID implements IPID {
   @Override
   public String toString() {
     return "PID{" +
-            "pageNo=" + pageNo +
-            ", slotNo=" + slotNo +
-            ", LID=" + lid +
-            '}';
+        "pageNo=" + pageNo +
+        ", slotNo=" + slotNo +
+        ", LID=" + lid +
+        '}';
   }
 
 }

@@ -12,8 +12,7 @@ import java.io.OutputStream;
 public class Convert {
 
   /**
-   * read 4 bytes from given byte array at the specified position
-   * convert it to an integer
+   * read 4 bytes from given byte array at the specified position convert it to an integer
    *
    * @param data     a byte array
    * @param position in data[]
@@ -41,8 +40,7 @@ public class Convert {
   }
 
   /**
-   * read 4 bytes from given byte array at the specified position
-   * convert it to a float value
+   * read 4 bytes from given byte array at the specified position convert it to a float value
    *
    * @param data     a byte array
    * @param position in data[]
@@ -70,8 +68,7 @@ public class Convert {
   }
 
   /**
-   * read 2 bytes from given byte array at the specified position
-   * convert it to a short integer
+   * read 2 bytes from given byte array at the specified position convert it to a short integer
    *
    * @param data     a byte array
    * @param position the position in data[]
@@ -99,13 +96,12 @@ public class Convert {
   }
 
   /**
-   * reads a string that has been encoded using a modified UTF-8 format from
-   * the given byte array at the specified position
+   * reads a string that has been encoded using a modified UTF-8 format from the given byte array at
+   * the specified position
    *
    * @param data     a byte array
    * @param position the position in data[]
-   * @param length   the length of the string in bytes
-   *                 (=strlength +2)
+   * @param length   the length of the string in bytes (=strlength +2)
    * @return the string
    * @throws java.io.IOException I/O errors
    */
@@ -129,8 +125,7 @@ public class Convert {
   }
 
   /**
-   * reads 2 bytes from the given byte array at the specified position
-   * convert it to a character
+   * reads 2 bytes from the given byte array at the specified position convert it to a character
    *
    * @param data     a byte array
    * @param position the position in data[]
@@ -158,10 +153,10 @@ public class Convert {
   /**
    * update an integer value in the given byte array at the specified position
    *
-   * @param data a byte array
+   * @param data     a byte array
+   * @param value    the value to be copied into the data[]
+   * @param position the position of tht value in data[]
    * @throws java.io.IOException I/O errors
-   * @param  value the value to be copied into the data[]
-   * @param  position the position of tht value in data[]
    */
   public static void setIntValue(int value, int position, byte[] data)
       throws java.io.IOException {
@@ -187,10 +182,10 @@ public class Convert {
   /**
    * update a float value in the given byte array at the specified position
    *
-   * @param data a byte array
+   * @param data     a byte array
+   * @param value    the value to be copied into the data[]
+   * @param position the position of tht value in data[]
    * @throws java.io.IOException I/O errors
-   * @param  value the value to be copied into the data[]
-   * @param  position the position of tht value in data[]
    */
   public static void setFloValue(float value, int position, byte[] data)
       throws java.io.IOException {
@@ -216,10 +211,10 @@ public class Convert {
   /**
    * update a short integer in the given byte array at the specified position
    *
-   * @param data a byte array
+   * @param data     a byte array
+   * @param value    the value to be copied into data[]
+   * @param position the position of tht value in data[]
    * @throws java.io.IOException I/O errors
-   * @param  value the value to be copied into data[]
-   * @param  position the position of tht value in data[]
    */
   public static void setShortValue(short value, int position, byte[] data)
       throws java.io.IOException {
@@ -243,8 +238,7 @@ public class Convert {
   }
 
   /**
-   * Insert or update a string in the given byte array at the specified
-   * position.
+   * Insert or update a string in the given byte array at the specified position.
    *
    * @param data     a byte array
    * @param value    the value to be copied into data[]

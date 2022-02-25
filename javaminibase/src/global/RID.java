@@ -21,7 +21,8 @@ public class RID {
   /**
    * default constructor of class
    */
-  public RID() {}
+  public RID() {
+  }
 
   /**
    * constructor of class
@@ -56,8 +57,7 @@ public class RID {
    * Compares two RID object, i.e, this to the rid
    *
    * @param rid RID object to be compared to
-   * @return true is they are equal
-   * false if not.
+   * @return true is they are equal false if not.
    */
   public boolean equals(RID rid) {
 

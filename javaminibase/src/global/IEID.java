@@ -5,9 +5,11 @@ import java.io.*;
 public interface IEID {
 
   PageId getPageNo();
+
   void setPageNo(PageId pageId);
 
   int getSlotNo();
+
   void setSlotNo(int slotNo);
 
   void copyPid(EID eid);

@@ -4,33 +4,34 @@ package global;
  * Interface for specifying the behaviour of label ID.
  */
 public interface ILID {
-    PageId getPageNo();
 
-    void setPageNo(PageId pageNo);
+  PageId getPageNo();
 
-    int getSlotNo();
+  void setPageNo(PageId pageNo);
 
-    void setSlotNo(int slotNo);
+  int getSlotNo();
 
-    LabelType getLabelType();
+  void setSlotNo(int slotNo);
 
-    void setLabelType(LabelType labelType);
+  LabelType getLabelType();
 
-    EID getEntityID();
+  void setLabelType(LabelType labelType);
 
-    void setEntityID(EID entityID);
+  EID getEntityID();
 
-    PID getPredicateID();
+  void setEntityID(EID entityID);
 
-    void setPredicateID(PID predicateID);
+  PID getPredicateID();
 
-    void copyLid(LID lid);
+  void setPredicateID(PID predicateID);
 
-    boolean equals(LID lid);
+  void copyLid(LID lid);
 
-    EID returnEID();
+  boolean equals(LID lid);
 
-    PID returnPID();
+  EID returnEID();
 
-    void writeToByteArray(byte[] array, int offset) throws java.io.IOException;
+  PID returnPID();
+
+  void writeToByteArray(byte[] array, int offset) throws java.io.IOException;
 }
