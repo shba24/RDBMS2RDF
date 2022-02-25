@@ -9,8 +9,6 @@ import lombok.Data;
 @Data
 public class Label {
 
-    private LID lid;
-
     /**
      * label name
      */
@@ -25,6 +23,7 @@ public class Label {
 
     /**
      * Gets a label
+     *
      * @return
      */
     public String getLabel() {
@@ -33,6 +32,7 @@ public class Label {
 
     /**
      * sets the label
+     *
      * @param labelName given label
      * @return
      */
