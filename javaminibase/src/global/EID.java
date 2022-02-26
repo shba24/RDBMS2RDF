@@ -43,6 +43,7 @@ public class EID implements IEID {
   public EID(PageId pageNo, int slotNo) {
     this.slotNo = slotNo;
     this.pageNo = pageNo;
+    this.lid=new LID();
   }
 
   /**
@@ -148,7 +149,7 @@ public class EID implements IEID {
   public void writeToByteArray(byte[] array, int offset) throws IOException {
     Convert.setIntValue(slotNo, offset, array);
     Convert.setIntValue(pageNo.pid, offset + 4, array);
-    Convert.setStrValue(this.lid.toString(), offset + 8, array);
+    lid.writeToByteArray(array,offset+8);
   }
 
   @Override

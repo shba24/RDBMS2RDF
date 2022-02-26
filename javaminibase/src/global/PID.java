@@ -33,6 +33,7 @@ public class PID implements IPID {
   public PID(PageId pageNo, int slotNo) {
     this.slotNo = slotNo;
     this.pageNo = pageNo;
+    this.lid=new LID();
   }
 
 
@@ -151,7 +152,7 @@ public class PID implements IPID {
   public void writeToByteArray(byte[] ary, int offset) throws java.io.IOException {
     Convert.setIntValue(this.slotNo, offset, ary);
     Convert.setIntValue(this.pageNo.pid, offset + 4, ary);
-    Convert.setStrValue(this.lid.toString(), offset + 8, ary);
+    lid.writeToByteArray(ary,offset+8);
   }
 
   @Override
