@@ -37,6 +37,32 @@ public class LHFPage {
 
   //endregion
 
+  //region Private Methods
+
+  /**
+   * Checks if the object is valid
+   *
+   * @return boolean representing the
+   * validity of object
+   */
+  private boolean IsValid() {
+    return hfpage != null;
+  }
+
+  /**
+   * Checks if the object is valid and if invalid
+   * throws exception, other does nothing
+   *
+   * @throws NullPointerException
+   */
+  private void checkNullObjectAndThrowException() throws NullPointerException {
+    if (!IsValid()) {
+      throw new NullPointerException("Label heap file page Error, Not initialized");
+    }
+  }
+
+  //endregion
+
   /**
    * Constructor of class LHFPage initialize a new page
    *
@@ -47,6 +73,7 @@ public class LHFPage {
    */
   public void init(PageId pageNo, Page apage)
       throws IOException {
+    checkNullObjectAndThrowException();
     try {
       this.hfpage.init(pageNo, apage);
     }catch (Exception e) {
@@ -64,6 +91,7 @@ public class LHFPage {
    * @param apage a page in buffer pool
    */
   public void openLHFPage(Page apage) {
+    checkNullObjectAndThrowException();
     this.hfpage.openHFpage(apage);
   }
 
@@ -72,6 +100,7 @@ public class LHFPage {
    * @return byte array
    */
   public byte[] getLHFPageArray() {
+    checkNullObjectAndThrowException();
     return this.hfpage.getHFpageArray();
   }
 
@@ -82,6 +111,7 @@ public class LHFPage {
    */
   public void dumpPage()
       throws IOException {
+    checkNullObjectAndThrowException();
     hfpage.dumpPage();
   }
 
@@ -91,6 +121,7 @@ public class LHFPage {
    */
   public PageId getPrevPage()
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.getPrevPage();
   }
 
@@ -102,6 +133,7 @@ public class LHFPage {
    */
   public void setPrevPage(PageId pageNo)
       throws IOException {
+    checkNullObjectAndThrowException();
     hfpage.setPrevPage(pageNo);
   }
 
@@ -111,6 +143,7 @@ public class LHFPage {
    */
   public PageId getNextPage()
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.getNextPage();
   }
 
@@ -122,6 +155,7 @@ public class LHFPage {
    */
   public void setNextPage(PageId pageNo)
       throws IOException {
+    checkNullObjectAndThrowException();
     hfpage.setNextPage(pageNo);
   }
 
@@ -131,6 +165,7 @@ public class LHFPage {
    */
   public PageId getCurPage()
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.getCurPage();
   }
 
@@ -142,7 +177,8 @@ public class LHFPage {
    */
   public void setCurPage(PageId pageNo)
       throws IOException {
-    hfpage.setCurPage((pageNo));
+    checkNullObjectAndThrowException();
+    hfpage.setCurPage(pageNo);
   }
 
   /**
@@ -151,6 +187,7 @@ public class LHFPage {
    */
   public short getType()
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.getType();
   }
 
@@ -162,6 +199,7 @@ public class LHFPage {
    */
   public void setType(short valtype)
       throws IOException {
+    checkNullObjectAndThrowException();
     hfpage.setType(valtype);
   }
 
@@ -171,6 +209,7 @@ public class LHFPage {
    */
   public short getSlotCnt()
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.getSlotCnt();
   }
 
@@ -184,6 +223,7 @@ public class LHFPage {
    */
   public void setSlot(int slotno, int length, int offset)
       throws IOException {
+    checkNullObjectAndThrowException();
     hfpage.setSlot(slotno, length, offset);
   }
 
@@ -194,6 +234,7 @@ public class LHFPage {
    */
   public short getSlotLength(int slotno)
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.getSlotLength(slotno);
   }
 
@@ -204,6 +245,7 @@ public class LHFPage {
    */
   public short getSlotOffset(int slotno)
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.getSlotOffset(slotno);
   }
 
@@ -215,6 +257,7 @@ public class LHFPage {
    */
   public int available_space()
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.available_space();
   }
 
@@ -226,6 +269,7 @@ public class LHFPage {
    */
   public boolean empty()
       throws IOException {
+    checkNullObjectAndThrowException();
     return hfpage.empty();
   }
 
@@ -242,6 +286,7 @@ public class LHFPage {
    */
   public ILID insertLabel(byte[] label)
       throws IOException {
+    checkNullObjectAndThrowException();
     ILID lid = new LID();
 
     RID rid;
@@ -260,13 +305,14 @@ public class LHFPage {
   }
 
   /**
-   * delete the record with the specified rid
+   * delete the record with the specified lid
    *
-   * @param lid the Label ID in C++ Status deleteRecord(const RID& rid)
+   * @param lid the Label ID in C++ Status deleteRecord(const LID& lid)
    * @throws InvalidSlotNumberException Invalid slot number
    */
   public void deleteLabel(ILID lid)
       throws InvalidSlotNumberException {
+    checkNullObjectAndThrowException();
     RID rid = new RID();
     rid.pageNo = lid.getPageNo();
     rid.slotNo = lid.getSlotNo();
@@ -287,6 +333,7 @@ public class LHFPage {
    */
   public ILID firstLabel()
       throws IOException {
+    checkNullObjectAndThrowException();
     RID rid;
     try {
       rid = hfpage.firstRecord();
@@ -311,6 +358,7 @@ public class LHFPage {
    */
   public ILID nextLID(ILID curLid)
       throws IOException {
+    checkNullObjectAndThrowException();
     RID curRid = new RID();
     curRid.slotNo = curLid.getSlotNo();
     curRid.pageNo = curLid.getPageNo();
@@ -342,7 +390,7 @@ public class LHFPage {
    */
   public Label getLabel(ILID lid)
       throws InvalidSlotNumberException {
-
+    checkNullObjectAndThrowException();
     RID rid = new RID();
     rid.pageNo = lid.getPageNo();
     rid.slotNo = lid.getSlotNo();
@@ -375,6 +423,7 @@ public class LHFPage {
    */
   public Label returnLabel(ILID lid)
       throws InvalidSlotNumberException {
+    checkNullObjectAndThrowException();
 
     RID rid = new RID();
     rid.pageNo = lid.getPageNo();
@@ -408,6 +457,7 @@ public class LHFPage {
    */
   protected void compact_slot_dir()
       throws IOException {
+    checkNullObjectAndThrowException();
     this.hfpage.compact_slot_dir();
   }
 
