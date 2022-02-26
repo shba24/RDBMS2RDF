@@ -4,17 +4,18 @@ package global;
  * Interface for specifying the behavior of the quadruple ID.
  */
 public interface IQID {
-    PageId getPageNo();
 
-    void setPageNo(PageId pageNo);
+  PageId getPageNo();
 
-    int getSlotNo();
+  void setPageNo(PageId pageNo);
 
-    void setSlotNo(int slotNo);
+  int getSlotNo();
 
-    void copyQid(QID qid);
+  void setSlotNo(int slotNo);
 
-    void writeToByteArray(byte[] array, int offset) throws java.io.IOException;
+  void copyQid(QID qid);
 
-    boolean equals(QID qid);
+  void writeToByteArray(byte[] array, int offset) throws java.io.IOException;
+
+  boolean equals(QID qid);
 }
