@@ -3,22 +3,24 @@
  */
 package global;
 
+import static global.GlobalConst.INVALID_PAGE;
+
 import java.io.*;
 
 public class EID implements IEID {
 
   private int slotNo;
-
   private PageId pageNo = new PageId();
+  private ILID lid;
 
-  private LID lid;
-
-  private LabelType labelType;
 
   /**
-   * Default constructor. Nothing is being done in this constructor.
+   * Default constructor.
    */
   public EID() {
+    this.slotNo = -1;
+    this.pageNo = new PageId(INVALID_PAGE);
+    this.lid = new LID();
   }
 
   /**
@@ -49,11 +51,9 @@ public class EID implements IEID {
    * @param entityID
    */
   public EID(EID entityID) {
-    this.slotNo = entityID.slotNo;
-    this.pageNo = entityID.pageNo;
+    this.slotNo = entityID.getSlotNo();
+    this.pageNo = entityID.getPageNo();
     this.lid = entityID.lid;
-    this.labelType = entityID.labelType;
-
   }
 
 
@@ -64,7 +64,6 @@ public class EID implements IEID {
    */
   @Override
   public PageId getPageNo() {
-
     return this.pageNo;
   }
 
@@ -76,7 +75,6 @@ public class EID implements IEID {
   @Override
   public void setPageNo(PageId pageId) {
     this.pageNo = pageId;
-
   }
 
   /**
@@ -86,7 +84,6 @@ public class EID implements IEID {
    */
   @Override
   public int getSlotNo() {
-
     return this.slotNo;
   }
 
@@ -98,7 +95,6 @@ public class EID implements IEID {
   @Override
   public void setSlotNo(int slotNo) {
     this.slotNo = slotNo;
-
   }
 
   /**
@@ -108,10 +104,10 @@ public class EID implements IEID {
    * @param eid
    */
   @Override
-  public void copyPid(EID eid) {
-    pageNo = eid.getPageNo();
-    slotNo = eid.getSlotNo();
-
+  public void copyEid(EID eid) {
+    this.pageNo = new PageId(eid.getPageNo().pid);
+    this.slotNo = eid.getSlotNo();
+    this.lid = eid.lid;
   }
 
   /**
@@ -123,7 +119,7 @@ public class EID implements IEID {
   @Override
   public boolean equals(EID eid) {
     if ((this.pageNo.pid == eid.pageNo.pid)
-        && (this.slotNo == eid.slotNo)) {
+        && (this.slotNo == eid.slotNo) && (this.lid == eid.lid)) {
       return true;
     } else {
       return false;
@@ -136,8 +132,7 @@ public class EID implements IEID {
    * @return the label ID (LID) object
    */
   @Override
-  public LID returnLID() {
-
+  public ILID returnLID() {
     return this.lid;
   }
 
@@ -151,11 +146,17 @@ public class EID implements IEID {
    */
   @Override
   public void writeToByteArray(byte[] array, int offset) throws IOException {
-
     Convert.setIntValue(slotNo, offset, array);
     Convert.setIntValue(pageNo.pid, offset + 4, array);
-
+    Convert.setStrValue(this.lid.toString(), offset + 8, array);
   }
 
-
+  @Override
+  public String toString() {
+    return "EID{" +
+        "pageNo=" + this.pageNo +
+        ", slotNo=" + this.slotNo +
+        ", LID=" + this.lid +
+        '}';
+  }
 }

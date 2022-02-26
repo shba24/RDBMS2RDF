@@ -4,22 +4,24 @@
 
 package global;
 
+import static global.GlobalConst.INVALID_PAGE;
+
 import java.io.*;
 
 public class PID implements IPID {
 
   private int slotNo;
-
   private PageId pageNo = new PageId();
+  private ILID lid;
 
-  private LID lid;
-
-  private LabelType labelType;
 
   /**
    * Default constructor. Nothing is being done in this constructor.
    */
   public PID() {
+    this.slotNo = -1;
+    this.pageNo = new PageId(INVALID_PAGE);
+    this.lid = new LID();
   }
 
   /**
@@ -52,10 +54,9 @@ public class PID implements IPID {
    * @param predicateID
    */
   public PID(PID predicateID) {
-    this.slotNo = predicateID.slotNo;
-    this.pageNo = predicateID.pageNo;
+    this.slotNo = predicateID.getSlotNo();
+    this.pageNo = predicateID.getPageNo();
     this.lid = predicateID.lid;
-    this.labelType = predicateID.labelType;
   }
 
   /**
@@ -65,7 +66,6 @@ public class PID implements IPID {
    */
   @Override
   public PageId getPageNo() {
-
     return this.pageNo;
   }
 
@@ -77,7 +77,6 @@ public class PID implements IPID {
   @Override
   public void setPageNo(PageId pageId) {
     this.pageNo = pageId;
-
   }
 
   /**
@@ -87,7 +86,6 @@ public class PID implements IPID {
    */
   @Override
   public int getSlotNo() {
-
     return this.slotNo;
   }
 
@@ -99,7 +97,6 @@ public class PID implements IPID {
   @Override
   public void setSlotNo(int slotNo) {
     this.slotNo = slotNo;
-
   }
 
   /**
@@ -110,9 +107,9 @@ public class PID implements IPID {
    */
   @Override
   public void copyPid(PID pid) {
-    pageNo = pid.getPageNo();
-    slotNo = pid.getSlotNo();
-
+    this.pageNo = new PageId(pid.getPageNo().pid);
+    this.slotNo = pid.getSlotNo();
+    this.lid = pid.lid;
   }
 
   /**
@@ -125,7 +122,7 @@ public class PID implements IPID {
   public boolean equals(PID pid) {
 
     if ((this.pageNo.pid == pid.pageNo.pid)
-        && (this.slotNo == pid.slotNo)) {
+        && (this.slotNo == pid.slotNo) && (this.lid == pid.lid)) {
       return true;
     } else {
       return false;
@@ -138,8 +135,7 @@ public class PID implements IPID {
    * @return the label ID (LID) object
    */
   @Override
-  public LID returnLID() {
-
+  public ILID returnLID() {
     return this.lid;
   }
 
@@ -153,19 +149,17 @@ public class PID implements IPID {
    */
   @Override
   public void writeToByteArray(byte[] ary, int offset) throws java.io.IOException {
-    Convert.setIntValue(slotNo, offset, ary);
-    Convert.setIntValue(pageNo.pid, offset + 4, ary);
-
+    Convert.setIntValue(this.slotNo, offset, ary);
+    Convert.setIntValue(this.pageNo.pid, offset + 4, ary);
+    Convert.setStrValue(this.lid.toString(), offset + 8, ary);
   }
-
 
   @Override
   public String toString() {
     return "PID{" +
-        "pageNo=" + pageNo +
-        ", slotNo=" + slotNo +
-        ", LID=" + lid +
+        "pageNo=" + this.pageNo +
+        ", slotNo=" + this.slotNo +
+        ", LID=" + this.lid +
         '}';
   }
-
 }

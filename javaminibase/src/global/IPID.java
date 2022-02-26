@@ -17,7 +17,7 @@ public interface IPID {
 
   boolean equals(PID pid);
 
-  LID returnLID();
+  ILID returnLID();
 
   void writeToByteArray(byte[] array, int offset) throws IOException;
 

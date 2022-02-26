@@ -2,6 +2,8 @@
 
 package global;
 
+import static global.GlobalConst.INVALID_PAGE;
+
 /**
  * class RID
  */
@@ -22,6 +24,8 @@ public class RID {
    * default constructor of class
    */
   public RID() {
+    this.slotNo=-1;
+    this.pageNo=new PageId(INVALID_PAGE);
   }
 
   /**

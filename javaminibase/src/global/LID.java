@@ -15,6 +15,10 @@ public class LID implements ILID {
    * Default constructor. Nothing is being done in this constructor.
    */
   public LID() {
+    this.pageNo = new PageId(-1);
+    int slotNo = -1;
+    EID entityID = new EID();
+    PID predicateID = new PID();
   }
 
   /**

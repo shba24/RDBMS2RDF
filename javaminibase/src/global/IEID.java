@@ -12,11 +12,11 @@ public interface IEID {
 
   void setSlotNo(int slotNo);
 
-  void copyPid(EID eid);
+  void copyEid(EID eid);
 
   boolean equals(EID eid);
 
-  LID returnLID();
+  ILID returnLID();
 
   void writeToByteArray(byte[] array, int offset) throws IOException;
 
