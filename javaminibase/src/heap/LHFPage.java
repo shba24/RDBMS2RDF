@@ -10,9 +10,7 @@ import java.io.IOException;
  * performed.
  */
 
-public class LHFPage {
-
-  private HFPage hfpage;
+public class LHFPage extends HFPage{
 
   /**
    * Default constructor
@@ -26,7 +24,7 @@ public class LHFPage {
    * @param page the given page in Page type
    */
   public LHFPage(Page page) {
-    this.hfpage = new HFPage(page);
+    super(page);
   }
 
   /**
@@ -36,7 +34,7 @@ public class LHFPage {
    * validity of object
    */
   private boolean IsValid() {
-    return hfpage != null;
+    return this != null;
   }
 
   /**
@@ -63,7 +61,7 @@ public class LHFPage {
       throws IOException {
     checkNullObjectAndThrowException();
     try {
-      this.hfpage.init(pageNo, apage);
+      super.init(pageNo, apage);
     }catch (Exception e) {
       System.err.println("Error in initializing Label");
       e.printStackTrace();
@@ -78,7 +76,7 @@ public class LHFPage {
    */
   public void openLHFPage(Page apage) {
     checkNullObjectAndThrowException();
-    this.hfpage.openHFpage(apage);
+    super.openHFpage(apage);
   }
 
 
@@ -87,7 +85,7 @@ public class LHFPage {
    */
   public byte[] getLHFPageArray() {
     checkNullObjectAndThrowException();
-    return this.hfpage.getHFpageArray();
+    return super.getHFpageArray();
   }
 
   /**
@@ -98,7 +96,7 @@ public class LHFPage {
   public void dumpPage()
       throws IOException {
     checkNullObjectAndThrowException();
-    hfpage.dumpPage();
+    super.dumpPage();
   }
 
   /**
@@ -108,7 +106,7 @@ public class LHFPage {
   public PageId getPrevPage()
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.getPrevPage();
+    return super.getPrevPage();
   }
 
   /**
@@ -120,7 +118,7 @@ public class LHFPage {
   public void setPrevPage(PageId pageNo)
       throws IOException {
     checkNullObjectAndThrowException();
-    hfpage.setPrevPage(pageNo);
+    super.setPrevPage(pageNo);
   }
 
   /**
@@ -130,7 +128,7 @@ public class LHFPage {
   public PageId getNextPage()
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.getNextPage();
+    return super.getNextPage();
   }
 
   /**
@@ -142,7 +140,7 @@ public class LHFPage {
   public void setNextPage(PageId pageNo)
       throws IOException {
     checkNullObjectAndThrowException();
-    hfpage.setNextPage(pageNo);
+    super.setNextPage(pageNo);
   }
 
   /**
@@ -152,7 +150,7 @@ public class LHFPage {
   public PageId getCurPage()
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.getCurPage();
+    return super.getCurPage();
   }
 
   /**
@@ -164,7 +162,7 @@ public class LHFPage {
   public void setCurPage(PageId pageNo)
       throws IOException {
     checkNullObjectAndThrowException();
-    hfpage.setCurPage(pageNo);
+    super.setCurPage(pageNo);
   }
 
   /**
@@ -174,7 +172,7 @@ public class LHFPage {
   public short getType()
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.getType();
+    return super.getType();
   }
 
   /**
@@ -186,7 +184,7 @@ public class LHFPage {
   public void setType(short valtype)
       throws IOException {
     checkNullObjectAndThrowException();
-    hfpage.setType(valtype);
+    super.setType(valtype);
   }
 
   /**
@@ -196,7 +194,7 @@ public class LHFPage {
   public short getSlotCnt()
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.getSlotCnt();
+    return super.getSlotCnt();
   }
 
   /**
@@ -210,7 +208,7 @@ public class LHFPage {
   public void setSlot(int slotno, int length, int offset)
       throws IOException {
     checkNullObjectAndThrowException();
-    hfpage.setSlot(slotno, length, offset);
+    super.setSlot(slotno, length, offset);
   }
 
   /**
@@ -221,7 +219,7 @@ public class LHFPage {
   public short getSlotLength(int slotno)
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.getSlotLength(slotno);
+    return super.getSlotLength(slotno);
   }
 
   /**
@@ -232,7 +230,7 @@ public class LHFPage {
   public short getSlotOffset(int slotno)
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.getSlotOffset(slotno);
+    return super.getSlotOffset(slotno);
   }
 
   /**
@@ -244,7 +242,7 @@ public class LHFPage {
   public int available_space()
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.available_space();
+    return super.available_space();
   }
 
   /**
@@ -256,7 +254,7 @@ public class LHFPage {
   public boolean empty()
       throws IOException {
     checkNullObjectAndThrowException();
-    return hfpage.empty();
+    return super.empty();
   }
 
   /**
@@ -272,7 +270,7 @@ public class LHFPage {
 
     RID rid;
     try {
-      rid = hfpage.insertRecord(label);
+      rid = super.insertRecord(label);
     } catch (Exception e) {
       System.err.println("Error in inserting Label");
       e.printStackTrace();
@@ -294,7 +292,7 @@ public class LHFPage {
     checkNullObjectAndThrowException();
     RID rid = new RID(lid.getPageNo(), lid.getSlotNo());
     try {
-      hfpage.deleteRecord(rid);
+      super.deleteRecord(rid);
     } catch (Exception e) {
       System.err.println("Error in deleting Label");
       e.printStackTrace();
@@ -311,7 +309,7 @@ public class LHFPage {
     checkNullObjectAndThrowException();
     RID rid;
     try {
-      rid = hfpage.firstRecord();
+      rid = super.firstRecord();
     } catch (Exception e) {
       System.err.println("Error in fetching first Label");
       e.printStackTrace();
@@ -333,7 +331,7 @@ public class LHFPage {
     RID curRid = new RID(curLid.getPageNo(), curLid.getSlotNo());
 
     try {
-      curRid = hfpage.nextRecord(curRid);
+      curRid = super.nextRecord(curRid);
     } catch (Exception e) {
       System.err.println("Error in fetching next Label");
       e.printStackTrace();
@@ -362,7 +360,7 @@ public class LHFPage {
 
     Tuple tuple = null;
     try {
-      tuple = hfpage.getRecord(rid);
+      tuple = super.getRecord(rid);
     } catch (Exception e) {
       System.err.println("Error in fetching Label");
       e.printStackTrace();
@@ -392,7 +390,7 @@ public class LHFPage {
 
     Tuple tuple = null;
     try {
-      tuple = hfpage.returnRecord(rid);
+      tuple = super.returnRecord(rid);
     } catch (Exception e) {
       System.err.println("Error in fetching Label in byte array");
       e.printStackTrace();
@@ -413,7 +411,7 @@ public class LHFPage {
   protected void compact_slot_dir()
       throws IOException {
     checkNullObjectAndThrowException();
-    this.hfpage.compact_slot_dir();
+    super.compact_slot_dir();
   }
 
 }
