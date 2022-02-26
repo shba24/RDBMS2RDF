@@ -1,32 +1,6 @@
 
 package global;
 
-import java.io.*;
-
-public class LID implements ILID{
-
-    private int slotNo;
-
-    /**
-     *
-     * @return slotNo
-     */
-    public int getSlotNo(){
-        return slotNo;
-    }
-
-    private PageId pageNo;
-
-    /**
-     *
-     * @return PageNo
-     */
-    public PageId getPageNo(){
-        if(pageNo == null)
-        {
-            pageNo = new PageId();
-        }
-package global;
 
 /**
  * Implementation of the class for label ID.
@@ -95,6 +69,13 @@ public class LID implements ILID {
         this.pageNo = pageNo;
     }
 
+    /**
+     *
+     * @return slotNo
+     */
+    public int getSlotNo(){
+        return slotNo;
+    }
 
     /**
      * Set the slot number associated with the label ID.
