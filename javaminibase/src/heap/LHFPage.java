@@ -12,13 +12,7 @@ import java.io.IOException;
 
 public class LHFPage {
 
-  //region Private Members
-
   private HFPage hfpage;
-
-  //endregion
-
-  //region Constructor
 
   /**
    * Default constructor
@@ -34,10 +28,6 @@ public class LHFPage {
   public LHFPage(Page page) {
     this.hfpage = new HFPage(page);
   }
-
-  //endregion
-
-  //region Private Methods
 
   /**
    * Checks if the object is valid
@@ -61,8 +51,6 @@ public class LHFPage {
     }
   }
 
-  //endregion
-
   /**
    * Constructor of class LHFPage initialize a new page
    *
@@ -82,8 +70,6 @@ public class LHFPage {
       throw e;
     }
   }
-
-  //region Page & Slot Methods
 
   /**
    * Constructor of class LHFPage open a existed LHFPage
@@ -273,10 +259,6 @@ public class LHFPage {
     return hfpage.empty();
   }
 
-  //endregion
-
-  //region Public label methods
-
   /**
    * inserts a new Label onto the page, returns LID of this Label
    *
@@ -287,7 +269,6 @@ public class LHFPage {
   public ILID insertLabel(byte[] label)
       throws IOException {
     checkNullObjectAndThrowException();
-    ILID lid = new LID();
 
     RID rid;
     try {
@@ -297,10 +278,8 @@ public class LHFPage {
       e.printStackTrace();
       throw e;
     }
-    if (rid != null) {
-      lid.setSlotNo(rid.slotNo);
-      lid.setPageNo(rid.pageNo);
-    }
+
+    ILID lid = new LID(rid.pageNo, rid.slotNo);
     return lid;
   }
 
@@ -311,15 +290,11 @@ public class LHFPage {
    * @throws InvalidSlotNumberException Invalid slot number
    */
   public void deleteLabel(ILID lid)
-      throws InvalidSlotNumberException {
+      throws InvalidSlotNumberException, IOException {
     checkNullObjectAndThrowException();
-    RID rid = new RID();
-    rid.pageNo = lid.getPageNo();
-    rid.slotNo = lid.getSlotNo();
+    RID rid = new RID(lid.getPageNo(), lid.getSlotNo());
     try {
       hfpage.deleteRecord(rid);
-    } catch (IOException e) {
-      e.printStackTrace();
     } catch (Exception e) {
       System.err.println("Error in deleting Label");
       e.printStackTrace();
@@ -343,11 +318,7 @@ public class LHFPage {
       throw e;
     }
 
-    ILID lid = new LID();
-
-    lid.setPageNo(rid.pageNo);
-    lid.setSlotNo(rid.slotNo);
-
+    ILID lid = new LID(rid.pageNo, rid.slotNo);
     return lid;
   }
 
@@ -359,9 +330,7 @@ public class LHFPage {
   public ILID nextLID(ILID curLid)
       throws IOException {
     checkNullObjectAndThrowException();
-    RID curRid = new RID();
-    curRid.slotNo = curLid.getSlotNo();
-    curRid.pageNo = curLid.getPageNo();
+    RID curRid = new RID(curLid.getPageNo(), curLid.getSlotNo());
 
     try {
       curRid = hfpage.nextRecord(curRid);
@@ -371,9 +340,7 @@ public class LHFPage {
       throw e;
     }
 
-    ILID lid = new LID();
-    lid.setSlotNo(curRid.slotNo);
-    lid.setPageNo(curRid.pageNo);
+    ILID lid = new LID(curRid.pageNo, curRid.slotNo);
 
     return lid;
   }
@@ -389,17 +356,13 @@ public class LHFPage {
    * @see Tuple
    */
   public Label getLabel(ILID lid)
-      throws InvalidSlotNumberException {
+      throws InvalidSlotNumberException, IOException {
     checkNullObjectAndThrowException();
-    RID rid = new RID();
-    rid.pageNo = lid.getPageNo();
-    rid.slotNo = lid.getSlotNo();
+    RID rid = new RID(lid.getPageNo(), lid.getSlotNo());
 
     Tuple tuple = null;
     try {
       tuple = hfpage.getRecord(rid);
-    } catch (IOException e) {
-      e.printStackTrace();
     } catch (Exception e) {
       System.err.println("Error in fetching Label");
       e.printStackTrace();
@@ -422,18 +385,14 @@ public class LHFPage {
    * @see Tuple
    */
   public Label returnLabel(ILID lid)
-      throws InvalidSlotNumberException {
+      throws InvalidSlotNumberException, IOException {
     checkNullObjectAndThrowException();
 
-    RID rid = new RID();
-    rid.pageNo = lid.getPageNo();
-    rid.slotNo = lid.getSlotNo();
+    RID rid = new RID(lid.getPageNo(), lid.getSlotNo());
 
     Tuple tuple = null;
     try {
       tuple = hfpage.returnRecord(rid);
-    } catch (IOException e) {
-      e.printStackTrace();
     } catch (Exception e) {
       System.err.println("Error in fetching Label in byte array");
       e.printStackTrace();
@@ -444,10 +403,6 @@ public class LHFPage {
     label.setLid(lid);
     return label;
   }
-
-  //endregion
-
-  //region Protected Methods
 
   /**
    * Compacts the slot directory on an LHFPage. WARNING -- this will probably lead to a change in
@@ -461,6 +416,5 @@ public class LHFPage {
     this.hfpage.compact_slot_dir();
   }
 
-  //endregion
 }
 
