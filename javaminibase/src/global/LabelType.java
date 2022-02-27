@@ -5,17 +5,17 @@ package global;
  */
 public enum LabelType {
 
-    SUBJECT('S'),
-    PREDICATE('P'),
-    OBJECT('O');
+  SUBJECT('S'),
+  PREDICATE('P'),
+  OBJECT('O');
 
-    private final char asChar;
+  private final char asChar;
 
-    LabelType(char asChar) {
-        this.asChar = asChar;
-    }
+  LabelType(char asChar) {
+    this.asChar = asChar;
+  }
 
-    public char getAsChar() {
-        return asChar;
-    }
+  public char getAsChar() {
+    return asChar;
+  }
 }
