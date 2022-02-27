@@ -120,7 +120,7 @@ public class EID implements IEID {
   @Override
   public boolean equals(EID eid) {
     if ((this.pageNo.pid == eid.pageNo.pid)
-        && (this.slotNo == eid.slotNo) && (this.lid == eid.lid)) {
+            && (this.slotNo == eid.slotNo) && (this.lid == eid.lid)) {
       return true;
     } else {
       return false;
@@ -155,9 +155,9 @@ public class EID implements IEID {
   @Override
   public String toString() {
     return "EID{" +
-        "pageNo=" + this.pageNo +
-        ", slotNo=" + this.slotNo +
-        ", LID=" + this.lid +
-        '}';
+            "pageNo=" + this.pageNo +
+            ", slotNo=" + this.slotNo +
+            ", LID=" + this.lid +
+            '}';
   }
 }
