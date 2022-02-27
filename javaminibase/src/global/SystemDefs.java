@@ -5,6 +5,7 @@ import catalog.Catalog;
 import diskmgr.DB;
 
 public class SystemDefs {
+
   public static BufMgr JavabaseBM;
   public static DB JavabaseDB;
   public static Catalog JavabaseCatalog;
@@ -14,7 +15,8 @@ public class SystemDefs {
   public static boolean MINIBASE_RESTART_FLAG = false;
   public static String MINIBASE_DBNAME;
 
-  public SystemDefs() {}
+  public SystemDefs() {
+  }
 
   ;
 

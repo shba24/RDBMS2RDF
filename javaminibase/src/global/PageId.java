@@ -13,12 +13,13 @@ public class PageId {
   /**
    * Default constructor
    */
-  public PageId() {}
+  public PageId() {
+  }
 
   /**
    * constructor of class
    *
-   * @param  pageno  the page ID
+   * @param pageno the page ID
    */
   public PageId(int pageno) {
     pid = pageno;

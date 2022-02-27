@@ -2,6 +2,8 @@
 
 package global;
 
+import static global.GlobalConst.INVALID_PAGE;
+
 /**
  * class RID
  */
@@ -21,7 +23,10 @@ public class RID {
   /**
    * default constructor of class
    */
-  public RID() {}
+  public RID() {
+    this.slotNo=-1;
+    this.pageNo=new PageId(INVALID_PAGE);
+  }
 
   /**
    * constructor of class
@@ -56,8 +61,7 @@ public class RID {
    * Compares two RID object, i.e, this to the rid
    *
    * @param rid RID object to be compared to
-   * @return true is they are equal
-   * false if not.
+   * @return true is they are equal false if not.
    */
   public boolean equals(RID rid) {
 

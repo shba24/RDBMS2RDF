@@ -18,8 +18,7 @@ public interface GlobalConst {
   public static final int MAX_SPACE = 1024;   // in Frames
 
   /**
-   * in Pages => the DBMS Manager tells the DB how much disk
-   * space is available for the database.
+   * in Pages => the DBMS Manager tells the DB how much disk space is available for the database.
    */
   public static final int MINIBASE_DB_SIZE = 10000;
   public static final int MINIBASE_MAX_TRANSACTIONS = 100;
