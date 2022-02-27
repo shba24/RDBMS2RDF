@@ -1,4 +1,6 @@
+
 package global;
+
 
 /**
  * Implementation of the class for label ID.
@@ -15,10 +17,6 @@ public class LID implements ILID {
    * Default constructor. Nothing is being done in this constructor.
    */
   public LID() {
-    this.pageNo = new PageId(-1);
-    int slotNo = -1;
-    EID entityID = new EID();
-    PID predicateID = new PID();
   }
 
   /**
@@ -44,9 +42,9 @@ public class LID implements ILID {
     // will get a copy of the reference pointing to the singleton
     this.labelType = lid.getLabelType();
 
-    if (this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
+    if(this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
       this.entityID = new EID(lid.getEntityID());
-    } else if (this.labelType == LabelType.PREDICATE) {
+    } else if(this.labelType == LabelType.PREDICATE) {
       this.predicateID = new PID(lid.getPredicateID());
     }
   }
@@ -72,12 +70,11 @@ public class LID implements ILID {
   }
 
   /**
-   * Returns the slot number associated with the label ID.
    *
-   * @return the integer value of the slot number
+   * @return slotNo
    */
   @Override
-  public int getSlotNo() {
+  public int getSlotNo(){
     return slotNo;
   }
 
@@ -152,8 +149,8 @@ public class LID implements ILID {
   }
 
   /**
-   * Copy the state of the specified label ID. The implementation of this function should be the
-   * same as the copy constructor.
+   * Copy the state of the specified label ID. The implementation
+   * of this function should be the same as the copy constructor.
    *
    * @param lid
    */
@@ -165,9 +162,9 @@ public class LID implements ILID {
     // will get a copy of the reference pointing to the singleton
     this.labelType = lid.getLabelType();
 
-    if (this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
+    if(this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
       this.entityID = new EID(lid.getEntityID());
-    } else if (this.labelType == LabelType.PREDICATE) {
+    } else if(this.labelType == LabelType.PREDICATE) {
       this.predicateID = new PID(lid.getPredicateID());
     }
   }
@@ -204,8 +201,9 @@ public class LID implements ILID {
   }
 
   /**
-   * Write the label ID into a byte array at the specified offset. The first 4 bytes after the
-   * offset will store the slot number and the next 4 bytes will store the page ID.
+   * Write the label ID into a byte array at the specified offset.
+   * The first 4 bytes after the offset will store the slot number and
+   * the next 4 bytes will store the page ID.
    *
    * @param array  the specified byte array
    * @param offset the offset of byte array to write
@@ -224,9 +222,9 @@ public class LID implements ILID {
          once the member is available.
          */
 
-    if (labelType == LabelType.SUBJECT || labelType == LabelType.OBJECT) {
+    if(labelType == LabelType.SUBJECT || labelType == LabelType.OBJECT) {
 //            Convert.setIntValue(entityID.eid, offset + 4 + 4 + 1, array);
-    } else if (labelType == LabelType.PREDICATE) {
+    } else if(labelType == LabelType.PREDICATE) {
 //            Convert.setIntValue(predicateID.pid, offset + 4 + 4 + 1, array);
     }
   }

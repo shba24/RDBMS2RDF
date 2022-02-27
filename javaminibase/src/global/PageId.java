@@ -26,6 +26,14 @@ public class PageId {
   }
 
   /**
+   * Set Pid
+   * @param pageno
+   */
+  public void setPid(int pageno) {
+    pid = pageno;
+  }
+
+  /**
    * make a copy of the given pageId
    */
   public void copyPageId(PageId pageno) {
