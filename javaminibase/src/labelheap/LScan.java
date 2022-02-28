@@ -16,8 +16,6 @@ import global.GlobalConst;
 import global.PageId;
 import global.RID;
 import global.SystemDefs;
-import heap.DataPageInfo;
-import heap.Tuple;
 
 import java.io.IOException;
 
@@ -86,10 +84,10 @@ public class LScan implements GlobalConst {
      * @param rid Record ID of the record
      * @return the Tuple of the retrieved record.
      */
-    public Tuple getNext(RID rid)
+    public Quadruple getNext(RID rid)
             throws InvalidTupleSizeException,
             IOException {
-        Tuple recptrtuple = null;
+        Quadruple quadruple = null;
 
         if (nextUserStatus != true) {
             nextDataPage();
@@ -103,7 +101,7 @@ public class LScan implements GlobalConst {
         rid.slotNo = userId.slotNo;
 
         try {
-            recptrtuple = datapage.getRecord(rid);
+            quadruple = datapage.getRecord(rid);
         } catch (Exception e) {
             //    System.err.println("SCAN: Error in Scan" + e);
             e.printStackTrace();
@@ -116,7 +114,7 @@ public class LScan implements GlobalConst {
             nextUserStatus = true;
         }
 
-        return recptrtuple;
+        return quadruple;
     }
 
     /** Position the scan cursor to the record with the given rid.
@@ -243,12 +241,12 @@ public class LScan implements GlobalConst {
             throws InvalidTupleSizeException,
             IOException {
         DataPageInfo dpinfo;
-        Tuple rectuple = null;
+        Quadruple quadruple = null;
         Boolean bst;
 
         /** copy data about first directory page */
 
-        dirpageId.pid = _hf._firstDirPageId.pid;
+        dirpageId.pid = _lhf._firstDirPageId.pid;
         nextUserStatus = true;
 
         /** get first directory page and pin it */
@@ -267,13 +265,13 @@ public class LScan implements GlobalConst {
             /** there is a datapage record on the first directory page: */
 
             try {
-                rectuple = dirpage.getRecord(datapageRid);
+                quadruple = dirpage.getRecord(datapageRid);
             } catch (Exception e) {
                 //	System.err.println("SCAN: Chain Error in Scan: " + e);
                 e.printStackTrace();
             }
 
-            dpinfo = new DataPageInfo(rectuple);
+            dpinfo = new DataPageInfo(quadruple);
             datapageId.pid = dpinfo.pageId.pid;
         } else {
 
@@ -298,7 +296,7 @@ public class LScan implements GlobalConst {
 
                 try {
 
-                    dirpage = new HFPage();
+                    dirpage = new LHFPage();
                     pinPage(nextDirPageId, (Page) dirpage, false);
                 } catch (Exception e) {
                     //  System.err.println("SCAN: Error in 1stdatapage 2 " + e);
@@ -319,17 +317,17 @@ public class LScan implements GlobalConst {
 
                     try {
 
-                        rectuple = dirpage.getRecord(datapageRid);
+                        quadruple = dirpage.getRecord(datapageRid);
                     } catch (Exception e) {
                         //    System.err.println("SCAN: Error getRecord 4: " + e);
                         e.printStackTrace();
                     }
 
-                    if (rectuple.getLength() != DataPageInfo.size) {
+                    if (quadruple.getLength() != DataPageInfo.size) {
                         return false;
                     }
 
-                    dpinfo = new DataPageInfo(rectuple);
+                    dpinfo = new DataPageInfo(quadruple);
                     datapageId.pid = dpinfo.pageId.pid;
                 } else {
                     // heapfile empty
@@ -378,7 +376,7 @@ public class LScan implements GlobalConst {
 
         boolean nextDataPageStatus;
         PageId nextDirPageId = new PageId();
-        Tuple rectuple = null;
+        Quadruple rectuple = null;
 
         // ASSERTIONS:
         // - this->dirpageId has Id of current directory page
@@ -414,7 +412,7 @@ public class LScan implements GlobalConst {
 
                 // pin first data page
                 try {
-                    datapage = new HFPage();
+                    datapage = new LHFPage();
                     pinPage(datapageId, (Page) datapage, false);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -477,7 +475,7 @@ public class LScan implements GlobalConst {
                 dirpageId = nextDirPageId;
 
                 try {
-                    dirpage = new HFPage();
+                    dirpage = new LHFPage();
                     pinPage(dirpageId, (Page) dirpage, false);
                 } catch (Exception e) {
 
@@ -519,7 +517,7 @@ public class LScan implements GlobalConst {
         datapageId.pid = dpinfo.pageId.pid;
 
         try {
-            datapage = new HFPage();
+            datapage = new LHFPage();
             pinPage(dpinfo.pageId, (Page) datapage, false);
         } catch (Exception e) {
             System.err.println("HeapFile: Error in Scan" + e);
@@ -580,29 +578,27 @@ public class LScan implements GlobalConst {
 
     /**
      * short cut to access the pinPage function in bufmgr package.
-     * @see bufmgr.pinPage
      */
     private void pinPage(PageId pageno, Page page, boolean emptyPage)
-            throws HFBufMgrException {
+            throws LHFBufMgrException {
 
         try {
             SystemDefs.JavabaseBM.pinPage(pageno, page, emptyPage);
         } catch (Exception e) {
-            throw new HFBufMgrException(e, "Scan.java: pinPage() failed");
+            throw new LHFBufMgrException(e, "Scan.java: pinPage() failed");
         }
     } // end of pinPage
 
     /**
      * short cut to access the unpinPage function in bufmgr package.
-     * @see bufmgr.unpinPage
      */
     private void unpinPage(PageId pageno, boolean dirty)
-            throws HFBufMgrException {
+            throws LHFBufMgrException {
 
         try {
             SystemDefs.JavabaseBM.unpinPage(pageno, dirty);
         } catch (Exception e) {
-            throw new HFBufMgrException(e, "Scan.java: unpinPage() failed");
+            throw new LHFBufMgrException(e, "Scan.java: unpinPage() failed");
         }
     } // end of unpinPage
 }
