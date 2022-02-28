@@ -2,8 +2,6 @@ package labelheap;
 
 import diskmgr.Page;
 import global.*;
-import heap.FileAlreadyDeletedException;
-import heap.InvalidTypeException;
 
 import java.io.IOException;
 
@@ -99,7 +97,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
             InvalidTupleSizeException,
             LHFDiskMgrException,
             LHFBufMgrException,
-            IOException, InvalidTupleSizeException, InvalidTypeException, heap.InvalidTupleSizeException {
+            IOException, InvalidTupleSizeException, labelheap.InvalidTypeException {
         int answer = 0;
         PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
@@ -118,11 +116,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
                  rid = currentDirPage.nextRecord(rid)) {
                 quadruple = currentDirPage.getRecord(rid);
                 DataPageInfo dpinfo = null;
-                try {
-                    dpinfo = new DataPageInfo(quadruple);
-                } catch (heap.InvalidTupleSizeException e) {
-                    e.printStackTrace();
-                }
+                dpinfo = new DataPageInfo(quadruple);
 
                 answer += dpinfo.recct;
             }
