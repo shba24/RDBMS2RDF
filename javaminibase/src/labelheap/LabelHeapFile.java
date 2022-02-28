@@ -1,7 +1,10 @@
 package labelheap;
 
 import diskmgr.Page;
-import global.*;
+import global.GlobalConst;
+import global.PageId;
+import global.RID;
+import global.SystemDefs;
 
 import java.io.IOException;
 

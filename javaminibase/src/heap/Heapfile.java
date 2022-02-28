@@ -50,14 +50,15 @@ public class Heapfile implements Filetype, GlobalConst {
     private boolean _file_deleted;
     private String _fileName;
 
-    /** Initialize.  A null name produces a temporary heapfile which will be
+    /**
+     * Initialize.  A null name produces a temporary heapfile which will be
      * deleted by the destructor.  If the name already denotes a file, the
      * file is opened; otherwise, a new empty file is created.
      *
-     * @exception HFException heapfile exception
-     * @exception HFBufMgrException exception thrown from bufmgr layer
-     * @exception HFDiskMgrException exception thrown from diskmgr layer
-     * @exception IOException I/O errors
+     * @throws HFException        heapfile exception
+     * @throws HFBufMgrException  exception thrown from bufmgr layer
+     * @throws HFDiskMgrException exception thrown from diskmgr layer
+     * @throws IOException        I/O errors
      */
     public Heapfile(String name)
             throws HFException,
@@ -549,16 +550,16 @@ public class Heapfile implements Filetype, GlobalConst {
         return rid;
     }
 
-    /** Delete record from file with given rid.
-     *
-     * @exception InvalidSlotNumberException invalid slot number
-     * @exception InvalidTupleSizeException invalid tuple size
-     * @exception HFException heapfile exception
-     * @exception HFBufMgrException exception thrown from bufmgr layer
-     * @exception HFDiskMgrException exception thrown from diskmgr layer
-     * @exception Exception other exception
+    /**
+     * Delete record from file with given rid.
      *
      * @return true record deleted  false:record not found
+     * @throws InvalidSlotNumberException invalid slot number
+     * @throws InvalidTupleSizeException  invalid tuple size
+     * @throws HFException                heapfile exception
+     * @throws HFBufMgrException          exception thrown from bufmgr layer
+     * @throws HFDiskMgrException         exception thrown from diskmgr layer
+     * @throws Exception                  other exception
      */
     public boolean deleteRecord(RID rid)
             throws InvalidSlotNumberException,
@@ -868,6 +869,7 @@ public class Heapfile implements Filetype, GlobalConst {
 
     /**
      * short cut to access the pinPage function in bufmgr package.
+     *
      * @see bufmgr.pinPage
      */
     private void pinPage(PageId pageno, Page page, boolean emptyPage)
@@ -882,6 +884,7 @@ public class Heapfile implements Filetype, GlobalConst {
 
     /**
      * short cut to access the unpinPage function in bufmgr package.
+     *
      * @see bufmgr.unpinPage
      */
     private void unpinPage(PageId pageno, boolean dirty)
