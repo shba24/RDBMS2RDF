@@ -12,41 +12,6 @@ import java.io.IOException;
 
 public class LHFPage extends HFPage{
 
-  public static final int SIZE_OF_SLOT = 4;
-  public static final int DPFIXED = 4 * 2 + 3 * 4;
-
-  public static final int SLOT_CNT = 0;
-  public static final int USED_PTR = 2;
-  public static final int FREE_SPACE = 4;
-  public static final int TYPE = 6;
-  public static final int CUR_PAGE = 16;
-
-  /* Warning:
-     These items must all pack tight, (no padding) for
-     the current implementation to work properly.
-     Be careful when modifying this class.
-  */
-  /**
-   * page number of this page
-   */
-  protected PageId curPage = new PageId();
-  /**
-   * number of slots in use
-   */
-  private short slotCnt;
-  /**
-   * offset of first used byte by data records in data[]
-   */
-  private short usedPtr;
-  /**
-   * number of bytes free in data[]
-   */
-  private short freeSpace;
-  /**
-   * an arbitrary value used by subclasses as needed
-   */
-  private short type;
-
   /**
    * Default constructor
    */
@@ -69,7 +34,7 @@ public class LHFPage extends HFPage{
    * @param  label a label to be inserted
    * @return LID of label, null if sufficient space does not exist
    */
-  public ILID insertLabel(byte[] label)
+  public LID insertLabel(byte[] label)
       throws IOException {
 
     try {
@@ -81,13 +46,13 @@ public class LHFPage extends HFPage{
       // This is an upper bound check. May not actually need a slot
       // if we can find an empty one.
 
-      freeSpace = Convert.getShortValue(FREE_SPACE, data);
-      if (spaceNeeded > freeSpace) {
+      short freespace = super.getFreeSpace();
+      if (spaceNeeded > freespace) {
         return null;
       } else {
 
         // look for an empty slot
-        slotCnt = Convert.getShortValue(SLOT_CNT, data);
+        short slotCnt = super.getSlotCnt();
         int i;
         short length;
         for (i = 0; i < slotCnt; i++) {
@@ -100,20 +65,20 @@ public class LHFPage extends HFPage{
         if (i == slotCnt)   //use a new slot
         {
           // adjust free space
-          freeSpace -= spaceNeeded;
-          Convert.setShortValue(freeSpace, FREE_SPACE, data);
+          freespace -= spaceNeeded;
+          super.setFreeSpace(freespace);
 
           slotCnt++;
-          Convert.setShortValue(slotCnt, SLOT_CNT, data);
+          super.setSlotCnt(slotCnt);
         } else {
           // reusing an existing slot
-          freeSpace -= recLen;
-          Convert.setShortValue(freeSpace, FREE_SPACE, data);
+          freespace -= recLen;
+          super.setFreeSpace(freespace);
         }
 
-        usedPtr = Convert.getShortValue(USED_PTR, data);
+        short usedPtr = super.getUsedPtr();
         usedPtr -= recLen;    // adjust usedPtr
-        Convert.setShortValue(usedPtr, USED_PTR, data);
+        super.setUsedPtr(usedPtr);
 
         //insert the slot info onto the data page
         setSlot(i, recLen, usedPtr);
@@ -122,7 +87,7 @@ public class LHFPage extends HFPage{
         System.arraycopy(label, 0, data, usedPtr, recLen);
         curPage.pid = Convert.getIntValue(CUR_PAGE, data);
 
-        ILID lid = new LID();
+        LID lid = new LID();
         lid.getPageNo().pid = curPage.pid;
         lid.setSlotNo(i);
         return lid;
@@ -140,12 +105,12 @@ public class LHFPage extends HFPage{
    * @param lid the Label ID in C++ Status deleteRecord(const LID& lid)
    * @throws InvalidSlotNumberException Invalid slot number
    */
-  public void deleteLabel(ILID lid)
+  public void deleteLabel(LID lid)
       throws InvalidSlotNumberException, IOException {
     try {
       int slotNo = lid.getSlotNo();
       short recLen = getSlotLength(slotNo);
-      slotCnt = Convert.getShortValue(SLOT_CNT, data);
+      short slotCnt = super.getSlotCnt();
 
       // first check if the record being deleted is actually valid
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)) {
@@ -155,7 +120,7 @@ public class LHFPage extends HFPage{
 
         // offset of record being deleted
         int offset = getSlotOffset(slotNo);
-        usedPtr = Convert.getShortValue(USED_PTR, data);
+        short usedPtr = super.getUsedPtr();
         int newSpot = usedPtr + recLen;
         int size = offset - usedPtr;
 
@@ -181,9 +146,9 @@ public class LHFPage extends HFPage{
         Convert.setShortValue(usedPtr, USED_PTR, data);
 
         // increase freespace by size of hole
-        freeSpace = Convert.getShortValue(FREE_SPACE, data);
+        short freeSpace = super.getFreeSpace();
         freeSpace += recLen;
-        Convert.setShortValue(freeSpace, FREE_SPACE, data);
+        super.setFreeSpace(freeSpace);
 
         setSlot(slotNo, EMPTY_SLOT, 0);  // mark slot free
       } else {
@@ -200,12 +165,12 @@ public class LHFPage extends HFPage{
    * @return LID of first label on page, null if page contains no labels.
    * @throws IOException I/O errors in C++ Status firstLabel(LID& firstLid)
    */
-  public ILID firstLabel()
+  public LID firstLabel()
       throws IOException {
     try {
       // find the first non-empty slot
 
-      slotCnt = Convert.getShortValue(SLOT_CNT, data);
+      short slotCnt = super.getSlotCnt();
 
       int i;
       short length;
@@ -222,7 +187,7 @@ public class LHFPage extends HFPage{
 
       // found a non-empty slot
 
-      ILID lid = new LID();
+      LID lid = new LID();
       lid.setSlotNo(i);
       curPage.pid = Convert.getIntValue(CUR_PAGE, data);
       lid.getPageNo().pid = curPage.pid;
@@ -240,10 +205,10 @@ public class LHFPage extends HFPage{
    * @return LID of next label on the page, null if no more labels exist on the page
    * @throws IOException I/O errors in C++ Status nextRecord (LID curLid, LID& nextLid)
    */
-  public ILID nextLID(ILID curLid)
+  public LID nextLabel(LID curLid)
       throws IOException {
     try {
-      slotCnt = Convert.getShortValue(SLOT_CNT, data);
+      short slotCnt = super.getSlotCnt();
 
       int i = curLid.getSlotNo();
       short length;
@@ -261,10 +226,10 @@ public class LHFPage extends HFPage{
       }
 
       // found a non-empty slot
-      ILID lid = new LID();
+      LID lid = new LID();
       lid.setSlotNo(i);
       curPage.setPid(Convert.getIntValue(CUR_PAGE, data));
-      lid.getPageNo().setPid(curPage.pid);
+      lid.getPageNo().pid = curPage.pid;
 
       return lid;
     } catch (Exception e) {
@@ -284,9 +249,8 @@ public class LHFPage extends HFPage{
    * @throws InvalidSlotNumberException Invalid slot number
    * @see Tuple
    */
-  public Label getLabel(ILID lid)
+  public Label getLabel(LID lid)
       throws InvalidSlotNumberException, IOException {
-    Tuple tuple = null;
     try {
       short recLen;
       short offset;
@@ -298,7 +262,7 @@ public class LHFPage extends HFPage{
 
       // length of record being returned
       recLen = getSlotLength(slotNo);
-      slotCnt = Convert.getShortValue(SLOT_CNT, data);
+      short slotCnt = super.getSlotCnt();
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)
           && (pageNo.pid == curPage.pid)) {
         offset = getSlotOffset(slotNo);
@@ -326,10 +290,9 @@ public class LHFPage extends HFPage{
    * @throws InvalidSlotNumberException Invalid slot number
    * @see Tuple
    */
-  public Label returnLabel(ILID lid)
+  public Label returnRecord(LID lid)
       throws InvalidSlotNumberException, IOException {
 
-    Label label = null;
     try {
       short recLen;
       short offset;
@@ -341,13 +304,13 @@ public class LHFPage extends HFPage{
 
       // length of record being returned
       recLen = getSlotLength(slotNo);
-      slotCnt = Convert.getShortValue(SLOT_CNT, data);
+      short slotCnt = super.getSlotCnt();
 
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)
           && (pageNo.pid == curPage.pid)) {
 
         offset = getSlotOffset(slotNo);
-        label = new Label(data, offset, recLen);
+        Label label = new Label(data, offset, recLen);
         return label;
       } else {
         throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
