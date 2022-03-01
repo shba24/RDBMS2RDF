@@ -46,13 +46,13 @@ public class LHFPage extends HFPage{
       // This is an upper bound check. May not actually need a slot
       // if we can find an empty one.
 
-      short freespace = super.getFreeSpace();
-      if (spaceNeeded > freespace) {
+      freeSpace = Convert.getShortValue(FREE_SPACE, data);
+      if (spaceNeeded > freeSpace) {
         return null;
       } else {
 
         // look for an empty slot
-        short slotCnt = super.getSlotCnt();
+        slotCnt = Convert.getShortValue(SLOT_CNT, data);
         int i;
         short length;
         for (i = 0; i < slotCnt; i++) {
@@ -65,20 +65,20 @@ public class LHFPage extends HFPage{
         if (i == slotCnt)   //use a new slot
         {
           // adjust free space
-          freespace -= spaceNeeded;
-          super.setFreeSpace(freespace);
+          freeSpace -= spaceNeeded;
+          Convert.setShortValue(freeSpace, FREE_SPACE, data);
 
           slotCnt++;
-          super.setSlotCnt(slotCnt);
+          Convert.setShortValue(slotCnt, SLOT_CNT, data);
         } else {
           // reusing an existing slot
-          freespace -= recLen;
-          super.setFreeSpace(freespace);
+          freeSpace -= recLen;
+          Convert.setShortValue(freeSpace, FREE_SPACE, data);
         }
 
-        short usedPtr = super.getUsedPtr();
+        usedPtr = Convert.getShortValue(USED_PTR, data);
         usedPtr -= recLen;    // adjust usedPtr
-        super.setUsedPtr(usedPtr);
+        Convert.setShortValue(usedPtr, USED_PTR, data);
 
         //insert the slot info onto the data page
         setSlot(i, recLen, usedPtr);
@@ -110,7 +110,7 @@ public class LHFPage extends HFPage{
     try {
       int slotNo = lid.getSlotNo();
       short recLen = getSlotLength(slotNo);
-      short slotCnt = super.getSlotCnt();
+      slotCnt = Convert.getShortValue(SLOT_CNT, data);
 
       // first check if the record being deleted is actually valid
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)) {
@@ -120,7 +120,7 @@ public class LHFPage extends HFPage{
 
         // offset of record being deleted
         int offset = getSlotOffset(slotNo);
-        short usedPtr = super.getUsedPtr();
+        usedPtr = Convert.getShortValue(USED_PTR, data);
         int newSpot = usedPtr + recLen;
         int size = offset - usedPtr;
 
@@ -141,14 +141,14 @@ public class LHFPage extends HFPage{
           }
         }
 
-        // move used Ptr forwar
+        // move used Ptr forward
         usedPtr += recLen;
         Convert.setShortValue(usedPtr, USED_PTR, data);
 
         // increase freespace by size of hole
-        short freeSpace = super.getFreeSpace();
+        freeSpace = Convert.getShortValue(FREE_SPACE, data);
         freeSpace += recLen;
-        super.setFreeSpace(freeSpace);
+        Convert.setShortValue(freeSpace, FREE_SPACE, data);
 
         setSlot(slotNo, EMPTY_SLOT, 0);  // mark slot free
       } else {
@@ -169,8 +169,7 @@ public class LHFPage extends HFPage{
       throws IOException {
     try {
       // find the first non-empty slot
-
-      short slotCnt = super.getSlotCnt();
+      slotCnt = Convert.getShortValue(SLOT_CNT, data);
 
       int i;
       short length;
@@ -208,7 +207,7 @@ public class LHFPage extends HFPage{
   public LID nextLabel(LID curLid)
       throws IOException {
     try {
-      short slotCnt = super.getSlotCnt();
+      slotCnt = Convert.getShortValue(SLOT_CNT, data);
 
       int i = curLid.getSlotNo();
       short length;
@@ -262,14 +261,13 @@ public class LHFPage extends HFPage{
 
       // length of record being returned
       recLen = getSlotLength(slotNo);
-      short slotCnt = super.getSlotCnt();
+      slotCnt = Convert.getShortValue(SLOT_CNT, data);
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)
           && (pageNo.pid == curPage.pid)) {
         offset = getSlotOffset(slotNo);
         record = new byte[recLen];
         System.arraycopy(data, offset, record, 0, recLen);
-        Label label = new Label(record, 0, recLen);
-        return label;
+        return new Label(record, 0, recLen);
       } else {
         throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
       }
@@ -304,14 +302,13 @@ public class LHFPage extends HFPage{
 
       // length of record being returned
       recLen = getSlotLength(slotNo);
-      short slotCnt = super.getSlotCnt();
+      slotCnt = Convert.getShortValue(SLOT_CNT, data);
 
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)
           && (pageNo.pid == curPage.pid)) {
 
         offset = getSlotOffset(slotNo);
-        Label label = new Label(data, offset, recLen);
-        return label;
+        return new Label(data, offset, recLen);
       } else {
         throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
       }

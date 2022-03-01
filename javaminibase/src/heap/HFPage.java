@@ -50,15 +50,15 @@ public class HFPage extends Page
   /**
    * number of slots in use
    */
-  private short slotCnt;
+  protected short slotCnt;
   /**
    * offset of first used byte by data records in data[]
    */
-  private short usedPtr;
+  protected short usedPtr;
   /**
    * number of bytes free in data[]
    */
-  private short freeSpace;
+  protected short freeSpace;
   /**
    * an arbitrary value used by subclasses as needed
    */
@@ -171,49 +171,6 @@ public class HFPage extends Page
   }
 
   /**
-   * @return usedptr
-   * @throws IOException I/O errors
-   */
-  public short getUsedPtr()
-      throws IOException {
-    usedPtr = Convert.getShortValue(USED_PTR, data);
-    return usedPtr;
-  }
-
-  /**
-   * set used ptr
-   * @param usedPtr sets value of Used ptr
-   * @throws IOException I/O errors
-   */
-  public void setUsedPtr(short usedPtr)
-      throws IOException {
-    this.usedPtr = usedPtr;
-    Convert.setShortValue(usedPtr, USED_PTR, data);
-  }
-
-
-  /**
-   * @return freespace
-   * @throws IOException I/O errors
-   */
-  public short getFreeSpace()
-      throws IOException {
-    freeSpace = Convert.getShortValue(FREE_SPACE, data);
-    return freeSpace;
-  }
-
-  /**
-   * set free space
-   * @param freespace sets value of Free space
-   * @throws IOException I/O errors
-   */
-  public void setFreeSpace(short freespace)
-      throws IOException {
-    this.freeSpace = freespace;
-    Convert.setShortValue(freeSpace, FREE_SPACE, data);
-  }
-
-  /**
    * @return PageId of previous page
    * @throws IOException I/O errors
    */
@@ -299,28 +256,6 @@ public class HFPage extends Page
       throws IOException {
     type = valtype;
     Convert.setShortValue(type, TYPE, data);
-  }
-
-  /**
-   * @return slotCnt used in this page
-   * @throws IOException I/O errors
-   */
-  public short getSlotCnt()
-      throws IOException {
-    slotCnt = Convert.getShortValue(SLOT_CNT, data);
-    return slotCnt;
-  }
-
-  /**
-   * set slot count
-   * @param slotCnt
-   * @return returns slot count
-   * @throws IOException
-   */
-  public void setSlotCnt(short slotCnt)
-      throws IOException {
-    this.slotCnt = slotCnt;
-    Convert.setShortValue(slotCnt, SLOT_CNT, data);
   }
 
   /**
