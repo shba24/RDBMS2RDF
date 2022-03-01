@@ -50,15 +50,15 @@ public class HFPage extends Page
   /**
    * number of slots in use
    */
-  private short slotCnt;
+  protected short slotCnt;
   /**
    * offset of first used byte by data records in data[]
    */
-  private short usedPtr;
+  protected short usedPtr;
   /**
    * number of bytes free in data[]
    */
-  private short freeSpace;
+  protected short freeSpace;
   /**
    * an arbitrary value used by subclasses as needed
    */
@@ -256,16 +256,6 @@ public class HFPage extends Page
       throws IOException {
     type = valtype;
     Convert.setShortValue(type, TYPE, data);
-  }
-
-  /**
-   * @return slotCnt used in this page
-   * @throws IOException I/O errors
-   */
-  public short getSlotCnt()
-      throws IOException {
-    slotCnt = Convert.getShortValue(SLOT_CNT, data);
-    return slotCnt;
   }
 
   /**
