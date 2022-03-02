@@ -97,6 +97,14 @@ public class Quadruple {
   }
 
   /**
+   *
+   * @return tuple
+   */
+  public Tuple getTuple(){
+    return this.tuple;
+  }
+
+  /**
    * Returns the subject ID
    *
    * @return Subject object
