@@ -36,6 +36,14 @@ public class THFPage {
   }
 
   /**
+   * Constructor to initialize a quadruple heap file page from a HFPage object.
+   *
+   * @param hfPage HFPage object to construct the THFPage from
+   */
+  public THFPage(HFPage hfPage) {
+    this.hfPage = new HFPage(hfPage);
+  }
+  /**
    * Initialize THFPage using a page id and a page. Internally calls init() on the underlying hfPage
    * object.
    *
@@ -541,5 +549,23 @@ public class THFPage {
       System.err.println("[THFPage] I/O exception in empty().");
       throw e;
     }
+  }
+
+  /**
+   * Returns the byte array stored in the Page.
+   *
+   * @return byte array
+   */
+  public byte[] getpage() {
+    return this.hfPage.getpage();
+  }
+
+  /**
+   * Set the byte array of the page to the specified byte array.
+   *
+   * @param array byte array
+   */
+  public void setpage(byte[] array) {
+    this.hfPage.setpage(array);
   }
 }
