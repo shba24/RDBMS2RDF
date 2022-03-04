@@ -359,15 +359,4 @@ public class Utility implements Catalogglobal {
 
   // LOADS RECORDS
   void loadRecordsUT(String relation, String fileName) {}
-
-  //-------------------------------------------------------------------
-  // CHECK STRING LENGTH
-  // Checks to make sure that the length of the string is within the liMits
-  // set by the attrDesc
-  //--------------------------------------------------------------------
-
-  // LOADS INDEXES
-  void loadIndexesUT(
-      Tuple tuple, int attrCnt, int indexCnt,
-      AttrDesc[] attrs, IndexDesc[] indexes, void[] iFiles, RID rid) {}
 }
