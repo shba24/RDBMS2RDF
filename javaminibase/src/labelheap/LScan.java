@@ -7,6 +7,8 @@ package labelheap;
  * Scan.java-  class Scan
  * <p>
  * Scan.java-  class Scan
+ * <p>
+ * Scan.java-  class Scan
  */
 /**
  * Scan.java-  class Scan
@@ -15,8 +17,8 @@ package labelheap;
 
 import diskmgr.Page;
 import global.GlobalConst;
+import global.LID;
 import global.PageId;
-import global.RID;
 import global.SystemDefs;
 
 import java.io.IOException;
@@ -49,16 +51,16 @@ public class LScan implements GlobalConst {
     /** record ID of the DataPageInfo struct (in the directory page) which
      * describes the data page where our current record lives.
      */
-    private RID datapageRid = new RID();
+    private LID datePageLid = new LID();
 
     /** the actual PageId of the data page with the current record */
-    private PageId datapageId = new PageId();
+    private PageId dataPageId = new PageId();
 
     /** in-core copy (pinned) of the same */
-    private LHFPage datapage = new LHFPage();
+    private LHFPage dataPage = new LHFPage();
 
     /** record ID of the current record (from the current data page) */
-    private RID userId = new RID();
+    private LID lid = new LID();
 
     /** Status of next user status */
     private boolean nextUserStatus;
@@ -83,67 +85,67 @@ public class LScan implements GlobalConst {
      * @exception InvalidTupleSizeException Invalid tuple size
      * @exception IOException I/O errors
      *
-     * @param rid Record ID of the record
+     * @param lid Record ID of the record
      * @return the Tuple of the retrieved record.
      */
-    public Quadruple getNext(RID rid)
+    public Label getNext(LID lid)
             throws InvalidTupleSizeException,
             IOException {
-        Quadruple quadruple = null;
+        Label label = null;
 
         if (nextUserStatus != true) {
             nextDataPage();
         }
 
-        if (datapage == null) {
+        if (dataPage == null) {
             return null;
         }
 
-        rid.pageNo.pid = userId.pageNo.pid;
-        rid.slotNo = userId.slotNo;
+        lid.getPageNo().setPid(this.lid.getPageNo().pid);
+        lid.setSlotNo(this.lid.getSlotNo());
 
         try {
-            quadruple = datapage.getRecord(rid);
+            label = dataPage.getLabel(lid);
         } catch (Exception e) {
             //    System.err.println("SCAN: Error in Scan" + e);
             e.printStackTrace();
         }
 
-        userId = datapage.nextRecord(rid);
-        if (userId == null) {
+        this.lid = dataPage.nextLabel(lid);
+        if (this.lid == null) {
             nextUserStatus = false;
         } else {
             nextUserStatus = true;
         }
 
-        return quadruple;
+        return label;
     }
 
-    /** Position the scan cursor to the record with the given rid.
+    /** Position the scan cursor to the record with the given lid.
      *
      * @exception InvalidTupleSizeException Invalid tuple size
      * @exception IOException I/O errors
-     * @param rid Record ID of the given record
+     * @param lid Record ID of the given record
      * @return true if successful,
      *			false otherwise.
      */
-    public boolean position(RID rid)
+    public boolean position(LID lid)
             throws InvalidTupleSizeException,
             IOException {
-        RID nxtrid = new RID();
+        LID nxtrid = new LID();
         boolean bst;
 
         bst = peekNext(nxtrid);
 
-        if (nxtrid.equals(rid) == true) {
+        if (nxtrid.equals(lid) == true) {
             return true;
         }
 
         // This is kind lame, but otherwise it will take all day.
         PageId pgid = new PageId();
-        pgid.pid = rid.pageNo.pid;
+        pgid.setPid(lid.getPageNo().pid);
 
-        if (!datapageId.equals(pgid)) {
+        if (!dataPageId.equals(pgid)) {
 
             // reset everything and start over from the beginning
             reset();
@@ -154,7 +156,7 @@ public class LScan implements GlobalConst {
                 return bst;
             }
 
-            while (!datapageId.equals(pgid)) {
+            while (!dataPageId.equals(pgid)) {
                 bst = nextDataPage();
                 if (bst != true) {
                     return bst;
@@ -165,19 +167,19 @@ public class LScan implements GlobalConst {
         // Now we are on the correct page.
 
         try {
-            userId = datapage.firstRecord();
+            this.lid = dataPage.firstLabel();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if (userId == null) {
+        if (this.lid == null) {
             bst = false;
             return bst;
         }
 
         bst = peekNext(nxtrid);
 
-        while ((bst == true) && (nxtrid != rid)) {
+        while ((bst == true) && (nxtrid != lid)) {
             bst = mvNext(nxtrid);
         }
 
@@ -207,17 +209,17 @@ public class LScan implements GlobalConst {
     /** Reset everything and unpin all pages. */
     private void reset() {
 
-        if (datapage != null) {
+        if (dataPage != null) {
 
             try {
-                unpinPage(datapageId, false);
+                unpinPage(dataPageId, false);
             } catch (Exception e) {
                 // 	System.err.println("SCAN: Error in Scan" + e);
                 e.printStackTrace();
             }
         }
-        datapageId.pid = 0;
-        datapage = null;
+        dataPageId.pid = 0;
+        dataPage = null;
 
         if (dirpage != null) {
 
@@ -243,7 +245,7 @@ public class LScan implements GlobalConst {
             throws InvalidTupleSizeException,
             IOException {
         DataPageInfo dpinfo;
-        Quadruple quadruple = null;
+        Label label = null;
         Boolean bst;
 
         /** copy data about first directory page */
@@ -261,20 +263,20 @@ public class LScan implements GlobalConst {
         }
 
         /** now try to get a pointer to the first datapage */
-        datapageRid = dirpage.firstRecord();
+        LID dataPageLid = dirpage.firstLabel();
 
-        if (datapageRid != null) {
+        if (dataPageLid != null) {
             /** there is a datapage record on the first directory page: */
 
             try {
-                quadruple = dirpage.getRecord(datapageRid);
+                label = dirpage.getLabel(dataPageLid);
             } catch (Exception e) {
                 //	System.err.println("SCAN: Chain Error in Scan: " + e);
                 e.printStackTrace();
             }
 
-            dpinfo = new DataPageInfo(quadruple);
-            datapageId.pid = dpinfo.pageId.pid;
+            dpinfo = new DataPageInfo(label);
+            dataPageId.pid = dpinfo.pageId.pid;
         } else {
 
             /** the first directory page is the only one which can possibly remain
@@ -308,40 +310,40 @@ public class LScan implements GlobalConst {
                 /** now try again to read a data record: */
 
                 try {
-                    datapageRid = dirpage.firstRecord();
+                    dataPageLid = dirpage.firstLabel();
                 } catch (Exception e) {
                     //  System.err.println("SCAN: Error in 1stdatapg 3 " + e);
                     e.printStackTrace();
-                    datapageId.pid = INVALID_PAGE;
+                    dataPageId.pid = INVALID_PAGE;
                 }
 
-                if (datapageRid != null) {
+                if (dataPageLid != null) {
 
                     try {
 
-                        quadruple = dirpage.getRecord(datapageRid);
+                        label = dirpage.getLabel(dataPageLid);
                     } catch (Exception e) {
-                        //    System.err.println("SCAN: Error getRecord 4: " + e);
+                        //    System.err.println("SCAN: Error getLabel 4: " + e);
                         e.printStackTrace();
                     }
 
-                    if (quadruple.getLength() != DataPageInfo.size) {
+                    if (label.getLength() != DataPageInfo.size) {
                         return false;
                     }
 
-                    dpinfo = new DataPageInfo(quadruple);
-                    datapageId.pid = dpinfo.pageId.pid;
+                    dpinfo = new DataPageInfo(label);
+                    dataPageId.pid = dpinfo.pageId.pid;
                 } else {
                     // heapfile empty
-                    datapageId.pid = INVALID_PAGE;
+                    dataPageId.pid = INVALID_PAGE;
                 }
             }//end if01
             else {// heapfile empty
-                datapageId.pid = INVALID_PAGE;
+                dataPageId.pid = INVALID_PAGE;
             }
         }
 
-        datapage = null;
+        dataPage = null;
 
         try {
             nextDataPage();
@@ -378,7 +380,7 @@ public class LScan implements GlobalConst {
 
         boolean nextDataPageStatus;
         PageId nextDirPageId = new PageId();
-        Quadruple rectuple = null;
+        Label rectuple = null;
 
         // ASSERTIONS:
         // - this->dirpageId has Id of current directory page
@@ -395,12 +397,12 @@ public class LScan implements GlobalConst {
         // (4)- if the scan had already been done,
         //        dirpage = NULL;  datapageId = INVALID_PAGE
 
-        if ((dirpage == null) && (datapageId.pid == INVALID_PAGE)) {
+        if ((dirpage == null) && (dataPageId.pid == INVALID_PAGE)) {
             return false;
         }
 
-        if (datapage == null) {
-            if (datapageId.pid == INVALID_PAGE) {
+        if (dataPage == null) {
+            if (dataPageId.pid == INVALID_PAGE) {
                 // heapfile is empty to begin with
 
                 try {
@@ -414,14 +416,14 @@ public class LScan implements GlobalConst {
 
                 // pin first data page
                 try {
-                    datapage = new LHFPage();
-                    pinPage(datapageId, (Page) datapage, false);
+                    dataPage = new LHFPage();
+                    pinPage(dataPageId, (Page) dataPage, false);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 try {
-                    userId = datapage.firstRecord();
+                    lid = dataPage.firstLabel();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -436,8 +438,8 @@ public class LScan implements GlobalConst {
 
         // unpin the current datapage
         try {
-            unpinPage(datapageId, false /* no dirty */);
-            datapage = null;
+            unpinPage(dataPageId, false /* no dirty */);
+            dataPage = null;
         } catch (Exception e) {
 
         }
@@ -449,9 +451,9 @@ public class LScan implements GlobalConst {
             return false;
         }
 
-        datapageRid = dirpage.nextRecord(datapageRid);
+        datePageLid = dirpage.nextLabel(datePageLid);
 
-        if (datapageRid == null) {
+        if (datePageLid == null) {
             nextDataPageStatus = false;
             // we have read all datapage records on the current directory page
 
@@ -463,7 +465,7 @@ public class LScan implements GlobalConst {
                 unpinPage(dirpageId, false /* not dirty */);
                 dirpage = null;
 
-                datapageId.pid = INVALID_PAGE;
+                dataPageId.pid = INVALID_PAGE;
             } catch (Exception e) {
 
             }
@@ -488,7 +490,7 @@ public class LScan implements GlobalConst {
                 }
 
                 try {
-                    datapageRid = dirpage.firstRecord();
+                    datePageLid = dirpage.firstLabel();
                     nextDataPageStatus = true;
                 } catch (Exception e) {
                     nextDataPageStatus = false;
@@ -506,7 +508,7 @@ public class LScan implements GlobalConst {
 
         // data page is not yet loaded: read its record from the directory page
         try {
-            rectuple = dirpage.getRecord(datapageRid);
+            rectuple = dirpage.getLabel(datePageLid);
         } catch (Exception e) {
             System.err.println("HeapFile: Error in Scan" + e);
         }
@@ -516,11 +518,11 @@ public class LScan implements GlobalConst {
         }
 
         dpinfo = new DataPageInfo(rectuple);
-        datapageId.pid = dpinfo.pageId.pid;
+        dataPageId.pid = dpinfo.pageId.pid;
 
         try {
-            datapage = new LHFPage();
-            pinPage(dpinfo.pageId, (Page) datapage, false);
+            dataPage = new LHFPage();
+            pinPage(dpinfo.pageId, (Page) dataPage, false);
         } catch (Exception e) {
             System.err.println("HeapFile: Error in Scan" + e);
         }
@@ -530,9 +532,9 @@ public class LScan implements GlobalConst {
         // - this->dirpageId, this->dirpage correct
         // - this->datapageId, this->datapage, this->datapageRid correct
 
-        userId = datapage.firstRecord();
+        lid = dataPage.firstLabel();
 
-        if (userId == null) {
+        if (lid == null) {
             nextUserStatus = false;
             return false;
         }
@@ -540,39 +542,39 @@ public class LScan implements GlobalConst {
         return true;
     }
 
-    private boolean peekNext(RID rid) {
+    private boolean peekNext(LID lid) {
 
-        rid.pageNo.pid = userId.pageNo.pid;
-        rid.slotNo = userId.slotNo;
+        lid.getPageNo().setPid(this.lid.getPageNo().pid);
+        lid.setSlotNo(this.lid.getSlotNo());
         return true;
     }
 
     /** Move to the next record in a sequential scan.
-     * Also returns the RID of the (new) current record.
+     * Also returns the LID of the (new) current record.
      */
-    private boolean mvNext(RID rid)
+    private boolean mvNext(LID lid)
             throws InvalidTupleSizeException,
             IOException {
-        RID nextrid;
+        LID nextLid;
         boolean status;
 
-        if (datapage == null) {
+        if (dataPage == null) {
             return false;
         }
 
-        nextrid = datapage.nextRecord(rid);
+        nextLid = dataPage.nextLabel(lid);
 
-        if (nextrid != null) {
-            userId.pageNo.pid = nextrid.pageNo.pid;
-            userId.slotNo = nextrid.slotNo;
+        if (nextLid != null) {
+            this.lid.getPageNo().setPid(nextLid.getPageNo().pid);
+            this.lid.setSlotNo(nextLid.getSlotNo());
             return true;
         } else {
 
             status = nextDataPage();
 
             if (status == true) {
-                rid.pageNo.pid = userId.pageNo.pid;
-                rid.slotNo = userId.slotNo;
+                lid.getPageNo().setPid(this.lid.getPageNo().pid);
+                lid.setSlotNo(this.lid.getSlotNo());
             }
         }
         return true;

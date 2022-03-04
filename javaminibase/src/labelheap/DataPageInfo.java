@@ -87,6 +87,10 @@ class DataPageInfo implements GlobalConst {
         }
     }
 
+    public DataPageInfo(Label label) {
+
+    }
+
     public byte[] returnByteArray() {
         return data;
     }

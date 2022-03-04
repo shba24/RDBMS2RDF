@@ -2,7 +2,6 @@ package labelheap;
 
 import diskmgr.Page;
 import global.*;
-import heap.Tuple;
 
 import java.io.IOException;
 
@@ -11,42 +10,7 @@ import java.io.IOException;
  * performed.
  */
 
-public class LHFPage extends Page {
-
-    public static final int SIZE_OF_SLOT = 4;
-    public static final int DPFIXED = 4 * 2 + 3 * 4;
-
-    public static final int SLOT_CNT = 0;
-    public static final int USED_PTR = 2;
-    public static final int FREE_SPACE = 4;
-    public static final int TYPE = 6;
-    public static final int CUR_PAGE = 16;
-
-  /* Warning:
-     These items must all pack tight, (no padding) for
-     the current implementation to work properly.
-     Be careful when modifying this class.
-  */
-    /**
-     * page number of this page
-     */
-    protected PageId curPage = new PageId();
-    /**
-     * number of slots in use
-     */
-    private short slotCnt;
-    /**
-     * offset of first used byte by data records in data[]
-     */
-    private short usedPtr;
-    /**
-     * number of bytes free in data[]
-     */
-    private short freeSpace;
-    /**
-     * an arbitrary value used by subclasses as needed
-     */
-    private short type;
+public class LHFPage extends HFPage{
 
     /**
      * Default constructor
@@ -70,7 +34,7 @@ public class LHFPage extends Page {
      * @param  label a label to be inserted
      * @return LID of label, null if sufficient space does not exist
      */
-    public ILID insertLabel(byte[] label)
+    public LID insertLabel(byte[] label)
             throws IOException {
 
         try {
@@ -123,7 +87,7 @@ public class LHFPage extends Page {
                 System.arraycopy(label, 0, data, usedPtr, recLen);
                 curPage.pid = Convert.getIntValue(CUR_PAGE, data);
 
-                ILID lid = new LID();
+                LID lid = new LID();
                 lid.getPageNo().pid = curPage.pid;
                 lid.setSlotNo(i);
                 return lid;
@@ -141,7 +105,7 @@ public class LHFPage extends Page {
      * @param lid the Label ID in C++ Status deleteRecord(const LID& lid)
      * @throws InvalidSlotNumberException Invalid slot number
      */
-    public void deleteLabel(ILID lid)
+    public void deleteLabel(LID lid)
             throws InvalidSlotNumberException, IOException {
         try {
             int slotNo = lid.getSlotNo();
@@ -177,7 +141,7 @@ public class LHFPage extends Page {
                     }
                 }
 
-                // move used Ptr forwar
+                // move used Ptr forward
                 usedPtr += recLen;
                 Convert.setShortValue(usedPtr, USED_PTR, data);
 
@@ -201,11 +165,10 @@ public class LHFPage extends Page {
      * @return LID of first label on page, null if page contains no labels.
      * @throws IOException I/O errors in C++ Status firstLabel(LID& firstLid)
      */
-    public ILID firstLabel()
+    public LID firstLabel()
             throws IOException {
         try {
             // find the first non-empty slot
-
             slotCnt = Convert.getShortValue(SLOT_CNT, data);
 
             int i;
@@ -223,7 +186,7 @@ public class LHFPage extends Page {
 
             // found a non-empty slot
 
-            ILID lid = new LID();
+            LID lid = new LID();
             lid.setSlotNo(i);
             curPage.pid = Convert.getIntValue(CUR_PAGE, data);
             lid.getPageNo().pid = curPage.pid;
@@ -241,7 +204,7 @@ public class LHFPage extends Page {
      * @return LID of next label on the page, null if no more labels exist on the page
      * @throws IOException I/O errors in C++ Status nextRecord (LID curLid, LID& nextLid)
      */
-    public ILID nextLID(ILID curLid)
+    public LID nextLabel(LID curLid)
             throws IOException {
         try {
             slotCnt = Convert.getShortValue(SLOT_CNT, data);
@@ -262,10 +225,10 @@ public class LHFPage extends Page {
             }
 
             // found a non-empty slot
-            ILID lid = new LID();
+            LID lid = new LID();
             lid.setSlotNo(i);
             curPage.setPid(Convert.getIntValue(CUR_PAGE, data));
-            lid.getPageNo().setPid(curPage.pid);
+            lid.getPageNo().pid = curPage.pid;
 
             return lid;
         } catch (Exception e) {
@@ -284,9 +247,8 @@ public class LHFPage extends Page {
      * @return a label contains the record
      * @throws InvalidSlotNumberException Invalid slot number
      */
-    public Label getLabel(ILID lid)
+    public Label getLabel(LID lid)
             throws InvalidSlotNumberException, IOException {
-        Tuple tuple = null;
         try {
             short recLen;
             short offset;
@@ -304,8 +266,7 @@ public class LHFPage extends Page {
                 offset = getSlotOffset(slotNo);
                 record = new byte[recLen];
                 System.arraycopy(data, offset, record, 0, recLen);
-                Label label = new Label(record, 0, recLen);
-                return label;
+                return new Label(record, 0, recLen);
             } else {
                 throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
             }
@@ -325,10 +286,9 @@ public class LHFPage extends Page {
      * @return a Label  with its length and offset in the byte array
      * @throws InvalidSlotNumberException Invalid slot number
      */
-    public Label returnLabel(ILID lid)
+    public Label returnRecord(LID lid)
             throws InvalidSlotNumberException, IOException {
 
-        Label label = null;
         try {
             short recLen;
             short offset;
@@ -346,8 +306,7 @@ public class LHFPage extends Page {
                     && (pageNo.pid == curPage.pid)) {
 
                 offset = getSlotOffset(slotNo);
-                label = new Label(data, offset, recLen);
-                return label;
+                return new Label(data, offset, recLen);
             } else {
                 throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
             }
@@ -358,32 +317,4 @@ public class LHFPage extends Page {
         }
     }
 
-    private short getSlotLength(int slotNo) {
-        return 0;
-    }
-
-    public Quadruple getRecord(RID rid) throws InvalidTupleSizeException, IOException, InvalidTypeException {
-        return null;
-    }
-
-    public RID nextRecord(RID rid) {
-        return new RID();
-    }
-
-    public RID firstRecord() {
-        return new RID();
-    }
-
-    public PageId getNextPage() {
-        return new PageId();
-    }
-
-    public void init(PageId firstDirPageId, Page apage) {
-    }
-
-    public void setNextPage(PageId pageId) {
-    }
-
-    public void setPrevPage(PageId pageId) {
-    }
 }

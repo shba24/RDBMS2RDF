@@ -1,10 +1,7 @@
 package labelheap;
 
 import diskmgr.Page;
-import global.GlobalConst;
-import global.PageId;
-import global.RID;
-import global.SystemDefs;
+import global.*;
 
 import java.io.IOException;
 
@@ -112,14 +109,14 @@ public class LabelHeapFile implements Filetype, GlobalConst {
         while (currentDirPageId.pid != INVALID_PAGE) {
             pinPage(currentDirPageId, currentDirPage, false);
 
-            RID rid = new RID();
-            Quadruple quadruple;
-            for (rid = currentDirPage.firstRecord();
-                 rid != null;  // rid==NULL means no more record
-                 rid = currentDirPage.nextRecord(rid)) {
-                quadruple = currentDirPage.getRecord(rid);
+            LID lid = new LID();
+            Label label;
+            for (lid = currentDirPage.firstLabel();
+                 lid != null;  // rid==NULL means no more record
+                 lid = currentDirPage.nextLabel(lid)) {
+                label = currentDirPage.getLabel(lid);
                 DataPageInfo dpinfo = null;
-                dpinfo = new DataPageInfo(quadruple);
+                dpinfo = new DataPageInfo(label);
 
                 answer += dpinfo.recct;
             }
@@ -147,7 +144,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
             InvalidTupleSizeException,
             LHFBufMgrException,
             LHFDiskMgrException,
-            IOException, InvalidTupleSizeException, heap.InvalidTupleSizeException, InvalidTypeException {
+            IOException, InvalidTupleSizeException, heap.InvalidTupleSizeException, InvalidTypeException, InvalidSlotNumberException {
         if (_file_deleted) {
             throw new FileAlreadyDeletedException(null, "file already deleted");
         }
@@ -162,18 +159,18 @@ public class LabelHeapFile implements Filetype, GlobalConst {
         nextDirPageId.pid = 0;
         Page pageinbuffer = new Page();
         LHFPage currentDirPage = new LHFPage();
-        Quadruple quadruple;
+        Label label;
 
         pinPage(currentDirPageId, currentDirPage, false);
         //currentDirPage.openHFpage(pageinbuffer);
 
-        RID rid = new RID();
+        LID lid = new LID();
         while (currentDirPageId.pid != INVALID_PAGE) {
-            for (rid = currentDirPage.firstRecord();
-                 rid != null;
-                 rid = currentDirPage.nextRecord(rid)) {
-                quadruple = currentDirPage.getRecord(rid);
-                DataPageInfo dpinfo = new DataPageInfo(quadruple);
+            for (lid = currentDirPage.firstLabel();
+                 lid != null;
+                 lid = currentDirPage.nextLabel(lid)) {
+                label = currentDirPage.getLabel(lid);
+                DataPageInfo dpinfo = new DataPageInfo(label);
                 //int dpinfoLen = arecord.length;
 
                 freePage(dpinfo.pageId);
