@@ -43,6 +43,17 @@ public class THFPage {
   public THFPage(HFPage hfPage) {
     this.hfPage = new HFPage(hfPage);
   }
+
+  /**
+   * Copy constructor
+   *
+   * @param thfPage THFPage object to copy from
+   */
+  public THFPage(THFPage thfPage) {
+    Page page = new Page(thfPage.getpage());
+    this.hfPage = new HFPage(page);
+  }
+
   /**
    * Initialize THFPage using a page id and a page. Internally calls init() on the underlying hfPage
    * object.
