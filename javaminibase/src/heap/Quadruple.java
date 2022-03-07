@@ -53,26 +53,53 @@ public class Quadruple {
   /**
    * Constructor for the quadruple class from the byte array
    *
-   * @param aquadruple array of quadruples
-   * @param offset     offset to add quadruples at
+   * @param aquadruple a byte array of quadruples
+   * @param offset     offset to add quadruples in the byte array
+   * @param length     length of the byte array of the quadruple
    */
-  public Quadruple(byte[] aquadruple, int offset) throws Exception {
+  public Quadruple(byte[] aquadruple, int offset, int length) throws Exception {
     if (aquadruple.length > Tuple.max_size) {
       throw new Exception("[Quadruple] Error, aquadruple byte " +
           "array length exceeds max allowed size");
     }
-    tuple = new Tuple(aquadruple, offset, 4);
+    tuple = new Tuple(aquadruple, offset, length);
   }
 
   /**
    * Constructor for the quadruple class from another
    * quadruple class through copy
    *
-   * @param fromQuadruple
+   * @param fromQuadruple a byte array which contains the quadruple
    */
   public Quadruple(Quadruple fromQuadruple) {
     tuple = new Tuple(fromQuadruple.tuple);
   }
+
+  /**
+   * Class constructor
+   * Creates a new quadruple with length = size,tuple offset = 0.
+   *
+   * @param size
+   */
+  public Quadruple(int size) {
+    tuple = new Tuple(size);
+  }
+
+  /**
+   * Gets the length of the byte array of the quadruple
+   *
+   * @return get the length of a tuple
+   */
+  public int getLength() {
+    return tuple.getLength();
+  }
+
+  /**
+   * get the offset of the quadruple
+   *
+   * @return offset of the quadruple in byte array
+   */
+  public int getOffset() { return tuple.getOffset(); }
 
   /**
    * Checks if the object is valid
@@ -85,18 +112,6 @@ public class Quadruple {
   }
 
   /**
-   * Checks if the object is valid and if invalid
-   * throws exception, other does nothing
-   *
-   * @throws NullPointerException
-   */
-  private void checkNullObjectAndThrowException() throws NullPointerException {
-    if (!IsValid()) {
-      throw new NullPointerException("[Quadruple] Error, Not initialized");
-    }
-  }
-
-  /**
    * Returns the subject ID
    *
    * @return Subject object
@@ -104,8 +119,6 @@ public class Quadruple {
    * @throws IOException
    */
   public IEID getSubjectID() throws FieldNumberOutOfBoundException, IOException {
-    checkNullObjectAndThrowException();
-
     IEID subject = new EID();
     String data;
     try {
@@ -130,8 +143,6 @@ public class Quadruple {
    * @throws FieldNumberOutOfBoundException
    */
   public Quadruple setSubjectID(IEID subjectId) throws IOException, FieldNumberOutOfBoundException {
-    checkNullObjectAndThrowException();
-
     byte[] data = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
       Convert.setIntValue(subjectId.getPageNo().pid, 0, data);
@@ -153,8 +164,6 @@ public class Quadruple {
    * @throws IOException
    */
   public IPID getPredicateID() throws FieldNumberOutOfBoundException, IOException {
-    checkNullObjectAndThrowException();
-
     IPID predicate = new PID();
     String data;
     try {
@@ -179,8 +188,6 @@ public class Quadruple {
    * @throws IOException
    */
   public Quadruple setPredicateID(IPID predicateId) throws FieldNumberOutOfBoundException, IOException {
-    checkNullObjectAndThrowException();
-
     byte[] data = new byte[GlobalConst.MAX_PID_OBJ_SIZE];
     try {
       Convert.setIntValue(predicateId.getPageNo().pid, 0, data);
@@ -202,8 +209,6 @@ public class Quadruple {
    * @throws IOException
    */
   public IEID getObjectID() throws FieldNumberOutOfBoundException, IOException {
-    checkNullObjectAndThrowException();
-
     IEID object = new EID();
     String data;
     try {
@@ -228,8 +233,6 @@ public class Quadruple {
    * @throws IOException
    */
   public Quadruple setObjectID(IEID objectId) throws FieldNumberOutOfBoundException, IOException {
-    checkNullObjectAndThrowException();
-
     byte[] data = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
       Convert.setIntValue(objectId.getPageNo().pid, 0, data);
@@ -251,8 +254,6 @@ public class Quadruple {
    * @throws IOException
    */
   public double getConfidence() throws FieldNumberOutOfBoundException, IOException {
-    checkNullObjectAndThrowException();
-
     double confidence;
     try {
       confidence = tuple.getFloFld(4);
@@ -274,8 +275,6 @@ public class Quadruple {
    * @throws IOException
    */
   public Quadruple setConfidence(double confidence) throws FieldNumberOutOfBoundException, IOException {
-    checkNullObjectAndThrowException();
-
     byte[] data = new byte[GlobalConst.MAX_FLOAT_SIZE];
     try {
       Convert.setFloValue((float) confidence, 0, data);
@@ -294,10 +293,15 @@ public class Quadruple {
    * @return byte array of this quadruple object
    */
   public byte[] getQuadrupleByteArray() {
-    checkNullObjectAndThrowException();
-
     return tuple.getTupleByteArray();
   }
+
+  /**
+   * return the data byte array
+   *
+   * @return data byte array
+   */
+  public byte[] returnQuadrupleByteArray() { return tuple.returnTupleByteArray(); }
 
   /**
    * Print out the quadruple
@@ -323,13 +327,25 @@ public class Quadruple {
   }
 
   /**
+   * Returns number of fields in this quadruple
+   *
+   * @return the number of fields in this quadruple
+   */
+  public short noOfFlds() { return tuple.noOfFlds(); }
+
+  /**
+   * Makes a copy of the fldOffset array
+   *
+   * @return a copuy of the fldOffset array
+   */
+  public short[] copyFldOffset() { return tuple.copyFldOffset(); }
+
+  /**
    * Get the length of the quadruple
    *
    * @return size of the current tuple
    */
   public short size() {
-    checkNullObjectAndThrowException();
-
     return this.tuple.size();
   }
 
