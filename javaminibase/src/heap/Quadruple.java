@@ -359,7 +359,7 @@ public class Quadruple {
   }
 
   /**
-   * This is used when you don’t want
+   * This is used when you do not want
    * to use the constructor
    *
    * @param aquadruple
