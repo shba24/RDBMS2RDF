@@ -14,14 +14,14 @@ public class IndexData extends DataClass {
    *
    * @param pageNo the page number
    */
-  IndexData(PageId pageNo) {pageId = new PageId(pageNo.pid);}
+  public IndexData(PageId pageNo) {pageId = new PageId(pageNo.pid);}
 
   /**
    * Class constructor
    *
    * @param pageNo the page number
    */
-  IndexData(int pageNo) {pageId = new PageId(pageNo);}
+  public IndexData(int pageNo) {pageId = new PageId(pageNo);}
 
   ;
 
@@ -36,14 +36,14 @@ public class IndexData extends DataClass {
    *
    * @return the reference of the copy
    */
-  protected PageId getData() {return new PageId(pageId.pid);}
+  public PageId getData() {return new PageId(pageId.pid);}
 
   ;
 
   /**
    * set the pageNo
    */
-  protected void setData(PageId pageNo) {pageId = new PageId(pageNo.pid);}
+  public void setData(PageId pageNo) {pageId = new PageId(pageNo.pid);}
 
   ;
 }   
