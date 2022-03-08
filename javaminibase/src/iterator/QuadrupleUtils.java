@@ -1,7 +1,6 @@
 package iterator;
 
 import global.AttrType;
-import heap.FieldNumberOutOfBoundException;
 import heap.Quadruple;
 
 import java.io.IOException;
@@ -257,7 +256,7 @@ public class QuadrupleUtils {
       }
     }
     try {
-      Jquadruple.setHdr((short) nOutFlds, res_attrs, res_str_sizes);
+      Jquadruple.setHdr(res_attrs, res_str_sizes);
     } catch (Exception e) {
       throw new QuadrupleUtilsException(e, "setHdr() failed");
     }
@@ -323,7 +322,7 @@ public class QuadrupleUtils {
     }
 
     try {
-      Jquadruple.setHdr((short) nOutFlds, res_attrs, res_str_sizes);
+      Jquadruple.setHdr(res_attrs, res_str_sizes);
     } catch (Exception e) {
       throw new QuadrupleUtilsException(e, "setHdr() failed");
     }
