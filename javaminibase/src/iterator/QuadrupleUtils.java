@@ -1,6 +1,7 @@
 package iterator;
 
 import global.AttrType;
+import heap.FieldNumberOutOfBoundException;
 import heap.Quadruple;
 
 import java.io.IOException;
@@ -34,9 +35,9 @@ public class QuadrupleUtils {
       AttrType fldType,
       Quadruple q1, int q1_fld_no,
       Quadruple q2, int q2_fld_no)
-      throws IOException,
-      UnknowAttrType,
-      QuadrupleUtilsException {
+          throws IOException,
+          UnknowAttrType,
+          QuadrupleUtilsException, FieldNumberOutOfBoundException {
     int q1_i, q2_i;
     float q1_r, q2_r;
     String q1_s, q2_s;
@@ -105,9 +106,9 @@ public class QuadrupleUtils {
       AttrType fldType,
       Quadruple q1, int q1_fld_no,
       Quadruple value)
-      throws IOException,
-      UnknowAttrType,
-      QuadrupleUtilsException {
+          throws IOException,
+          UnknowAttrType,
+          QuadrupleUtilsException, FieldNumberOutOfBoundException {
     return CompareQuadrupleWithQuadruple(fldType, q1, q1_fld_no, value, q1_fld_no);
   }
 
@@ -126,7 +127,7 @@ public class QuadrupleUtils {
    */
 
   public static boolean Equal(Quadruple q1, Quadruple q2, AttrType types[], int len)
-      throws IOException, UnknowAttrType, QuadrupleUtilsException {
+          throws IOException, UnknowAttrType, QuadrupleUtilsException, FieldNumberOutOfBoundException {
     int i;
 
     for (i = 1; i <= len; i++) {
@@ -146,8 +147,8 @@ public class QuadrupleUtils {
    * @throws QuadrupleUtilsException exception from this class
    */
   public static String Value(Quadruple quadruple, int fldno)
-      throws
-          QuadrupleUtilsException {
+          throws
+          QuadrupleUtilsException, FieldNumberOutOfBoundException, IOException {
     String temp;
     temp = quadruple.getStrFld(fldno);
     return temp;
@@ -165,9 +166,9 @@ public class QuadrupleUtils {
    * @throws QuadrupleUtilsException exception from this class
    */
   public static void SetValue(Quadruple value, Quadruple quadruple, int fld_no, AttrType fldType)
-      throws IOException,
-      UnknowAttrType,
-      QuadrupleUtilsException {
+          throws IOException,
+          UnknowAttrType,
+          QuadrupleUtilsException, FieldNumberOutOfBoundException {
 
     switch (fldType.attrType) {
       case AttrType.attrInteger:

@@ -35,9 +35,9 @@ public class LabelUtils {
       AttrType fldType,
       Label l1, int l1_fld_no,
       Label l2, int l2_fld_no)
-      throws IOException,
-      UnknowAttrType,
-      LabelUtilsException {
+          throws IOException,
+          UnknowAttrType,
+          LabelUtilsException, FieldNumberOutOfBoundException {
     int l1_i, l2_i;
     float l1_r, l2_r;
     String l1_s, l2_s;
@@ -106,9 +106,9 @@ public class LabelUtils {
       AttrType fldType,
       Label l1, int l1_fld_no,
       Label value)
-      throws IOException,
-      UnknowAttrType,
-      LabelUtilsException {
+          throws IOException,
+          UnknowAttrType,
+          LabelUtilsException, FieldNumberOutOfBoundException {
     return CompareLabelWithLabel(fldType, l1, l1_fld_no, value, l1_fld_no);
   }
 
@@ -126,7 +126,7 @@ public class LabelUtils {
    */
 
   public static boolean Equal(Label l1, Label l2, AttrType types[], int len)
-      throws IOException, UnknowAttrType, LabelUtilsException {
+          throws IOException, UnknowAttrType, LabelUtilsException, FieldNumberOutOfBoundException {
     int i;
 
     for (i = 1; i <= len; i++) {
@@ -146,8 +146,8 @@ public class LabelUtils {
    * @throws LabelUtilsException exception from this class
    */
   public static String Value(Label label, int fldno)
-      throws IOException,
-      LabelUtilsException {
+          throws IOException,
+          LabelUtilsException, FieldNumberOutOfBoundException {
     String temp;
     temp = label.getStrFld(fldno);
     return temp;
@@ -165,9 +165,9 @@ public class LabelUtils {
    * @throws LabelUtilsException exception from this class
    */
   public static void SetValue(Label value, Label label, int fld_no, AttrType fldType)
-      throws IOException,
-      UnknowAttrType,
-      LabelUtilsException {
+          throws IOException,
+          UnknowAttrType,
+          LabelUtilsException, FieldNumberOutOfBoundException {
 
     switch (fldType.attrType) {
       case AttrType.attrInteger:

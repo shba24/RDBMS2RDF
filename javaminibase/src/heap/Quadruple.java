@@ -404,7 +404,7 @@ public class Quadruple {
     }
 
     public void setStrFld(int fld_no, String strFld) throws FieldNumberOutOfBoundException, IOException {
-      tuple.setStrFld(1, strFld);
+      tuple.setStrFld(fld_no, strFld);
     }
 
     public void setHdr(AttrType[] res_attrs, short[] attrSize) throws InvalidTupleSizeException, IOException, InvalidTypeException {
