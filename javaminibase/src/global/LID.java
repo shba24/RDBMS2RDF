@@ -6,8 +6,8 @@ package global;
  */
 public class LID implements ILID {
 
-  private PageId pageNo;
-  private int slotNo;
+  public PageId pageNo;
+  public int slotNo;
   private LabelType labelType;
   private EID entityID;
   private PID predicateID;

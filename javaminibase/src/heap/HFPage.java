@@ -100,6 +100,12 @@ public class HFPage extends Page
     data = apage.getpage();
   }
 
+  public void setSlotCnt(short cnt) { slotCnt = cnt; }
+
+  public void setUsedPtr(short ptr) { usedPtr = ptr; }
+
+  public void setFreeSpace(short space) { freeSpace = space; }
+
   /**
    * Constructor of class HFPage
    * initialize a new page
@@ -256,6 +262,16 @@ public class HFPage extends Page
       throws IOException {
     type = valtype;
     Convert.setShortValue(type, TYPE, data);
+  }
+
+  /**
+   * @return slotCnt used in this page
+   * @throws IOException I/O errors
+   */
+  public short getSlotCnt()
+      throws IOException {
+    slotCnt = Convert.getShortValue(SLOT_CNT, data);
+    return slotCnt;
   }
 
   /**
