@@ -56,7 +56,7 @@ class DataPageInfo implements GlobalConst {
 
   /** constructor: translate a tuple to a DataPageInfo object
    *  it will make a copy of the data in the tuple
-   * @param atuple: the input tuple
+   * @param _atuple: the input tuple
    */
   public DataPageInfo(Tuple _atuple)
       throws InvalidTupleSizeException, IOException {
