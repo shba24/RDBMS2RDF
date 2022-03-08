@@ -50,15 +50,15 @@ public class HFPage extends Page
   /**
    * number of slots in use
    */
-  private short slotCnt;
+  protected short slotCnt;
   /**
    * offset of first used byte by data records in data[]
    */
-  private short usedPtr;
+  protected short usedPtr;
   /**
    * number of bytes free in data[]
    */
-  private short freeSpace;
+  protected short freeSpace;
   /**
    * an arbitrary value used by subclasses as needed
    */
@@ -99,6 +99,12 @@ public class HFPage extends Page
   public void openHFpage(Page apage) {
     data = apage.getpage();
   }
+
+  public void setSlotCnt(short cnt) { slotCnt = cnt; }
+
+  public void setUsedPtr(short ptr) { usedPtr = ptr; }
+
+  public void setFreeSpace(short space) { freeSpace = space; }
 
   /**
    * Constructor of class HFPage

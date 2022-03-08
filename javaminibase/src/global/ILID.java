@@ -5,33 +5,96 @@ package global;
  */
 public interface ILID {
 
-  PageId getPageNo();
+    /**
+     * get page number
+     * @return
+     */
+    PageId getPageNo();
 
-  void setPageNo(PageId pageNo);
+    /**
+     * set page number
+     * @param pageNo
+     */
+    void setPageNo(PageId pageNo);
 
-  int getSlotNo();
+    /**
+     * get slot number
+     * @return
+     */
+    int getSlotNo();
 
-  void setSlotNo(int slotNo);
+    /**
+     * set slot number
+     * @param slotNo
+     */
+    void setSlotNo(int slotNo);
 
-  LabelType getLabelType();
+    /**
+     * get label type
+     * @return
+     */
+    LabelType getLabelType();
 
-  void setLabelType(LabelType labelType);
+    /**
+     * set label type
+     * @param labelType
+     */
+    void setLabelType(LabelType labelType);
 
-  EID getEntityID();
+    /**
+     * gets entity id
+     * @return
+     */
+    EID getEntityID();
 
-  void setEntityID(EID entityID);
+    /**
+     * sets entity id
+     * @param entityID
+     */
+    void setEntityID(EID entityID);
 
-  PID getPredicateID();
+    /**
+     * gets predicate id
+     * @return
+     */
+    PID getPredicateID();
 
-  void setPredicateID(PID predicateID);
+    /**
+     * sets predicate id
+     * @param predicateID
+     */
+    void setPredicateID(PID predicateID);
 
-  void copyLid(LID lid);
+    /**
+     * copy lid object
+     * @param lid
+     */
+    void copyLid(LID lid);
 
-  boolean equals(LID lid);
+    /**
+     * compares lid
+     * @param lid
+     * @return
+     */
+    boolean equals(LID lid);
 
-  EID returnEID();
+    /**
+     * returns eid
+     * @return
+     */
+    EID returnEID();
 
-  PID returnPID();
+    /**
+     * returns pid
+     * @return
+     */
+    PID returnPID();
 
-  void writeToByteArray(byte[] array, int offset) throws java.io.IOException;
+    /**
+     * writes data to byte array
+     * @param array - data
+     * @param offset - offset
+     * @throws java.io.IOException
+     */
+    void writeToByteArray(byte[] array, int offset) throws java.io.IOException;
 }

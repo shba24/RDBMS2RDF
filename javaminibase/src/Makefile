@@ -3,8 +3,17 @@
 #the following macros should be updated according to
 #the assignment to be generated
 
-JARFILES=bufmgr/*.class diskmgr/*.class global/*.class iterator/*.class\
-         heap/*.class chainexception/*.class  btree/*.class index/*.class tests/*.class catalog/*.class
+JARFILES=bufmgr/*.class \
+		 diskmgr/*.class \
+		 global/*.class \
+		 iterator/*.class\
+         heap/*.class \
+         chainexception/*.class \
+         btree/*.class \
+         index/*.class \
+         lablebtree/*.class \
+         tests/*.class \
+         catalog/*.class
 
 JDKPATH = /usr
 LIBPATH = .:..
@@ -37,6 +46,8 @@ db:
 	make -C heap
 	make -C index
 	make -C iterator
+	make -C lablebtree
+	make -C catalog
 	
 doc:
 	$(JAVADOC) $(DOCFILES)
