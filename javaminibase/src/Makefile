@@ -9,9 +9,8 @@ JARFILES=bufmgr/*.class \
 		 iterator/*.class\
          heap/*.class \
          chainexception/*.class \
-         btree/*.class \
+         btree/**/*.class \
          index/*.class \
-         lablebtree/*.class \
          tests/*.class \
          catalog/*.class
 
@@ -46,7 +45,6 @@ db:
 	make -C heap
 	make -C index
 	make -C iterator
-	make -C lablebtree
 	make -C catalog
 	
 doc:

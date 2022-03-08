@@ -5,8 +5,8 @@ package global;
  */
 public class QID implements IQID {
 
-  private PageId pageNo;
-  private int slotNo;
+  public PageId pageNo;
+  public int slotNo;
 
   /**
    * Default constructor. Nothing is being done in this constructor.
