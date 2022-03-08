@@ -6,7 +6,7 @@ import global.*;
 import java.io.IOException;
 
 /**
- * Class label heap file page. The design assumes that records are kept compacted when deletions are
+ * Class label heap file page. The design assumes that labels are kept compacted when deletions are
  * performed.
  */
 
@@ -100,9 +100,9 @@ public class LHFPage extends HFPage{
     }
 
     /**
-     * delete the record with the specified lid
+     * delete the label with the specified lid
      *
-     * @param lid the Label ID in C++ Status deleteRecord(const LID& lid)
+     * @param lid the Label ID in C++ Status deleteLabel(const LID& lid)
      * @throws InvalidSlotNumberException Invalid slot number
      */
     public void deleteLabel(LID lid)
@@ -112,13 +112,13 @@ public class LHFPage extends HFPage{
             short recLen = getSlotLength(slotNo);
             slotCnt = Convert.getShortValue(SLOT_CNT, data);
 
-            // first check if the record being deleted is actually valid
+            // first check if the label being deleted is actually valid
             if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)) {
-                // The records always need to be compacted, as they are
+                // The labels always need to be compacted, as they are
                 // not necessarily stored on the page in the order that
                 // they are listed in the slot index.
 
-                // offset of record being deleted
+                // offset of label being deleted
                 int offset = getSlotOffset(slotNo);
                 usedPtr = Convert.getShortValue(USED_PTR, data);
                 int newSpot = usedPtr + recLen;
@@ -128,7 +128,7 @@ public class LHFPage extends HFPage{
                 System.arraycopy(data, usedPtr, data, newSpot, size);
 
                 // now need to adjust offsets of all valid slots that refer
-                // to the left of the record being removed. (by the size of the hole)
+                // to the left of the label being removed. (by the size of the hole)
 
                 int i, n, chkoffset;
                 for (i = 0, n = DPFIXED; i < slotCnt; n += SIZE_OF_SLOT, i++) {
@@ -202,7 +202,7 @@ public class LHFPage extends HFPage{
     /**
      * @param curLid current label ID
      * @return LID of next label on the page, null if no more labels exist on the page
-     * @throws IOException I/O errors in C++ Status nextRecord (LID curLid, LID& nextLid)
+     * @throws IOException I/O errors in C++ Status nextLabel (LID curLid, LID& nextLid)
      */
     public LID nextLabel(LID curLid)
             throws IOException {
@@ -244,7 +244,7 @@ public class LHFPage extends HFPage{
      * Status getLabel(LID lid, char *recPtr, int& recLen)
      *
      * @param lid the label ID
-     * @return a label contains the record
+     * @return a label contains the label
      * @throws InvalidSlotNumberException Invalid slot number
      */
     public Label getLabel(LID lid)
@@ -252,21 +252,21 @@ public class LHFPage extends HFPage{
         try {
             short recLen;
             short offset;
-            byte[] record;
+            byte[] label;
             PageId pageNo = new PageId();
             pageNo.pid = lid.getPageNo().pid;
             curPage.pid = Convert.getIntValue(CUR_PAGE, data);
             int slotNo = lid.getSlotNo();
 
-            // length of record being returned
+            // length of label being returned
             recLen = getSlotLength(slotNo);
             slotCnt = Convert.getShortValue(SLOT_CNT, data);
             if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)
                     && (pageNo.pid == curPage.pid)) {
                 offset = getSlotOffset(slotNo);
-                record = new byte[recLen];
-                System.arraycopy(data, offset, record, 0, recLen);
-                return new Label(record, 0, recLen);
+                label = new byte[recLen];
+                System.arraycopy(data, offset, label, 0, recLen);
+                return new Label(label, 0, recLen);
             } else {
                 throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
             }
@@ -286,7 +286,7 @@ public class LHFPage extends HFPage{
      * @return a Label  with its length and offset in the byte array
      * @throws InvalidSlotNumberException Invalid slot number
      */
-    public Label returnRecord(LID lid)
+    public Label returnLabel(LID lid)
             throws InvalidSlotNumberException, IOException {
 
         try {
@@ -298,7 +298,7 @@ public class LHFPage extends HFPage{
             curPage.pid = Convert.getIntValue(CUR_PAGE, data);
             int slotNo = lid.getSlotNo();
 
-            // length of record being returned
+            // length of label being returned
             recLen = getSlotLength(slotNo);
             slotCnt = Convert.getShortValue(SLOT_CNT, data);
 

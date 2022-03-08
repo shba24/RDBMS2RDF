@@ -8,6 +8,7 @@ JARFILES=bufmgr/*.class \
 		 global/*.class \
 		 iterator/*.class\
          heap/*.class \
+         labelheap/*.class \
          chainexception/*.class \
          btree/*.class \
          index/*.class \
@@ -48,6 +49,7 @@ db:
 	make -C iterator
 	make -C lablebtree
 	make -C catalog
+	make -C labelheap
 	
 doc:
 	$(JAVADOC) $(DOCFILES)

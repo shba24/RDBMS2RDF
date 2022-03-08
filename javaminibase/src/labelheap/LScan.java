@@ -26,7 +26,7 @@ import java.io.IOException;
 /**
  * A Scan object is created ONLY through the function openScan
  * of a HeapFile. It supports the getNext interface which will
- * simply retrieve the next record in the heapfile.
+ * simply retrieve the next label in the heapfile.
  *
  * An object of type scan will always have pinned one directory page
  * of the heapfile.
@@ -34,7 +34,7 @@ import java.io.IOException;
 public class LScan implements GlobalConst {
 
     /**
-     * Note that one record in our way-cool HeapFile implementation is
+     * Note that one label in our way-cool HeapFile implementation is
      * specified by six (6) parameters, some of which can be determined
      * from others:
      */
@@ -48,18 +48,18 @@ public class LScan implements GlobalConst {
     /** pointer to in-core data of dirpageId (page is pinned) */
     private LHFPage dirpage = new LHFPage();
 
-    /** record ID of the DataPageInfo struct (in the directory page) which
-     * describes the data page where our current record lives.
+    /** label ID of the DataPageInfo struct (in the directory page) which
+     * describes the data page where our current label lives.
      */
     private LID datePageLid = new LID();
 
-    /** the actual PageId of the data page with the current record */
+    /** the actual PageId of the data page with the current label */
     private PageId dataPageId = new PageId();
 
     /** in-core copy (pinned) of the same */
     private LHFPage dataPage = new LHFPage();
 
-    /** record ID of the current record (from the current data page) */
+    /** label ID of the current label (from the current data page) */
     private LID lid = new LID();
 
     /** Status of next user status */
@@ -80,13 +80,13 @@ public class LScan implements GlobalConst {
         init(lhf);
     }
 
-    /** Retrieve the next record in a sequential scan
+    /** Retrieve the next label in a sequential scan
      *
      * @exception InvalidTupleSizeException Invalid tuple size
      * @exception IOException I/O errors
      *
-     * @param lid Record ID of the record
-     * @return the Tuple of the retrieved record.
+     * @param lid Label ID of the label
+     * @return the Tuple of the retrieved label.
      */
     public Label getNext(LID lid)
             throws InvalidTupleSizeException,
@@ -121,23 +121,23 @@ public class LScan implements GlobalConst {
         return label;
     }
 
-    /** Position the scan cursor to the record with the given lid.
+    /** Position the scan cursor to the label with the given lid.
      *
      * @exception InvalidTupleSizeException Invalid tuple size
      * @exception IOException I/O errors
-     * @param lid Record ID of the given record
+     * @param lid Label ID of the given label
      * @return true if successful,
      *			false otherwise.
      */
     public boolean position(LID lid)
             throws InvalidTupleSizeException,
             IOException {
-        LID nxtrid = new LID();
+        LID nxtlid = new LID();
         boolean bst;
 
-        bst = peekNext(nxtrid);
+        bst = peekNext(nxtlid);
 
-        if (nxtrid.equals(lid) == true) {
+        if (nxtlid.equals(lid) == true) {
             return true;
         }
 
@@ -177,10 +177,10 @@ public class LScan implements GlobalConst {
             return bst;
         }
 
-        bst = peekNext(nxtrid);
+        bst = peekNext(nxtlid);
 
-        while ((bst == true) && (nxtrid != lid)) {
-            bst = mvNext(nxtrid);
+        while ((bst == true) && (nxtlid != lid)) {
+            bst = mvNext(nxtlid);
         }
 
         return bst;
@@ -266,7 +266,7 @@ public class LScan implements GlobalConst {
         LID dataPageLid = dirpage.firstLabel();
 
         if (dataPageLid != null) {
-            /** there is a datapage record on the first directory page: */
+            /** there is a datapage label on the first directory page: */
 
             try {
                 label = dirpage.getLabel(dataPageLid);
@@ -281,7 +281,7 @@ public class LScan implements GlobalConst {
 
             /** the first directory page is the only one which can possibly remain
              * empty: therefore try to get the next directory page and
-             * check it. The next one has to contain a datapage record, unless
+             * check it. The next one has to contain a datapage label, unless
              * the heapfile is empty:
              */
             PageId nextDirPageId = new PageId();
@@ -307,7 +307,7 @@ public class LScan implements GlobalConst {
                     e.printStackTrace();
                 }
 
-                /** now try again to read a data record: */
+                /** now try again to read a data label: */
 
                 try {
                     dataPageLid = dirpage.firstLabel();
@@ -361,7 +361,7 @@ public class LScan implements GlobalConst {
          * - if heapfile empty:
          *    - this->datapage == NULL, this->datapageId==INVALID_PAGE
          * - if heapfile nonempty:
-         *    - this->datapage == NULL, this->datapageId, this->datapageRid valid
+         *    - this->datapage == NULL, this->datapageId, this->datapage Lid valid
          *    - first datapage is not yet pinned
          */
 
@@ -387,12 +387,12 @@ public class LScan implements GlobalConst {
         // - this->dirpage is valid and pinned
         // (1) if heapfile empty:
         //    - this->datapage==NULL; this->datapageId == INVALID_PAGE
-        // (2) if overall first record in heapfile:
+        // (2) if overall first label in heapfile:
         //    - this->datapage==NULL, but this->datapageId valid
-        //    - this->datapageRid valid
+        //    - this->datapageLid valid
         //    - current data page unpinned !!!
         // (3) if somewhere in heapfile
-        //    - this->datapageId, this->datapage, this->datapageRid valid
+        //    - this->datapageId, this->datapage, this->datapageLid valid
         //    - current data page pinned
         // (4)- if the scan had already been done,
         //        dirpage = NULL;  datapageId = INVALID_PAGE
@@ -433,7 +433,7 @@ public class LScan implements GlobalConst {
         }
 
         // ASSERTIONS:
-        // - this->datapage, this->datapageId, this->datapageRid valid
+        // - this->datapage, this->datapageId, this->datapageLid valid
         // - current datapage pinned
 
         // unpin the current datapage
@@ -444,8 +444,8 @@ public class LScan implements GlobalConst {
 
         }
 
-        // read next datapagerecord from current directory page
-        // dirpage is set to NULL at the end of scan. Hence
+        // read next dataPageLabel from current directory page
+        // dirPage is set to NULL at the end of scan. Hence
 
         if (dirpage == null) {
             return false;
@@ -455,7 +455,7 @@ public class LScan implements GlobalConst {
 
         if (datePageLid == null) {
             nextDataPageStatus = false;
-            // we have read all datapage records on the current directory page
+            // we have read all datapage labels on the current directory page
 
             // get next directory page
             nextDirPageId = dirpage.getNextPage();
@@ -503,10 +503,10 @@ public class LScan implements GlobalConst {
         // - this->dirpageId, this->dirpage valid
         // - this->dirpage pinned
         // - the new datapage to be read is on dirpage
-        // - this->datapageRid has the Rid of the next datapage to be read
+        // - this->datapageLid has the Lid of the next datapage to be read
         // - this->datapage, this->datapageId invalid
 
-        // data page is not yet loaded: read its record from the directory page
+        // data page is not yet loaded: read its label from the directory page
         try {
             rectuple = dirpage.getLabel(datePageLid);
         } catch (Exception e) {
@@ -530,7 +530,7 @@ public class LScan implements GlobalConst {
         // - directory page is pinned
         // - datapage is pinned
         // - this->dirpageId, this->dirpage correct
-        // - this->datapageId, this->datapage, this->datapageRid correct
+        // - this->datapageId, this->datapage, this->datapageLid correct
 
         lid = dataPage.firstLabel();
 
@@ -549,8 +549,8 @@ public class LScan implements GlobalConst {
         return true;
     }
 
-    /** Move to the next record in a sequential scan.
-     * Also returns the LID of the (new) current record.
+    /** Move to the next label in a sequential scan.
+     * Also returns the LID of the (new) current label.
      */
     private boolean mvNext(LID lid)
             throws InvalidTupleSizeException,

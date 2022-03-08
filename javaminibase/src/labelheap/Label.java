@@ -61,4 +61,8 @@ public class Label {
     public int getLength() {
         return 0;
     }
+
+    public void labelCopy(Label newLabel) {
+
+    }
 }
