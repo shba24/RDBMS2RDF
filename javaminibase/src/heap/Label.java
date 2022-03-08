@@ -50,4 +50,32 @@ public class Label {
     this.lid.setPageNo(pageNo);
     this.lid.setSlotNo(slotNo);
   }
+
+  public int getIntFld(int l1_fld_no) {
+    return 0;
+  }
+
+  public float getFloFld(int l1_fld_no) {
+    return 0;
+  }
+
+  public String getStrFld(int l1_fld_no) {
+    return null;
+  }
+
+  public void setIntFld(int fld_no, int intFld) {
+
+  }
+
+  public void setFloFld(int fld_no, float floFld) {
+
+  }
+
+  public void setStrFld(int fld_no, String strFld) {
+
+  }
+
+  public void setHdr(short nOutFlds, AttrType[] res_attrs, short[] res_str_sizes) {
+
+  }
 }
