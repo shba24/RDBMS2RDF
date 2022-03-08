@@ -11,7 +11,7 @@ import java.io.IOException;
  * THFPage is the implementation of the quadruple heap file page. It uses adapter design pattern to
  * deliver its functionality by using HFPage object as a member of this class.
  */
-public class THFPage {
+public class THFPage extends HFPage{
 
   private HFPage hfPage;
 
@@ -29,14 +29,6 @@ public class THFPage {
    */
   public THFPage(Page page) {
     this.hfPage = new HFPage(page);
-  }
-
-  /**
-   *
-   * @return HFpage
-   */
-  public HFPage getHFPage(){
-    return this.hfPage;
   }
 
   /**

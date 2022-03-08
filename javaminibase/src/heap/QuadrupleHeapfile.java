@@ -4,5 +4,13 @@ import global.PageId;
 
 public class QuadrupleHeapfile {
 
-  public PageId _firstDirPageId;
+  private PageId _firstDirPageId;
+
+  /**
+   *
+   * @return _firstDirPageId
+   */
+  public PageId getFirstDirPageId(){
+    return this._firstDirPageId;
+  }
 }

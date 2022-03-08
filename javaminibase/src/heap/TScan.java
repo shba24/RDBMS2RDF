@@ -9,11 +9,6 @@ import global.SystemDefs;
 import java.io.IOException;
 
 public class TScan implements GlobalConst {
-/**
- * Note that one record in our way-cool HeapFile implementation is
- * specified by six (6) parameters, some of which can be determined
- * from others:
- */
 
   /** The Quadruple heapfile we are using. */
   private QuadrupleHeapfile _qhf;
@@ -69,7 +64,7 @@ public class TScan implements GlobalConst {
       IOException {
     Quadruple recptrquadruple = null;
 
-    if (nextUserStatus != true) {
+    if (!nextUserStatus) {
       nextDataPage();
     }
 
@@ -113,7 +108,7 @@ public class TScan implements GlobalConst {
 
     bst = peekNext(nxtqid);
 
-    if (nxtqid.equals(qid) == true) {
+    if (nxtqid.equals(qid)) {
       return true;
     }
 
@@ -128,13 +123,13 @@ public class TScan implements GlobalConst {
 
       bst = firstDataPage();
 
-      if (bst != true) {
+      if (!bst) {
         return bst;
       }
 
       while (!datapageId.equals(pgid)) {
         bst = nextDataPage();
-        if (bst != true) {
+        if (!bst) {
           return bst;
         }
       }
@@ -155,7 +150,7 @@ public class TScan implements GlobalConst {
 
     bst = peekNext(nxtqid);
 
-    while ((bst == true) && (nxtqid != qid)) {
+    while ((bst) && (nxtqid != qid)) {
       bst = mvNext(nxtqid);
     }
 
@@ -226,13 +221,13 @@ public class TScan implements GlobalConst {
 
     /** copy data about first directory page */
 
-    dirpageId.pid = _qhf._firstDirPageId.pid;
+    dirpageId.pid = _qhf.getFirstDirPageId().pid;
     nextUserStatus = true;
 
     /** get first directory page and pin it */
     try {
       dirpage = new THFPage();
-      pinPage(dirpageId, (Page) dirpage.getHFPage(), false);
+      pinPage(dirpageId, (Page) dirpage, false);
     } catch (Exception e) {
       //    System.err.println("SCAN Error, try pinpage: " + e);
       e.printStackTrace();
@@ -277,7 +272,7 @@ public class TScan implements GlobalConst {
         try {
 
           dirpage = new THFPage();
-          pinPage(nextDirPageId, (Page) dirpage.getHFPage(), false);
+          pinPage(nextDirPageId, dirpage, false);
         } catch (Exception e) {
           //  System.err.println("SCAN: Error in 1stdatapage 2 " + e);
           e.printStackTrace();
@@ -393,7 +388,7 @@ public class TScan implements GlobalConst {
         // pin first data page
         try {
           datapage = new THFPage();
-          pinPage(datapageId, (Page) datapage.getHFPage(), false);
+          pinPage(datapageId, datapage, false);
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -456,7 +451,7 @@ public class TScan implements GlobalConst {
 
         try {
           dirpage = new THFPage();
-          pinPage(dirpageId, (Page) dirpage.getHFPage(), false);
+          pinPage(dirpageId, dirpage, false);
         } catch (Exception e) {
 
         }
@@ -498,7 +493,7 @@ public class TScan implements GlobalConst {
 
     try {
       datapage = new THFPage();
-      pinPage(dpinfo.pageId, (Page) datapage.getHFPage(), false);
+      pinPage(dpinfo.pageId, datapage, false);
     } catch (Exception e) {
       System.err.println("HeapFile: Error in Scan" + e);
     }
@@ -548,7 +543,7 @@ public class TScan implements GlobalConst {
 
       status = nextDataPage();
 
-      if (status == true) {
+      if (status) {
         qid.getPageNo().pid = userqid.getPageNo().pid;
         qid.setSlotNo(userqid.getSlotNo());
       }
