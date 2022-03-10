@@ -1,53 +1,64 @@
 package heap;
 
-import global.*;
+import global.Convert;
+import java.io.IOException;
 
+/**
+ * Label
+ * Tuple is modified into label which can be used by subject, predicate or object
+ */
 public class Label {
 
-  private ILID lid;
-
-  private Tuple tuple;
+  /**
+   * label name
+   */
+  private String labelName;
 
   /**
-   * Parameterized Constructor
-   * @param record
-   * @param i
-   * @param recLen
+   * Label constructor
+   *
+   * @param name
    */
-  public Label(byte[] record, int i, short recLen) {
-    //To be implemented
+  public Label(String name) {
+    labelName = name;
   }
 
   /**
-   * Sets the tuple member
-   * @param  tuple to be assigned
+   * Label constructor
+   *
+   * @param data      byte array
+   * @param offset    offset in the data array
+   * @param len       length of data
+   * @throws IOException
    */
-  public void setTuple(Tuple tuple)
-  {
-    this.tuple = tuple;
+  public Label(byte[] data, int offset, int len) throws IOException {
+    labelName = Convert.getStrValue(offset, data, len);
   }
 
   /**
-   * Sets the lid
-   * @param lid to be assigned
+   * Gets a label
+   *
+   * @return
    */
-  public void setLid(ILID lid){
-    this.lid.setPageNo(lid.getPageNo());
-    this.lid.setSlotNo(lid.getSlotNo());
+  public String getLabel() {
+    return this.labelName;
   }
 
   /**
-   * Default constructor of class
+   * sets the label
+   *
+   * @param name given label
+   * @return
    */
-  public Label(){}
+  public Label setLabel(String name) {
+    labelName = name;
+    return this;
+  }
 
   /**
-   * Parametric constructor for intoalizing Pageno and slot no
-   * @param pageNo pageno
-   * @param slotNo slot no
+   * print the label
    */
-  public Label(PageId pageNo, int slotNo) {
-    this.lid.setPageNo(pageNo);
-    this.lid.setSlotNo(slotNo);
+  public void print() {
+    System.out.println(this.getLabel());
   }
 }
