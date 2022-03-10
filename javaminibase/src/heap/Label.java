@@ -1,177 +1,93 @@
 package heap;
 
-import global.AttrType;
-import global.GlobalConst;
-import global.ILID;
-import global.PageId;
+import global.Convert;
 
 import java.io.IOException;
 
+/**
+ * Label
+ * Tuple is modified into label which can be used by subject, predicate or object
+ */
 public class Label {
 
-    private ILID lid;
-
-    private Tuple tuple;
+    /**
+     * label name
+     */
+    private String labelName;
 
     /**
-     * Parameterized Constructor
+     * Label constructor
      *
-     * @param record
-     * @param i
-     * @param recLen
+     * @param name
      */
-    public Label(byte[] record, int i, short recLen) {
-        //To be implemented
+    public Label(String name) {
+        labelName = name;
     }
 
     /**
-     * Constructor for the Label class with the size of Tuple.max_size
+     * Label constructor
      *
-     * @throws InvalidTupleSizeException
+     * @param data   byte array
+     * @param offset offset in the data array
+     * @param len    length of data
      * @throws IOException
-     * @throws InvalidTypeException
      */
-    public Label() throws InvalidTupleSizeException, IOException, InvalidTypeException {
-        AttrType[] attrType = new AttrType[4];
-        attrType[0] = new AttrType(AttrType.attrString);
-        attrType[1] = new AttrType(AttrType.attrString);
-        attrType[2] = new AttrType(AttrType.attrString);
-        attrType[3] = new AttrType(AttrType.attrReal);
-
-        short[] attrSize = new short[3];
-        attrSize[0] = GlobalConst.MAX_EID_OBJ_SIZE;
-        attrSize[1] = GlobalConst.MAX_PID_OBJ_SIZE;
-        attrSize[2] = GlobalConst.MAX_EID_OBJ_SIZE;
-
-        tuple = new Tuple();
-        try {
-            tuple.setHdr((short) 4, attrType, attrSize);
-        } catch (Exception e) {
-            System.err.println("[Label] Error in creating label object.");
-            e.printStackTrace();
-            throw e;
-        }
+    public Label(byte[] data, int offset, int len) throws IOException {
+        labelName = Convert.getStrValue(offset, data, len);
     }
 
     /**
-     * Constructor for the label  class from the byte array
+     * Gets a label
      *
-     * @param alabel  a byte array of label s
-     * @param offset     offset to add label s in the byte array
-     * @param length     length of the byte array of the label 
+     * @return
      */
-    public Label(byte[] alabel , int offset, int length) throws Exception {
-        if (alabel .length > Tuple.max_size) {
-            throw new Exception("[Label] Error, alabel  byte " +
-                    "array length exceeds max allowed size");
-        }
-        tuple = new Tuple(alabel , offset, length);
+    public String getLabel() {
+        return labelName;
     }
 
     /**
-     * Constructor for the label  class from another
-     * label  class through copy
+     * sets the label
      *
-     * @param fromLabel  a byte array which contains the label 
+     * @param name given label
+     * @return
      */
-    public Label(Label fromLabel ) {
-        tuple = new Tuple(fromLabel .tuple);
+    public Label setLabel(String name) {
+        labelName = name;
+        return this;
     }
 
     /**
-     * Class constructor
-     * Creates a new label  with length = size,tuple offset = 0.
-     *
-     * @param size
+     * print the label
      */
-    public Label(int size) {
-        tuple = new Tuple(size);
+    public void print() {
+        System.out.println(this.getLabel());
     }
 
     /**
-     * Gets the length of the byte array of the label 
-     *
-     * @return get the length of a tuple
+     * returns the length
+     * @return
      */
     public int getLength() {
-        return tuple.getLength();
+        return labelName.length();
     }
 
     /**
-     * get the offset of the label 
-     *
-     * @return offset of the label  in byte array
+     * return the tuple in byte array
+     * @return
+     */
+    public byte[] returnTupleByteArray() {
+        return labelName.getBytes();
+    }
+
+    /**
+     * returns offset
+     * @return
      */
     public int getOffset() {
-        return tuple.getOffset();
+        return 0;
     }
 
-    /**
-     * Checks if the object is valid
-     *
-     * @return boolean representing the
-     * validity of object
-     */
-    private boolean IsValid() {
-        return tuple != null;
-    }
-
-    /**
-     * Sets the tuple member
-     *
-     * @param tuple to be assigned
-     */
-    public void setTuple(Tuple tuple) {
-        this.tuple = tuple;
-    }
-
-    /**
-     * Sets the lid
-     *
-     * @param lid to be assigned
-     */
-    public void setLid(ILID lid) {
-        this.lid.setPageNo(lid.getPageNo());
-        this.lid.setSlotNo(lid.getSlotNo());
-    }
-
-    /**
-     * Parametric constructor for intoalizing Pageno and slot no
-     *
-     * @param pageNo pageno
-     * @param slotNo slot no
-     */
-    public Label(PageId pageNo, int slotNo) {
-        this.lid.setPageNo(pageNo);
-        this.lid.setSlotNo(slotNo);
-    }
-
-    public int getIntFld(int l1_fld_no) throws FieldNumberOutOfBoundException, IOException {
-        return tuple.getIntFld(l1_fld_no);
-    }
-
-
-    public float getFloFld(int l1_fld_no) throws FieldNumberOutOfBoundException, IOException {
-        return tuple.getFloFld(l1_fld_no);
-    }
-
-    public String getStrFld(int l1_fld_no) throws FieldNumberOutOfBoundException, IOException {
-        return tuple.getStrFld(l1_fld_no);
-    }
-
-    public void setIntFld(int fld_no, int intFld) throws FieldNumberOutOfBoundException, IOException {
-        tuple.setIntFld(fld_no, intFld);
-    }
-
-    public void setFloFld(int fld_no, float floFld) throws FieldNumberOutOfBoundException, IOException {
-        tuple.setFloFld(fld_no, floFld);
-    }
-
-    public void setStrFld(int fld_no, String strFld) throws FieldNumberOutOfBoundException, IOException {
-        tuple.setStrFld(fld_no, strFld);
-    }
-
-    public void setHdr(short nOutFlds, AttrType[] res_attrs, short[] attrSize) throws InvalidTupleSizeException, IOException, InvalidTypeException {
-        tuple.setHdr(nOutFlds, res_attrs, attrSize);
+    public void labelCopy(Label newLabel) {
+        labelName = newLabel.getLabel();
     }
 }

@@ -68,8 +68,8 @@ public class Scan implements GlobalConst {
    * @param hf A HeapFile object
    */
   public Scan(Heapfile hf)
-      throws InvalidTupleSizeException,
-      IOException {
+          throws InvalidTupleSizeException,
+          IOException {
     init(hf);
   }
 
@@ -82,8 +82,8 @@ public class Scan implements GlobalConst {
    * @return the Tuple of the retrieved record.
    */
   public Tuple getNext(RID rid)
-      throws InvalidTupleSizeException,
-      IOException {
+          throws InvalidTupleSizeException,
+          IOException {
     Tuple recptrtuple = null;
 
     if (nextUserStatus != true) {
@@ -123,8 +123,8 @@ public class Scan implements GlobalConst {
    *			false otherwise.
    */
   public boolean position(RID rid)
-      throws InvalidTupleSizeException,
-      IOException {
+          throws InvalidTupleSizeException,
+          IOException {
     RID nxtrid = new RID();
     boolean bst;
 
@@ -187,8 +187,8 @@ public class Scan implements GlobalConst {
    * @param hf A HeapFile object
    */
   private void init(Heapfile hf)
-      throws InvalidTupleSizeException,
-      IOException {
+          throws InvalidTupleSizeException,
+          IOException {
     _hf = hf;
 
     firstDataPage();
@@ -235,8 +235,8 @@ public class Scan implements GlobalConst {
    *         false otherwise
    */
   private boolean firstDataPage()
-      throws InvalidTupleSizeException,
-      IOException {
+          throws InvalidTupleSizeException,
+          IOException {
     DataPageInfo dpinfo;
     Tuple rectuple = null;
     Boolean bst;
@@ -367,8 +367,8 @@ public class Scan implements GlobalConst {
    *			false if unsuccessful
    */
   private boolean nextDataPage()
-      throws InvalidTupleSizeException,
-      IOException {
+          throws InvalidTupleSizeException,
+          IOException {
     DataPageInfo dpinfo;
 
     boolean nextDataPageStatus;
@@ -546,8 +546,8 @@ public class Scan implements GlobalConst {
    * Also returns the RID of the (new) current record.
    */
   private boolean mvNext(RID rid)
-      throws InvalidTupleSizeException,
-      IOException {
+          throws InvalidTupleSizeException,
+          IOException {
     RID nextrid;
     boolean status;
 
@@ -578,7 +578,7 @@ public class Scan implements GlobalConst {
    * @see bufmgr.pinPage
    */
   private void pinPage(PageId pageno, Page page, boolean emptyPage)
-      throws HFBufMgrException {
+          throws HFBufMgrException {
 
     try {
       SystemDefs.JavabaseBM.pinPage(pageno, page, emptyPage);
@@ -592,7 +592,7 @@ public class Scan implements GlobalConst {
    * @see bufmgr.unpinPage
    */
   private void unpinPage(PageId pageno, boolean dirty)
-      throws HFBufMgrException {
+          throws HFBufMgrException {
 
     try {
       SystemDefs.JavabaseBM.unpinPage(pageno, dirty);

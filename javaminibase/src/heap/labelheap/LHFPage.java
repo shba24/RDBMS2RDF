@@ -1,7 +1,11 @@
-package heap;
+package heap.labelheap;
 
 import diskmgr.Page;
 import global.*;
+import heap.HFPage;
+import heap.InvalidSlotNumberException;
+import heap.Label;
+import heap.Tuple;
 
 import java.io.IOException;
 
@@ -10,7 +14,7 @@ import java.io.IOException;
  * performed.
  */
 
-public class LHFPage extends HFPage{
+public class LHFPage extends HFPage {
 
   /**
    * Default constructor
@@ -253,7 +257,6 @@ public class LHFPage extends HFPage{
     try {
       short recLen;
       short offset;
-      byte[] record;
       PageId pageNo = new PageId();
       pageNo.pid = lid.getPageNo().pid;
       curPage.pid = Convert.getIntValue(CUR_PAGE, data);
@@ -265,9 +268,7 @@ public class LHFPage extends HFPage{
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)
           && (pageNo.pid == curPage.pid)) {
         offset = getSlotOffset(slotNo);
-        record = new byte[recLen];
-        System.arraycopy(data, offset, record, 0, recLen);
-        return new Label(record, 0, recLen);
+        return new Label(data, offset, recLen);
       } else {
         throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
       }
@@ -288,7 +289,7 @@ public class LHFPage extends HFPage{
    * @throws InvalidSlotNumberException Invalid slot number
    * @see Tuple
    */
-  public Label returnRecord(LID lid)
+  public Label returnLabel(LID lid)
       throws InvalidSlotNumberException, IOException {
 
     try {

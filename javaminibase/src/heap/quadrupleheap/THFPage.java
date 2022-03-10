@@ -1,8 +1,13 @@
-package heap;
+package heap.quadrupleheap;
 
 import diskmgr.Page;
 import global.QID;
 import global.RID;
+import heap.HFPage;
+import heap.InvalidSlotNumberException;
+import heap.Quadruple;
+import heap.Tuple;
+
 import java.io.IOException;
 
 /**
