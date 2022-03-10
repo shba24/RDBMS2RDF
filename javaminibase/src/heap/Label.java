@@ -2,7 +2,7 @@ package heap;
 
 import global.AttrType;
 import global.Convert;
-import global.GlobalConst;
+
 import java.io.IOException;
 
 /**
@@ -30,15 +30,6 @@ public class Label {
     /**
      * Label constructor
      *
-     * @param name
-     */
-    public Label(String name) {
-        labelName = name;
-    }
-
-    /**
-     * Label constructor
-     *
      * @param data   byte array
      * @param offset offset in the data array
      * @param len    length of data
@@ -55,16 +46,17 @@ public class Label {
      * @throws IOException
      * @throws InvalidTypeException
      */
-    public Label() throws InvalidTupleSizeException, IOException, InvalidTypeException {
+    public Label(String label) throws InvalidTupleSizeException, IOException, InvalidTypeException, FieldNumberOutOfBoundException {
         AttrType[] attrType = new AttrType[1]; //ToDo: I am assuming label requires just one size tuple to store a string
         attrType[0] = new AttrType(AttrType.attrString);
 
         short[] attrSize = new short[1];
-        attrSize[0] = GlobalConst.MAX_EID_OBJ_SIZE;
+        attrSize[0] = (short) label.length();
 
         tuple = new Tuple();
         try {
             tuple.setHdr((short) 1, attrType, attrSize);
+            tuple.setStrFld(0, label);
         } catch (Exception e) {
             System.err.println("[Quadruple] Error in creating Quadruple object.");
             e.printStackTrace();
@@ -101,6 +93,7 @@ public class Label {
 
     /**
      * returns the length
+     *
      * @return
      */
     public int getLength() {
@@ -109,6 +102,7 @@ public class Label {
 
     /**
      * return the tuple in byte array
+     *
      * @return
      */
     public byte[] returnTupleByteArray() {
@@ -117,6 +111,7 @@ public class Label {
 
     /**
      * returns offset
+     *
      * @return
      */
     public int getOffset() {
