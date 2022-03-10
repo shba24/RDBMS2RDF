@@ -128,7 +128,7 @@ public class TupleUtils {
    *
    * @param t1     the first tuple
    * @param t2     the secocnd tuple
-   * @param type[] the field types
+   * @param types the field types
    * @param len    the field numbers
    * @return 0        if the two are not equal,
    * 1        if the two are equal,
@@ -153,7 +153,7 @@ public class TupleUtils {
    * get the string specified by the field number
    *
    * @param tuple the tuple
-   * @param fidno the field number
+   * @param fldno the field number
    * @return the content of the field number
    * @throws IOException         some I/O fault
    * @throws TupleUtilsException exception from this class
