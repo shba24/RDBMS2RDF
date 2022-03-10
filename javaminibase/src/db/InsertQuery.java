@@ -1,5 +1,7 @@
 package db;
 
+import diskmgr.Page;
+
 public class InsertQuery extends BaseQuery implements IQuery {
   private String dataFileName;
   private IndexOption indexOption;
@@ -66,7 +68,7 @@ public class InsertQuery extends BaseQuery implements IQuery {
   }
 
   /**
-   * Execute the query
+   * Executes the query
    *
    */
   public void execute() {

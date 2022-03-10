@@ -15,7 +15,7 @@ public class BaseQuery {
   /**
    * Get db name
    *
-   * @return  String db name
+   * @return String db name
    */
   public String getDbName() {
     return dbName;

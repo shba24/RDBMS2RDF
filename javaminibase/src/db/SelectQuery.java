@@ -23,8 +23,8 @@ public class SelectQuery extends BaseQuery implements IQuery {
    */
   public SelectQuery(
       String _dbName, String _indexOption, String _order, String _subjectFilter,
-      String _predicateFilter, String _objectFilter, String _confidenceFilter, int _numBuf) {
-    super(_indexOption);
+      String _predicateFilter, String _objectFilter, String _confidenceFilter, String _numBuf) {
+    super(_dbName);
     indexOption = IndexOption.valueOf(_indexOption);
     order = _order;
     if (_subjectFilter.equals("*") ||
@@ -50,7 +50,7 @@ public class SelectQuery extends BaseQuery implements IQuery {
     } else {
       confidenceFilter = Float.valueOf(_confidenceFilter);
     }
-    numBuf = _numBuf;
+    numBuf = Integer.valueOf(_numBuf);
   }
 
   /**
