@@ -1,53 +1,53 @@
-package heap;
+package global;
 
-import global.*;
+import lombok.Data;
 
+/**
+ * Label
+ * Tuple is modified into label which can be used by subject, predicate or object
+ */
+@Data
 public class Label {
 
-  private ILID lid;
-
-  private Tuple tuple;
+  /**
+   * label name
+   */
+  private String labelName;
 
   /**
-   * Parameterized Constructor
-   * @param record
-   * @param i
-   * @param recLen
+   * Constructor to label class
    */
-  public Label(byte[] record, int i, short recLen) {
-    //To be implemented
+  public Label() {
+
   }
 
   /**
-   * Sets the tuple member
-   * @param  tuple to be assigned
+   * Gets a label
+   *
+   * @return
    */
-  public void setTuple(Tuple tuple)
-  {
-    this.tuple = tuple;
+  public String getLabel() {
+    return this.getLabelName();
   }
 
   /**
-   * Sets the lid
-   * @param lid to be assigned
+   * sets the label
+   *
+   * @param labelName given label
+   * @return
    */
-  public void setLid(ILID lid){
-    this.lid.setPageNo(lid.getPageNo());
-    this.lid.setSlotNo(lid.getSlotNo());
+  public Label setLabel(String labelName) {
+
+    Label newLabel = new Label();
+    newLabel.setLabelName(labelName);
+
+    return newLabel;
   }
 
   /**
-   * Default constructor of class
+   * print the label
    */
-  public Label(){}
-
-  /**
-   * Parametric constructor for intoalizing Pageno and slot no
-   * @param pageNo pageno
-   * @param slotNo slot no
-   */
-  public Label(PageId pageNo, int slotNo) {
-    this.lid.setPageNo(pageNo);
-    this.lid.setSlotNo(slotNo);
+  public void print() {
+    System.out.println(this.getLabel());
   }
 }
