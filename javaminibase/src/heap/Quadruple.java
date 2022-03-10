@@ -98,10 +98,10 @@ public class Quadruple {
 
   /**
    *
-   * @return tuple
+   * @return length of Quadruple
    */
-  public Tuple getTuple(){
-    return this.tuple;
+  public int getLength(){
+    return this.tuple.getLength();
   }
 
   /**

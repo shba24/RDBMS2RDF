@@ -215,7 +215,7 @@ public class TScan implements GlobalConst {
   private boolean firstDataPage()
       throws InvalidTupleSizeException,
       IOException {
-    DataPageInfo dpinfo;
+    QuadDataPageInfo dpinfo;
     Quadruple recQuadruple = null;
     Boolean bst;
 
@@ -246,7 +246,7 @@ public class TScan implements GlobalConst {
         e.printStackTrace();
       }
 
-      dpinfo = new DataPageInfo(recQuadruple.getTuple());
+      dpinfo = new QuadDataPageInfo(recQuadruple);
       datapageId.pid = dpinfo.pageId.pid;
     } else {
 
@@ -298,11 +298,11 @@ public class TScan implements GlobalConst {
             e.printStackTrace();
           }
 
-          if (recQuadruple.getTuple().getLength() != DataPageInfo.size) {
+          if (recQuadruple.getLength() != QuadDataPageInfo.size) {
             return false;
           }
 
-          dpinfo = new DataPageInfo(recQuadruple.getTuple());
+          dpinfo = new QuadDataPageInfo(recQuadruple);
           datapageId.pid = dpinfo.pageId.pid;
         } else {
           // heapfile empty
@@ -347,7 +347,7 @@ public class TScan implements GlobalConst {
   private boolean nextDataPage()
       throws InvalidTupleSizeException,
       IOException {
-    DataPageInfo dpinfo;
+    QuadDataPageInfo dpinfo;
 
     boolean nextDataPageStatus;
     PageId nextDirPageId = new PageId();
@@ -484,11 +484,11 @@ public class TScan implements GlobalConst {
       System.err.println("HeapFile: Error in Scan" + e);
     }
 
-    if (recQuadruple.getTuple().getLength() != DataPageInfo.size) {
+    if (recQuadruple.getLength() != QuadDataPageInfo.size) {
       return false;
     }
 
-    dpinfo = new DataPageInfo(recQuadruple.getTuple());
+    dpinfo = new QuadDataPageInfo(recQuadruple);
     datapageId.pid = dpinfo.pageId.pid;
 
     try {
@@ -560,7 +560,7 @@ public class TScan implements GlobalConst {
     try {
       SystemDefs.JavabaseBM.pinPage(pageno, page, emptyPage);
     } catch (Exception e) {
-      throw new HFBufMgrException(e, "Scan.java: pinPage() failed");
+      throw new HFBufMgrException(e, "TScan.java: pinPage() failed");
     }
   } // end of pinPage
 
@@ -573,7 +573,7 @@ public class TScan implements GlobalConst {
     try {
       SystemDefs.JavabaseBM.unpinPage(pageno, dirty);
     } catch (Exception e) {
-      throw new HFBufMgrException(e, "Scan.java: unpinPage() failed");
+      throw new HFBufMgrException(e, "TScan.java: unpinPage() failed");
     }
   } // end of unpinPage
 }
