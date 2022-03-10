@@ -24,26 +24,30 @@ import heap.SpaceNotAvailableException;
 import java.io.IOException;
 
 
-
 interface Filetype {
+
   int TEMP = 0;
   int ORDINARY = 1;
 } // end of Filetype
-public class QuadrupleHeapFile extends Heapfile{
+
+public class QuadrupleHeapFile extends Heapfile {
 
 
-  /** Initialize.  A null name produces a temporary heapfile which will be
-   * deleted by the destructor.  If the name already denotes a file, the
-   * file is opened; otherwise, a new empty file is created.
+  /**
+   * Initialize.  A null name produces a temporary heapfile which will be deleted by the destructor.
+   *  If the name already denotes a file, the file is opened; otherwise, a new empty file is
+   * created.
    *
-   * @exception HFException heapfile exception
-   * @exception HFBufMgrException exception thrown from bufmgr layer
-   * @exception HFDiskMgrException exception thrown from diskmgr layer
-   * @exception IOException I/O errors
+   * @throws HFException        heapfile exception
+   * @throws HFBufMgrException  exception thrown from bufmgr layer
+   * @throws HFDiskMgrException exception thrown from diskmgr layer
+   * @throws IOException        I/O errors
    */
-  public QuadrupleHeapFile(String name) throws HFException, HFBufMgrException, HFDiskMgrException, IOException {
+  public QuadrupleHeapFile(String name)
+      throws HFException, HFBufMgrException, HFDiskMgrException, IOException {
     super(name);
   }
+
   public void quadrupleHeapFile(String name)
       throws HFDiskMgrException, HFException, HFBufMgrException, IOException {
 
@@ -63,8 +67,7 @@ public class QuadrupleHeapFile extends Heapfile{
       _fileName = _fileName + filenum;
       _ftype = TEMP;
       tempfilecount++;
-    }
-    else {
+    } else {
       _fileName = name;
       _ftype = ORDINARY;
     }
@@ -105,7 +108,7 @@ public class QuadrupleHeapFile extends Heapfile{
     }
     _file_deleted = false;
     // ASSERTIONS:
-    // - ALL private data members of class Heapfile are valid:
+    // - ALL private data members of class QuadrupleHeapfile are valid:
     //
     //  - _firstDirPageId valid
     //  - _fileName valid
@@ -116,7 +119,7 @@ public class QuadrupleHeapFile extends Heapfile{
   private THFPage _newDatapage(QuadDataPageInfo dpinfop) throws HFException,
       HFBufMgrException,
       HFDiskMgrException,
-      IOException{
+      IOException {
     Page apage = new Page();
     PageId pageId = new PageId();
     pageId = newPage(apage, 1);
@@ -126,7 +129,6 @@ public class QuadrupleHeapFile extends Heapfile{
     }
 
     // initialize internal values of the new page:
-
 
     THFPage thfpage = new THFPage();
     thfpage.init(pageId, apage);
@@ -139,110 +141,110 @@ public class QuadrupleHeapFile extends Heapfile{
 
   }// end of _newDatapage
 
-   /* Internal QuadrupleHeapFile function (used in getQuadruple and updateQuadruple):
-     returns pinned directory page and pinned data page of the specified
-     user quadruple(qid) and true if quadruple is found.
-     If the user quadruple cannot be found, return false.
-  */
-   private boolean _findDataPage(
-       QID qid,
-       PageId dirPageId, THFPage dirpage,
-       PageId dataPageId, THFPage datapage,
-       IQID rpDataPageQid)
-       throws InvalidSlotNumberException,
-       InvalidTupleSizeException,
-       HFException,
-       HFBufMgrException,
-       HFDiskMgrException,
-       Exception {
-     PageId currentDirPageId = new PageId(_firstDirPageId.pid);
+  /* Internal QuadrupleHeapFile function (used in getQuadruple and updateQuadruple):
+    returns pinned directory page and pinned data page of the specified
+    user quadruple(qid) and true if quadruple is found.
+    If the user quadruple cannot be found, return false.
+ */
+  private boolean _findDataPage(
+      QID qid,
+      PageId dirPageId, THFPage dirpage,
+      PageId dataPageId, THFPage datapage,
+      IQID rpDataPageQid)
+      throws InvalidSlotNumberException,
+      InvalidTupleSizeException,
+      HFException,
+      HFBufMgrException,
+      HFDiskMgrException,
+      Exception {
+    PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
-     THFPage currentDirPage = new THFPage();
-     THFPage currentDataPage = new THFPage();
-     QID currentDataPageQid = new QID();
-     PageId nextDirPageId = new PageId();
-     // datapageId is stored in dpinfo.pageId
+    THFPage currentDirPage = new THFPage();
+    THFPage currentDataPage = new THFPage();
+    QID currentDataPageQid = new QID();
+    PageId nextDirPageId = new PageId();
+    // datapageId is stored in dpinfo.pageId
 
-     pinPage(currentDirPageId, currentDirPage, false/*read disk*/);
+    pinPage(currentDirPageId, currentDirPage, false/*read disk*/);
 
-     Quadruple aquadruple = new Quadruple();
+    Quadruple aquadruple = new Quadruple();
 
-     while (currentDirPageId.pid != INVALID_PAGE) {// Start While01
-       // ASSERTIONS:
-       //  currentDirPage, currentDirPageId valid and pinned and Locked.
+    while (currentDirPageId.pid != INVALID_PAGE) {// Start While01
+      // ASSERTIONS:
+      //  currentDirPage, currentDirPageId valid and pinned and Locked.
 
-       for (currentDataPageQid = currentDirPage.firstQuadruple();
-           currentDataPageQid != null;
-           currentDataPageQid = currentDirPage.nextQuadruple(currentDataPageQid)) {
-         try {
-           aquadruple = currentDirPage.returnQuadruple(currentDataPageQid);
-         } catch (InvalidSlotNumberException e)// check error! return false(done)
-         {
-           return false;
-         }
+      for (currentDataPageQid = currentDirPage.firstQuadruple();
+          currentDataPageQid != null;
+          currentDataPageQid = currentDirPage.nextQuadruple(currentDataPageQid)) {
+        try {
+          aquadruple = currentDirPage.returnQuadruple(currentDataPageQid);
+        } catch (InvalidSlotNumberException e)// check error! return false(done)
+        {
+          return false;
+        }
 
-         QuadDataPageInfo dpinfo = new QuadDataPageInfo(aquadruple);
-         try {
-           pinPage(dpinfo.pageId, currentDataPage, false/*Rddisk*/);
+        QuadDataPageInfo dpinfo = new QuadDataPageInfo(aquadruple);
+        try {
+          pinPage(dpinfo.pageId, currentDataPage, false/*Rddisk*/);
 
-           //check error;need unpin currentDirPage
-         } catch (Exception e) {
-           unpinPage(currentDirPageId, false/*undirty*/);
-           dirpage = null;
-           datapage = null;
-           throw e;
-         }
+          //check error;need unpin currentDirPage
+        } catch (Exception e) {
+          unpinPage(currentDirPageId, false/*undirty*/);
+          dirpage = null;
+          datapage = null;
+          throw e;
+        }
 
-         // ASSERTIONS:
-         // - currentDataPage, currentDataPageQid, dpinfo valid
-         // - currentDataPage pinned
+        // ASSERTIONS:
+        // - currentDataPage, currentDataPageQid, dpinfo valid
+        // - currentDataPage pinned
 
-         if (dpinfo.pageId.pid == qid.getPageNo().pid) {
-           aquadruple = currentDataPage.returnQuadruple(qid);
-           // found user's Quadruple on the current datapage which itself
-           // is indexed on the current dirpage.  Return both of these.
+        if (dpinfo.pageId.pid == qid.getPageNo().pid) {
+          aquadruple = currentDataPage.returnQuadruple(qid);
+          // found user's Quadruple on the current datapage which itself
+          // is indexed on the current dirpage.  Return both of these.
 
-           dirpage.setpage(currentDirPage.getpage());
-           dirPageId.pid = currentDirPageId.pid;
+          dirpage.setpage(currentDirPage.getpage());
+          dirPageId.pid = currentDirPageId.pid;
 
-           datapage.setpage(currentDataPage.getpage());
-           dataPageId.pid = dpinfo.pageId.pid;
+          datapage.setpage(currentDataPage.getpage());
+          dataPageId.pid = dpinfo.pageId.pid;
 
-           rpDataPageQid.getPageNo().pid = currentDataPageQid.getPageNo().pid;
-           rpDataPageQid.setSlotNo(currentDataPageQid.getSlotNo());
-           return true;
-         } else {
-           // user Quadruple not found on this datapage; unpin it
-           // and try the next one
-           unpinPage(dpinfo.pageId, false /*undirty*/);
-         }
-       }
+          rpDataPageQid.getPageNo().pid = currentDataPageQid.getPageNo().pid;
+          rpDataPageQid.setSlotNo(currentDataPageQid.getSlotNo());
+          return true;
+        } else {
+          // user Quadruple not found on this datapage; unpin it
+          // and try the next one
+          unpinPage(dpinfo.pageId, false /*undirty*/);
+        }
+      }
 
-       // if we would have found the correct datapage on the current
-       // directory page we would have already returned.
-       // therefore:
-       // read in next directory page:
+      // if we would have found the correct datapage on the current
+      // directory page we would have already returned.
+      // therefore:
+      // read in next directory page:
 
-       nextDirPageId = currentDirPage.getNextPage();
-       try {
-         unpinPage(currentDirPageId, false /*undirty*/);
-       } catch (Exception e) {
-         throw new HFException(e, "heapfile,_find,unpinpage failed");
-       }
+      nextDirPageId = currentDirPage.getNextPage();
+      try {
+        unpinPage(currentDirPageId, false /*undirty*/);
+      } catch (Exception e) {
+        throw new HFException(e, "heapfile,_find,unpinpage failed");
+      }
 
-       currentDirPageId.pid = nextDirPageId.pid;
-       if (currentDirPageId.pid != INVALID_PAGE) {
-         pinPage(currentDirPageId, currentDirPage, false/*Rdisk*/);
-         if (currentDirPage == null) {
-           throw new HFException(null, "pinPage return null page");
-         }
-       }
-     } // end of While01
-     // checked all dir pages and all data pages; user Quadruple not found:(
-     dirPageId.pid = dataPageId.pid = INVALID_PAGE;
-     return false;
+      currentDirPageId.pid = nextDirPageId.pid;
+      if (currentDirPageId.pid != INVALID_PAGE) {
+        pinPage(currentDirPageId, currentDirPage, false/*Rdisk*/);
+        if (currentDirPage == null) {
+          throw new HFException(null, "pinPage return null page");
+        }
+      }
+    } // end of While01
+    // checked all dir pages and all data pages; user Quadruple not found:(
+    dirPageId.pid = dataPageId.pid = INVALID_PAGE;
+    return false;
 
-   }// end of _findDatapage
+  }// end of _findDatapage
 
   public int getQuadrupleCnt() throws Exception {
     int answer = 0;
@@ -252,25 +254,25 @@ public class QuadrupleHeapFile extends Heapfile{
     THFPage currentDirPage = new THFPage();
     Page pageinbuffer = new Page();
 
-    while (currentDirPageId.pid != INVALID_PAGE){
+    while (currentDirPageId.pid != INVALID_PAGE) {
       pinPage(currentDirPageId, currentDirPage, false);
 
       QID qid = new QID();
       Quadruple aquadruple;
 
-      for(qid=currentDirPage.firstQuadruple();qid!=null;qid=currentDirPage.nextQuadruple(qid))
-      {
-        aquadruple= currentDirPage.getQuadruple(qid);
-        QuadDataPageInfo dataPageInfo=new QuadDataPageInfo(aquadruple);
-        answer+=dataPageInfo.recct;
+      for (qid = currentDirPage.firstQuadruple(); qid != null;
+          qid = currentDirPage.nextQuadruple(qid)) {
+        aquadruple = currentDirPage.getQuadruple(qid);
+        QuadDataPageInfo dataPageInfo = new QuadDataPageInfo(aquadruple);
+        answer += dataPageInfo.recct;
       }
       // ASSERTIONS: no more Quadruple
       // - we have read all datapage Quadruples on
       //   the current directory page.
 
-      nextDirPageId=currentDirPage.getNextPage();
-      unpinPage(currentDirPageId,false);
-      currentDirPageId.pid=nextDirPageId.pid;
+      nextDirPageId = currentDirPage.getNextPage();
+      unpinPage(currentDirPageId, false);
+      currentDirPageId.pid = nextDirPageId.pid;
     }
 
     // ASSERTIONS:
@@ -281,20 +283,18 @@ public class QuadrupleHeapFile extends Heapfile{
     return answer;
   }//end of getQuadrupleCnt
 
-  /** Insert quadruple into file, return its Qid.
+  /**
+   * Insert quadruple into file, return its Qid.
    *
    * @param quadruplePtr pointer of the quadruple
-   *
-   *
-   * @exception InvalidSlotNumberException invalid slot number
-   * @exception InvalidTupleSizeException invalid tuple size
-   * @exception SpaceNotAvailableException no space left
-   * @exception HFException heapfile exception
-   * @exception HFBufMgrException exception thrown from bufmgr layer
-   * @exception HFDiskMgrException exception thrown from diskmgr layer
-   * @exception IOException I/O errors
-   *
    * @return the Qid of the quadruple
+   * @throws InvalidSlotNumberException invalid slot number
+   * @throws InvalidTupleSizeException  invalid tuple size
+   * @throws SpaceNotAvailableException no space left
+   * @throws HFException                heapfile exception
+   * @throws HFBufMgrException          exception thrown from bufmgr layer
+   * @throws HFDiskMgrException         exception thrown from diskmgr layer
+   * @throws IOException                I/O errors
    */
   public QID insertQuadruple(byte[] quadruplePtr) throws Exception {
     int dpinfoLen = 0;
@@ -317,16 +317,15 @@ public class QuadrupleHeapFile extends Heapfile{
     Quadruple quadruple;
     QuadDataPageInfo dpinfo = new QuadDataPageInfo();
 
-    while (found == false){//Start While01
+    while (found == false) {//Start While01
       // look for suitable dpinfo-struct
       for (currentDataPageQid = currentDirPage.firstQuadruple();
           currentDataPageQid != null;
           currentDataPageQid =
-              currentDirPage.nextQuadruple(currentDataPageQid))
-      {
-        quadruple=currentDirPage.getQuadruple(currentDataPageQid);
-        dpinfo=new QuadDataPageInfo(quadruple);
-        // need check the Quadruple length == DataPageInfo'slength
+              currentDirPage.nextQuadruple(currentDataPageQid)) {
+        quadruple = currentDirPage.getQuadruple(currentDataPageQid);
+        dpinfo = new QuadDataPageInfo(quadruple);
+        // need check the Quadruple length == QuadDataPageInfo'slength
 
         if (quadLen <= dpinfo.availspace) {
           found = true;
@@ -342,7 +341,7 @@ public class QuadrupleHeapFile extends Heapfile{
       //     there is no datapageQuadruple on the current directory page
       //     whose corresponding datapage has enough space free
       //     several subcases: see below
-      if (found == false){//Start IF01
+      if (found == false) {//Start IF01
         // case (2)
 
         //System.out.println("no datapageQuadruple on the current directory is OK");
@@ -360,7 +359,7 @@ public class QuadrupleHeapFile extends Heapfile{
         //         page
         // - (2.2) (currentDirPage->available_space() <= sizeof(DataPageInfo):
         //         look at the next directory page, if necessary, create it.
-        if (currentDirPage.available_space() >= dpinfo.size){
+        if (currentDirPage.available_space() >= dpinfo.size) {
           //Start IF02
           // case (2.1) : add a new data page Quadruple into the
           //              current directory page
@@ -372,15 +371,14 @@ public class QuadrupleHeapFile extends Heapfile{
           // currentDataPage is pinned: insert its Quadruple
           // calling a HFPage function
 
-          quadruple=dpinfo.convertToQuadruple();
-          byte[] tmpdata=quadruple.getQuadrupleByteArray();
+          quadruple = dpinfo.convertToQuadruple();
+          byte[] tmpdata = quadruple.getQuadrupleByteArray();
 
-          currentDataPageQid=currentDirPage.insertQuadruple(tmpdata);
+          currentDataPageQid = currentDirPage.insertQuadruple(tmpdata);
 
-          IQID tmpQid=currentDirPage.firstQuadruple();
+          IQID tmpQid = currentDirPage.firstQuadruple();
 
-          if(currentDataPageQid==null)
-          {
+          if (currentDataPageQid == null) {
             throw new HFException(null, "no space to insert Quadruple.");
           }
 
@@ -391,7 +389,7 @@ public class QuadrupleHeapFile extends Heapfile{
 
           found = true;
         }//end of IF02
-        else{//Start else 02
+        else {//Start else 02
           // case (2.2)
           nextDirPageId = currentDirPage.getNextPage();
           // two sub-cases:
@@ -403,7 +401,7 @@ public class QuadrupleHeapFile extends Heapfile{
           //         append a new directory page at the end of the current
           //         page and then do another loop
 
-          if (nextDirPageId.pid != INVALID_PAGE){//Start IF03
+          if (nextDirPageId.pid != INVALID_PAGE) {//Start IF03
             // case (2.2.1): there is another directory page:
             unpinPage(currentDirPageId, false);
             currentDirPageId.pid = nextDirPageId.pid;
@@ -413,7 +411,7 @@ public class QuadrupleHeapFile extends Heapfile{
             // now go back to the beginning of the outer while-loop and
             // search on the current directory page for a suitable datapage
           }//End of IF03
-          else{//Start Else03
+          else {//Start Else03
             // case (2.2): append a new directory page after currentDirPage
             //             since it is the last directory page
 
@@ -424,7 +422,7 @@ public class QuadrupleHeapFile extends Heapfile{
             }
 
             // initialize new directory page
-            nextDirPage.init(nextDirPageId,pageinbuffer);
+            nextDirPage.init(nextDirPageId, pageinbuffer);
             PageId temppid = new PageId(INVALID_PAGE);
             nextDirPage.setNextPage(temppid);
             nextDirPage.setPrevPage(currentDirPageId);
@@ -449,7 +447,7 @@ public class QuadrupleHeapFile extends Heapfile{
         // - if found == false: currentDirPage, currentDirPageId
         //   valid and pinned
       }//end IF01
-      else{//Start else01
+      else {//Start else01
         // found == true:
         // we have found a datapage with enough space,
         // but we have not yet pinned the datapage:
@@ -466,7 +464,7 @@ public class QuadrupleHeapFile extends Heapfile{
     // - currentDirPageId, currentDirPage valid and pinned
     // - dpinfo.pageId, currentDataPageQid valid
     // - currentDataPage is pinned!
-    if((dpinfo.pageId).pid == INVALID_PAGE) // check error!
+    if ((dpinfo.pageId).pid == INVALID_PAGE) // check error!
     {
       throw new HFException(null, "invalid PageId");
     }
@@ -480,7 +478,7 @@ public class QuadrupleHeapFile extends Heapfile{
     }
 
     IQID qid;
-    qid=currentDataPage.insertQuadruple(quadruplePtr);
+    qid = currentDataPage.insertQuadruple(quadruplePtr);
 
     dpinfo.recct++;
     dpinfo.availspace = currentDataPage.available_space();
@@ -488,12 +486,12 @@ public class QuadrupleHeapFile extends Heapfile{
     unpinPage(dpinfo.pageId, true /* = DIRTY */);
 
     // DataPage is now released
-    quadruple=currentDirPage.returnQuadruple(currentDataPageQid);
-    QuadDataPageInfo dpinfo_ondirpage=new QuadDataPageInfo(quadruple);
+    quadruple = currentDirPage.returnQuadruple(currentDataPageQid);
+    QuadDataPageInfo dpinfo_ondirpage = new QuadDataPageInfo(quadruple);
 
-    dpinfo_ondirpage.availspace=dpinfo.availspace;
-    dpinfo_ondirpage.recct=dpinfo.recct;
-    dpinfo_ondirpage.pageId.pid=dpinfo.pageId.pid;
+    dpinfo_ondirpage.availspace = dpinfo.availspace;
+    dpinfo_ondirpage.recct = dpinfo.recct;
+    dpinfo_ondirpage.pageId.pid = dpinfo.pageId.pid;
     dpinfo_ondirpage.flushToQuadruple();
 
     unpinPage(currentDirPageId, true /* = DIRTY */);
@@ -501,16 +499,16 @@ public class QuadrupleHeapFile extends Heapfile{
 
   }//end of insert Quadruple
 
-  /** Delete quadruple from file with given Qid.
-   *
-   * @exception InvalidSlotNumberException invalid slot number
-   * @exception InvalidTupleSizeException invalid tuple size
-   * @exception HFException heapfile exception
-   * @exception HFBufMgrException exception thrown from bufmgr layer
-   * @exception HFDiskMgrException exception thrown from diskmgr layer
-   * @exception Exception other exception
+  /**
+   * Delete quadruple from file with given Qid.
    *
    * @return true Quadruple deleted  false:Quadruple not found
+   * @throws InvalidSlotNumberException invalid slot number
+   * @throws InvalidTupleSizeException  invalid tuple size
+   * @throws HFException                heapfile exception
+   * @throws HFBufMgrException          exception thrown from bufmgr layer
+   * @throws HFDiskMgrException         exception thrown from diskmgr layer
+   * @throws Exception                  other exception
    */
   public boolean deleteQuadruple(QID qid) throws Exception {
     boolean status;
@@ -537,7 +535,7 @@ public class QuadrupleHeapFile extends Heapfile{
 
     Quadruple quadruple;
 
-    quadruple=currentDirPage.returnQuadruple(currentDataPageQid);
+    quadruple = currentDirPage.returnQuadruple(currentDataPageQid);
     QuadDataPageInfo pdpinfo = new QuadDataPageInfo(quadruple);
 
     // delete the quadruple on the datapage
@@ -555,8 +553,7 @@ public class QuadrupleHeapFile extends Heapfile{
       unpinPage(currentDataPageId, true /* = DIRTY*/);
 
       unpinPage(currentDirPageId, true /* = DIRTY */);
-    }
-    else {
+    } else {
       // the quadruple is already deleted:
       // we're removing the last quadruple on datapage so free datapage
       // also, free the directory page if
@@ -568,7 +565,7 @@ public class QuadrupleHeapFile extends Heapfile{
 
       freePage(currentDataPageId);
 
-      // delete corresponding DataPageInfo-entry on the directory page:
+      // delete corresponding QuadDataPageInfo-entry on the directory page:
       // currentDataPageQid points to datapage (from for loop above)
 
       currentDirPage.deleteQuadruple(currentDataPageQid);
@@ -581,7 +578,7 @@ public class QuadrupleHeapFile extends Heapfile{
 
       currentDataPageQid = currentDirPage.firstQuadruple();
 
-      // st == OK: we still found a datapageinfo quadruple on this directory page
+      // st == OK: we still found a Quaddatapageinfo quadruple on this directory page
       PageId pageId;
       pageId = currentDirPage.getPrevPage();
       if ((currentDataPageQid == null) && (pageId.pid != INVALID_PAGE)) {
@@ -627,20 +624,21 @@ public class QuadrupleHeapFile extends Heapfile{
     return true;
   }
 
-  /** Updates the specified Quadruple in the heapfile.
-   * @param qid: the Quadruple which needs update
-   * @param newquadruple: the new content of the Quadruple
+  /**
+   * Updates the specified Quadruple in the heapfile.
    *
-   * @exception InvalidSlotNumberException invalid slot number
-   * @exception InvalidUpdateException invalid update on Quadruple
-   * @exception InvalidTupleSizeException invalid tuple size
-   * @exception HFException heapfile exception
-   * @exception HFBufMgrException exception thrown from bufmgr layer
-   * @exception HFDiskMgrException exception thrown from diskmgr layer
-   * @exception Exception other exception
+   * @param qid:          the Quadruple which needs update
+   * @param newquadruple: the new content of the Quadruple
    * @return ture:update success   false: can't find the Quadruple
+   * @throws InvalidSlotNumberException invalid slot number
+   * @throws InvalidUpdateException     invalid update on Quadruple
+   * @throws InvalidTupleSizeException  invalid tuple size
+   * @throws HFException                heapfile exception
+   * @throws HFBufMgrException          exception thrown from bufmgr layer
+   * @throws HFDiskMgrException         exception thrown from diskmgr layer
+   * @throws Exception                  other exception
    */
-  public boolean  updateQuadruple(QID qid, Quadruple newquadruple)
+  public boolean updateQuadruple(QID qid, Quadruple newquadruple)
       throws InvalidSlotNumberException,
       InvalidUpdateException,
       InvalidTupleSizeException,
@@ -685,18 +683,18 @@ public class QuadrupleHeapFile extends Heapfile{
     return true;
   }
 
-  /** Read quadruple from file, returning pointer and length.
+  /**
+   * Read quadruple from file, returning pointer and length.
+   *
    * @param qid Quadruple ID
-   *
-   * @exception InvalidSlotNumberException invalid slot number
-   * @exception InvalidTupleSizeException invalid tuple size
-   * @exception SpaceNotAvailableException no space left
-   * @exception HFException heapfile exception
-   * @exception HFBufMgrException exception thrown from bufmgr layer
-   * @exception HFDiskMgrException exception thrown from diskmgr layer
-   * @exception Exception other exception
-   *
    * @return a Quadruple. if Quadruple==null, no more Quadruple
+   * @throws InvalidSlotNumberException invalid slot number
+   * @throws InvalidTupleSizeException  invalid tuple size
+   * @throws SpaceNotAvailableException no space left
+   * @throws HFException                heapfile exception
+   * @throws HFBufMgrException          exception thrown from bufmgr layer
+   * @throws HFDiskMgrException         exception thrown from diskmgr layer
+   * @throws Exception                  other exception
    */
   public Quadruple getQuadruple(QID qid)
       throws InvalidSlotNumberException,
@@ -737,14 +735,15 @@ public class QuadrupleHeapFile extends Heapfile{
     return quadruple;  //(true?)OK, but the caller need check if atuple==NULL
   }
 
-  /** Delete the file from the database.
+  /**
+   * Delete the file from the database.
    *
-   * @exception InvalidSlotNumberException invalid slot number
-   * @exception InvalidTupleSizeException invalid tuple size
-   * @exception FileAlreadyDeletedException file is deleted already
-   * @exception HFBufMgrException exception thrown from bufmgr layer
-   * @exception HFDiskMgrException exception thrown from diskmgr layer
-   * @exception IOException I/O errors
+   * @throws InvalidSlotNumberException  invalid slot number
+   * @throws InvalidTupleSizeException   invalid tuple size
+   * @throws FileAlreadyDeletedException file is deleted already
+   * @throws HFBufMgrException           exception thrown from bufmgr layer
+   * @throws HFDiskMgrException          exception thrown from diskmgr layer
+   * @throws IOException                 I/O errors
    */
   @Override
   public void deleteFile()
@@ -800,11 +799,10 @@ public class QuadrupleHeapFile extends Heapfile{
   }
 
 
-
   private void pinPage(PageId pageNo, THFPage apage, boolean dirty)
       throws HFBufMgrException {
     try {
-      Page page=new Page(apage.getpage());
+      Page page = new Page(apage.getpage());
       SystemDefs.JavabaseBM.pinPage(pageNo, page, dirty);
     } catch (Exception e) {
       throw new HFBufMgrException(e, "Heapfile.java: pinPage() failed");
