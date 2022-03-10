@@ -736,21 +736,17 @@ public class QuadrupleHeapFile extends Heapfile {
   }
 
   /**
-   * Delete the file from the database.
-   *
-   * @throws InvalidSlotNumberException  invalid slot number
-   * @throws InvalidTupleSizeException   invalid tuple size
-   * @throws FileAlreadyDeletedException file is deleted already
-   * @throws HFBufMgrException           exception thrown from bufmgr layer
-   * @throws HFDiskMgrException          exception thrown from diskmgr layer
-   * @throws IOException                 I/O errors
+   * Delete file from the DataBase
+   * @throws FileAlreadyDeletedException
+   * @throws HFBufMgrException
+   * @throws IOException
+   * @throws InvalidTupleSizeException
+   * @throws HFDiskMgrException
    */
   @Override
   public void deleteFile()
-      throws FileAlreadyDeletedException,
-      HFBufMgrException,
-      HFDiskMgrException,
-      IOException, InvalidSlotNumberException, InvalidTupleSizeException {
+      throws FileAlreadyDeletedException, HFBufMgrException, IOException, InvalidTupleSizeException, HFDiskMgrException {
+
     if (_file_deleted) {
       throw new FileAlreadyDeletedException(null, "file alread deleted");
     }
@@ -775,7 +771,13 @@ public class QuadrupleHeapFile extends Heapfile {
       for (qid = currentDirPage.firstQuadruple();
           qid != null;
           qid = currentDirPage.nextQuadruple(qid)) {
-        quadruple = currentDirPage.getQuadruple(qid);
+        try {
+          quadruple = currentDirPage.getQuadruple(qid);
+        }
+        catch (Exception e){
+          throw new HFBufMgrException(e, "QuadrupleHeapfile.java: deleteFile() failed");
+        }
+
         QuadDataPageInfo dpinfo = new QuadDataPageInfo(quadruple);
         //int dpinfoLen = aQuadruple.length;
 
@@ -810,12 +812,24 @@ public class QuadrupleHeapFile extends Heapfile {
 
   }
 
-
-  @Override
-  public TScan openScan() throws InvalidTupleSizeException, IOException {
+  /**
+   * Creates a new TScan Object and returns it.
+   * @return TScan
+   * @throws InvalidTupleSizeException
+   * @throws IOException
+   */
+  public TScan openTScan() throws InvalidTupleSizeException, IOException {
     TScan newscan = new TScan(this);
     return newscan;
 
+  }
+
+  /**
+   * Returns firstDirPageId from the HeapFile class.
+   * @return _firstDirPageId
+   */
+  public PageId getFirstDirPageId() {
+    return _firstDirPageId;
   }
 
 }
