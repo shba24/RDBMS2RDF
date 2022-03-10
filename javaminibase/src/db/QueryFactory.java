@@ -9,17 +9,16 @@ package db;
  * 2. SelectQuery
  */
 public class QueryFactory {
-  private static InsertQueryParser insertQParser;
-  private static SelectQueryParser selectQParser;
   public static IQuery getQuery(String type, String query) {
     if (type == null) {
       return null;
     }
 
+    IParser parser = ParserFactory.getParser(type);
     if (type.equalsIgnoreCase("INSERT")) {
-      return insertQParser.parse(query);
+      return parser.parse(query);
     } else if (type.equalsIgnoreCase("SELECT")) {
-      return selectQParser.parse(query);
+      return parser.parse(query);
     }
     return null;
   }
