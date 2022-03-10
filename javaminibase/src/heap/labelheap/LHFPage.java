@@ -1,7 +1,11 @@
-package heap;
+package heap.labelheap;
 
 import diskmgr.Page;
 import global.*;
+import heap.HFPage;
+import heap.InvalidSlotNumberException;
+import heap.Label;
+import heap.Tuple;
 
 import java.io.IOException;
 
@@ -10,7 +14,7 @@ import java.io.IOException;
  * performed.
  */
 
-public class LHFPage extends HFPage{
+public class LHFPage extends HFPage {
 
   /**
    * Default constructor

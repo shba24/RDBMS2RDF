@@ -47,7 +47,6 @@ db:
 	make -C index
 	make -C iterator
 	make -C catalog
-	make -C labelheap
 	
 doc:
 	$(JAVADOC) $(DOCFILES)

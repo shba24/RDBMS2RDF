@@ -1,7 +1,11 @@
-package labelheap;
+package heap.labelheap;
 
 import diskmgr.Page;
-import global.*;
+import global.GlobalConst;
+import global.LID;
+import global.PageId;
+import global.SystemDefs;
+import heap.*;
 
 import java.io.IOException;
 
@@ -10,17 +14,26 @@ interface Filetype {
     int ORDINARY = 1;
 } // end of Filetype
 
-public class LabelHeapFile implements Filetype, GlobalConst {
+public class LabelHeapFile extends Heapfile {
 
-    private static int tempfilecount = 0;
-    PageId _firstDirPageId;   // page number of header page
-    int _ftype;
-    private boolean _file_deleted;
-    private String _fileName;
+    /**
+     * Initialize.  A null name produces a temporary heapfile which will be
+     * deleted by the destructor.  If the name already denotes a file, the
+     * file is opened; otherwise, a new empty file is created.
+     *
+     * @param name
+     * @throws HFException        heapfile exception
+     * @throws HFBufMgrException  exception thrown from bufmgr layer
+     * @throws HFDiskMgrException exception thrown from diskmgr layer
+     * @throws IOException        I/O errors
+     */
+    public LabelHeapFile(String name) throws HFException, HFBufMgrException, HFDiskMgrException, IOException {
+        super(name);
+    }
 
-    public void labelHeapFile(String name) throws LHFException,
-            LHFBufMgrException,
-            LHFDiskMgrException,
+    public void labelHeapFile(String name) throws HFException,
+            HFBufMgrException,
+            HFDiskMgrException,
             IOException {
 
         _file_deleted = true;
@@ -55,7 +68,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
             _firstDirPageId = newPage(apage, 1);
             // check error
             if (_firstDirPageId == null) {
-                throw new LHFException(null, "can't new page");
+                throw new HFException(null, "can't new page");
             }
 
             add_file_entry(_fileName, _firstDirPageId);
@@ -78,25 +91,13 @@ public class LabelHeapFile implements Filetype, GlobalConst {
         //  - no datapage pinned yet
     }
 
-    private PageId newPage(Page page, int num)
-            throws LHFBufMgrException {
 
-        PageId tmpId = new PageId();
-
-        try {
-            tmpId = SystemDefs.JavabaseBM.newPage(page, num);
-        } catch (Exception e) {
-            throw new LHFBufMgrException(e, "Heapfile.java: newPage() failed");
-        }
-
-        return tmpId;
-    } // end of newPage
-
-    private void deleteFile()
+    @Override
+    public void deleteFile()
             throws FileAlreadyDeletedException,
-            LHFBufMgrException,
-            LHFDiskMgrException,
-            IOException, InvalidSlotNumberException {
+            HFBufMgrException,
+            HFDiskMgrException,
+            IOException, InvalidSlotNumberException, InvalidTupleSizeException {
         if (_file_deleted) {
             throw new FileAlreadyDeletedException(null, "file already deleted");
         }
@@ -148,12 +149,12 @@ public class LabelHeapFile implements Filetype, GlobalConst {
      *
      * @throws InvalidSlotNumberException invalid slot number
      * @throws InvalidTupleSizeException  invalid tuple size
-     * @throws LHFBufMgrException          exception thrown from bufmgr layer
-     * @throws LHFDiskMgrException         exception thrown from diskmgr layer
+     * @throws HFBufMgrException         exception thrown from bufmgr layer
+     * @throws HFDiskMgrException        exception thrown from diskmgr layer
      * @throws IOException                I/O errors
      */
     public int getRecCnt()
-            throws IOException, LHFBufMgrException, InvalidSlotNumberException {
+            throws IOException, HFBufMgrException, InvalidSlotNumberException, InvalidTupleSizeException {
         int answer = 0;
         PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
@@ -201,14 +202,14 @@ public class LabelHeapFile implements Filetype, GlobalConst {
      * @throws InvalidSlotNumberException invalid slot number
      * @throws InvalidTupleSizeException  invalid tuple size
      * @throws SpaceNotAvailableException no space left
-     * @throws LHFException                heapfile exception
-     * @throws LHFBufMgrException          exception thrown from bufmgr layer
-     * @throws LHFDiskMgrException         exception thrown from diskmgr layer
+     * @throws HFException               heapfile exception
+     * @throws HFBufMgrException         exception thrown from bufmgr layer
+     * @throws HFDiskMgrException        exception thrown from diskmgr layer
      * @throws IOException                I/O errors
      */
     public LID insertLabel(byte[] recPtr)
-            throws LHFException,
-            IOException, LHFBufMgrException, InvalidSlotNumberException, SpaceNotAvailableException {
+            throws HFException,
+            IOException, HFBufMgrException, InvalidSlotNumberException, SpaceNotAvailableException, InvalidTupleSizeException {
         int dpinfoLen = 0;
         int recLen = recPtr.length;
         boolean found;
@@ -284,16 +285,16 @@ public class LabelHeapFile implements Filetype, GlobalConst {
                     // currentDataPage is pinned: insert its label
                     // calling a HFPage function
 
-                    Quadruple quadruple = dpinfo.convertToQuadruple();
+                    Label newLabel = dpinfo.convertToLabel();
 
-                    byte[] tmpData = quadruple.getQuadrupleByteArray();
+                    byte[] tmpData = newLabel.returnTupleByteArray();
                     currentDataPageLid = currentDirPage.insertLabel(tmpData);
 
                     LID tmpLid = currentDirPage.firstLabel();
 
                     // need catch error here!
                     if (currentDataPageLid == null) {
-                        throw new LHFException(null, "no space to insert rec.");
+                        throw new HFException(null, "no space to insert rec.");
                     }
 
                     // end the loop, because a new datapage with its label
@@ -333,7 +334,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
                         nextDirPageId = newPage(pageinbuffer, 1);
                         // need check error!
                         if (nextDirPageId == null) {
-                            throw new LHFException(null, "can't new pae");
+                            throw new HFException(null, "can't new pae");
                         }
 
                         // initialize new directory page
@@ -386,7 +387,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
 
         if ((dpinfo.pageId).pid == INVALID_PAGE) // check error!
         {
-            throw new LHFException(null, "invalid PageId");
+            throw new HFException(null, "invalid PageId");
         }
 
         if (!(currentDataPage.available_space() >= recLen)) {
@@ -394,7 +395,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
         }
 
         if (currentDataPage == null) {
-            throw new LHFException(null, "can't find Data page");
+            throw new HFException(null, "can't find Data page");
         }
 
         LID lid;
@@ -425,17 +426,17 @@ public class LabelHeapFile implements Filetype, GlobalConst {
      * @return true label deleted  false:label not found
      * @throws InvalidSlotNumberException invalid slot number
      * @throws InvalidTupleSizeException  invalid tuple size
-     * @throws LHFException                heapfile exception
-     * @throws LHFBufMgrException          exception thrown from bufmgr layer
-     * @throws LHFDiskMgrException         exception thrown from diskmgr layer
+     * @throws HFException               heapfile exception
+     * @throws HFBufMgrException         exception thrown from bufmgr layer
+     * @throws HFDiskMgrException        exception thrown from diskmgr layer
      * @throws Exception                  other exception
      */
     public boolean deleteLabel(LID lid)
             throws InvalidSlotNumberException,
             InvalidTupleSizeException,
-            LHFException,
-            LHFBufMgrException,
-            LHFDiskMgrException,
+            HFException,
+            HFBufMgrException,
+            HFDiskMgrException,
             Exception {
         boolean status;
         LHFPage currentDirPage = new LHFPage();
@@ -557,17 +558,17 @@ public class LabelHeapFile implements Filetype, GlobalConst {
      * @throws InvalidSlotNumberException invalid slot number
      * @throws InvalidUpdateException     invalid update on label
      * @throws InvalidTupleSizeException  invalid tuple size
-     * @throws LHFException                heapfile exception
-     * @throws LHFBufMgrException          exception thrown from bufmgr layer
-     * @throws LHFDiskMgrException         exception thrown from diskmgr layer
+     * @throws HFException               heapfile exception
+     * @throws HFBufMgrException         exception thrown from bufmgr layer
+     * @throws HFDiskMgrException        exception thrown from diskmgr layer
      * @throws Exception                  other exception
      */
     public boolean updateLabel(LID lid, Label newLabel)
             throws InvalidSlotNumberException,
             InvalidUpdateException,
-            LHFException,
-            LHFDiskMgrException,
-            LHFBufMgrException,
+            HFException,
+            HFDiskMgrException,
+            HFBufMgrException,
             Exception {
         boolean status;
         LHFPage dirPage = new LHFPage();
@@ -584,8 +585,8 @@ public class LabelHeapFile implements Filetype, GlobalConst {
         if (status != true) {
             return status;  // label not found
         }
-        Label label = new Label();
-        label = dataPage.returnLabel(lid);
+
+        Label label = dataPage.returnLabel(lid);
 
         // Assume update a label with a label whose length is equal to
         // the original label
@@ -614,14 +615,14 @@ public class LabelHeapFile implements Filetype, GlobalConst {
      * @throws InvalidSlotNumberException invalid slot number
      * @throws InvalidTupleSizeException  invalid tuple size
      * @throws SpaceNotAvailableException no space left
-     * @throws LHFException                heapfile exception
-     * @throws LHFBufMgrException          exception thrown from bufmgr layer
-     * @throws LHFDiskMgrException         exception thrown from diskmgr layer
+     * @throws HFException               heapfile exception
+     * @throws HFBufMgrException         exception thrown from bufmgr layer
+     * @throws HFDiskMgrException        exception thrown from diskmgr layer
      * @throws Exception                  other exception
      */
     public Label getLabel(LID lid)
             throws InvalidSlotNumberException,
-            LHFBufMgrException,
+            HFBufMgrException,
             Exception {
         boolean status;
         LHFPage dirPage = new LHFPage();
@@ -639,8 +640,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
             return null; // label not found
         }
 
-        Label tuple = new Label();
-        tuple = dataPage.getLabel(lid);
+        Label label = dataPage.getLabel(lid);
 
         /*
          * getLabel has copied the contents of lid into recPtr and fixed up
@@ -652,75 +652,14 @@ public class LabelHeapFile implements Filetype, GlobalConst {
 
         unpinPage(currentDirPageId, false /*undirty*/);
 
-        return tuple;  //(true?)OK, but the caller need check if atuple==NULL
-    }
-
-    private void freePage(PageId pageId) {
-    }
-
-    private PageId get_file_entry(String filename)
-            throws LHFDiskMgrException {
-
-        PageId tmpId = new PageId();
-
-        try {
-            tmpId = SystemDefs.JavabaseDB.get_file_entry(filename);
-        } catch (Exception e) {
-            throw new LHFDiskMgrException(e, "Heapfile.java: get_file_entry() failed");
-        }
-
-        return tmpId;
-    } // end of get_file_entry
-
-    private void add_file_entry(String filename, PageId pageno)
-            throws LHFDiskMgrException {
-
-        try {
-            SystemDefs.JavabaseDB.add_file_entry(filename, pageno);
-        } catch (Exception e) {
-            throw new LHFDiskMgrException(e, "Heapfile.java: add_file_entry() failed");
-        }
-    } // end of add_file_entry
-
-    private void delete_file_entry(String filename)
-            throws LHFDiskMgrException {
-
-        try {
-            SystemDefs.JavabaseDB.delete_file_entry(filename);
-        } catch (Exception e) {
-            throw new LHFDiskMgrException(e, "Heapfile.java: delete_file_entry() failed");
-        }
-    } // end of delete_file_entry
-
-    private void pinPage(PageId pageno, Page page, boolean emptyPage)
-            throws LHFBufMgrException {
-
-        try {
-            SystemDefs.JavabaseBM.pinPage(pageno, page, emptyPage);
-        } catch (Exception e) {
-            throw new LHFBufMgrException(e, "LabelHeapFile.java: pinPage() failed");
-        }
-    }
-
-    private void unpinPage(PageId pageno, boolean dirty)
-            throws LHFBufMgrException {
-
-        try {
-            SystemDefs.JavabaseBM.unpinPage(pageno, dirty);
-        } catch (Exception e) {
-            throw new LHFBufMgrException(e, "LabelHeapFile.java: unpinPage() failed");
-        }
+        return label;  //(true?)OK, but the caller need check if atuple==NULL
     }
 
     public LScan openScan()
             throws InvalidTupleSizeException,
             IOException {
         LScan newscan = null;
-        try {
-            newscan = new LScan(this);
-        } catch (InvalidTupleSizeException e) {
-            e.printStackTrace();
-        }
+        newscan = new LScan(this);
         return newscan;
     }
 
@@ -728,13 +667,13 @@ public class LabelHeapFile implements Filetype, GlobalConst {
        @param dpinfop the information in the new HFPage
     */
     private LHFPage _newDatapage(DataPageInfo dpinfop)
-            throws IOException, LHFBufMgrException, LHFException {
+            throws IOException, HFBufMgrException, HFException {
         Page apage = new Page();
         PageId pageId = new PageId();
         pageId = newPage(apage, 1);
 
         if (pageId == null) {
-            throw new LHFException(null, "can't new pae");
+            throw new HFException(null, "can't new pae");
         }
 
         // initialize internal values of the new page:
@@ -759,7 +698,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
             PageId dirPageId, HFPage dirpage,
             PageId dataPageId, HFPage datapage,
             LID rpDataPageLid)
-            throws LHFBufMgrException, IOException, LHFException, InvalidSlotNumberException {
+            throws HFBufMgrException, IOException, HFException, InvalidSlotNumberException, InvalidTupleSizeException {
         PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
         LHFPage currentDirPage = new LHFPage();
@@ -770,8 +709,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
 
         pinPage(currentDirPageId, currentDirPage, false/*read disk*/);
 
-        Label label = new Label();
-
+        Label label = null;
         while (currentDirPageId.pid != INVALID_PAGE) {// Start While01
             // ASSERTIONS:
             //  currentDirPage, currentDirPageId valid and pinned and Locked.
@@ -785,7 +723,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
                 {
                     return false;
                 }
-                
+
                 DataPageInfo dpinfo = new DataPageInfo(label);
                 try {
                     pinPage(dpinfo.pageId, currentDataPage, false/*Rddisk*/);
@@ -832,14 +770,14 @@ public class LabelHeapFile implements Filetype, GlobalConst {
             try {
                 unpinPage(currentDirPageId, false /*undirty*/);
             } catch (Exception e) {
-                throw new LHFException(e, "labelheapfile,_find,unpinpage failed");
+                throw new HFException(e, "labelheapfile,_find,unpinpage failed");
             }
 
             currentDirPageId.pid = nextDirPageId.pid;
             if (currentDirPageId.pid != INVALID_PAGE) {
                 pinPage(currentDirPageId, currentDirPage, false/*Rdisk*/);
                 if (currentDirPage == null) {
-                    throw new LHFException(null, "pinPage return null page");
+                    throw new HFException(null, "pinPage return null page");
                 }
             }
         } // end of While01
@@ -850,4 +788,7 @@ public class LabelHeapFile implements Filetype, GlobalConst {
         return false;
     } // end of _findDatapage
 
+    public PageId getFirstDirPageId() {
+        return _firstDirPageId;
+    }
 }

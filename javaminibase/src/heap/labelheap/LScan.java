@@ -1,4 +1,4 @@
-package labelheap;
+package heap.labelheap;
 
 /**
  * JAVA
@@ -16,10 +16,13 @@ package labelheap;
  */
 
 import diskmgr.Page;
-import global.GlobalConst;
 import global.LID;
 import global.PageId;
 import global.SystemDefs;
+import heap.HFBufMgrException;
+import heap.InvalidTupleSizeException;
+import heap.Label;
+import heap.Scan;
 
 import java.io.IOException;
 
@@ -31,7 +34,7 @@ import java.io.IOException;
  * An object of type scan will always have pinned one directory page
  * of the heapfile.
  */
-public class LScan implements GlobalConst {
+public class LScan extends Scan {
 
     /**
      * Note that one label in our way-cool HeapFile implementation is
@@ -77,6 +80,7 @@ public class LScan implements GlobalConst {
     public LScan(LabelHeapFile lhf)
             throws InvalidTupleSizeException,
             IOException {
+        super(lhf);
         init(lhf);
     }
 
@@ -250,7 +254,7 @@ public class LScan implements GlobalConst {
 
         /** copy data about first directory page */
 
-        dirpageId.pid = _lhf._firstDirPageId.pid;
+        dirpageId.pid = _lhf.getFirstDirPageId().pid;
         nextUserStatus = true;
 
         /** get first directory page and pin it */
@@ -584,12 +588,12 @@ public class LScan implements GlobalConst {
      * short cut to access the pinPage function in bufmgr package.
      */
     private void pinPage(PageId pageno, Page page, boolean emptyPage)
-            throws LHFBufMgrException {
+            throws HFBufMgrException {
 
         try {
             SystemDefs.JavabaseBM.pinPage(pageno, page, emptyPage);
         } catch (Exception e) {
-            throw new LHFBufMgrException(e, "Scan.java: pinPage() failed");
+            throw new HFBufMgrException(e, "Scan.java: pinPage() failed");
         }
     } // end of pinPage
 
@@ -597,12 +601,12 @@ public class LScan implements GlobalConst {
      * short cut to access the unpinPage function in bufmgr package.
      */
     private void unpinPage(PageId pageno, boolean dirty)
-            throws LHFBufMgrException {
+            throws HFBufMgrException {
 
         try {
             SystemDefs.JavabaseBM.unpinPage(pageno, dirty);
         } catch (Exception e) {
-            throw new LHFBufMgrException(e, "Scan.java: unpinPage() failed");
+            throw new HFBufMgrException(e, "Scan.java: unpinPage() failed");
         }
     } // end of unpinPage
 }

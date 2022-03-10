@@ -47,7 +47,7 @@ import global.GlobalConst;
 import global.QID;
 import global.PageId;
 import global.SystemDefs;
-import heap.THFPage;
+import heap.quadrupleheap.THFPage;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;

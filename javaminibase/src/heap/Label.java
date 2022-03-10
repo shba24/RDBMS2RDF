@@ -41,7 +41,7 @@ public class Label {
    * @return
    */
   public String getLabel() {
-    return this.labelName;
+    return labelName;
   }
 
   /**
@@ -60,5 +60,21 @@ public class Label {
    */
   public void print() {
     System.out.println(this.getLabel());
+  }
+
+  public int getLength() {
+    return labelName.length();
+  }
+
+  public byte[] returnTupleByteArray() {
+    return labelName.getBytes();
+  }
+
+  public int getOffset() {
+    return 0;
+  }
+
+  public void labelCopy(Label newLabel) {
+     labelName = newLabel.getLabel();
   }
 }

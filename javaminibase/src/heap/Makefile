@@ -25,6 +25,7 @@ quadruple:Quadruple.java
 	$(JAVAC) Quadruple.java
 
 together:*.java
+	make -C labelheap
 	$(JAVAC) *.java
 
 clean:

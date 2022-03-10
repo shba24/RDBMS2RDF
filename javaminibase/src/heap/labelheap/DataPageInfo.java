@@ -1,4 +1,4 @@
-package labelheap;
+package heap.labelheap;
 
 /**
  * File DataPageInfo.java
@@ -7,6 +7,8 @@ package labelheap;
 import global.Convert;
 import global.GlobalConst;
 import global.PageId;
+import heap.InvalidTupleSizeException;
+import heap.Label;
 
 import java.io.IOException;
 
@@ -71,24 +73,20 @@ class DataPageInfo implements GlobalConst {
      * constructor: translate a tuple to a DataPageInfo object
      * it will make a copy of the data in the tuple
      */
-    public DataPageInfo(Quadruple quadruple)
+    public DataPageInfo(Label label)
             throws InvalidTupleSizeException, IOException, InvalidTupleSizeException {
         // need check _atuple size == this.size ?otherwise, throw new exception
-        if (quadruple.getLength() != 12) {
+        if (label.getLength() != 12) {
             throw new InvalidTupleSizeException(null, "HEAPFILE: TUPLE SIZE ERROR");
         } else {
-            data = quadruple.returnTupleByteArray();
-            offset = quadruple.getOffset();
+            data = label.returnTupleByteArray();
+            offset = label.getOffset();
 
             availspace = Convert.getIntValue(offset, data);
             recct = Convert.getIntValue(offset + 4, data);
             pageId = new PageId();
             pageId.pid = Convert.getIntValue(offset + 8, data);
         }
-    }
-
-    public DataPageInfo(Label label) {
-
     }
 
     public byte[] returnByteArray() {
@@ -98,7 +96,7 @@ class DataPageInfo implements GlobalConst {
     /**
      * convert this class objcet to a tuple(like cast a DataPageInfo to Tuple)
      */
-    public Quadruple convertToQuadruple()
+    public Label convertToLabel()
             throws IOException {
 
         // 1) write availspace, recct, pageId into data []
@@ -107,10 +105,10 @@ class DataPageInfo implements GlobalConst {
         Convert.setIntValue(pageId.pid, offset + 8, data);
 
         // 2) creat a Tuple object using this array
-        Quadruple quadruple = new Quadruple(data, offset, size);
+        Label label = new Label(data, offset, size);
 
         // 3) return tuple object
-        return quadruple;
+        return label;
     }
 
     /**

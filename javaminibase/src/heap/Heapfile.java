@@ -43,11 +43,11 @@ interface Filetype {
 
 public class Heapfile implements Filetype, GlobalConst {
 
-    private static int tempfilecount = 0;
-    PageId _firstDirPageId;   // page number of header page
-    int _ftype;
-    private boolean _file_deleted;
-    private String _fileName;
+    protected static int tempfilecount = 0;
+    protected PageId _firstDirPageId;   // page number of header page
+    protected int _ftype;
+    protected boolean _file_deleted;
+    protected String _fileName;
 
     /**
      * Initialize.  A null name produces a temporary heapfile which will be
@@ -871,7 +871,7 @@ public class Heapfile implements Filetype, GlobalConst {
      *
      * @see bufmgr.pinPage
      */
-    private void pinPage(PageId pageno, Page page, boolean emptyPage)
+    protected void pinPage(PageId pageno, Page page, boolean emptyPage)
             throws HFBufMgrException {
 
         try {
@@ -886,7 +886,7 @@ public class Heapfile implements Filetype, GlobalConst {
      *
      * @see bufmgr.unpinPage
      */
-    private void unpinPage(PageId pageno, boolean dirty)
+    protected void unpinPage(PageId pageno, boolean dirty)
             throws HFBufMgrException {
 
         try {
@@ -896,7 +896,7 @@ public class Heapfile implements Filetype, GlobalConst {
         }
     } // end of unpinPage
 
-    private void freePage(PageId pageno)
+    protected void freePage(PageId pageno)
             throws HFBufMgrException {
 
         try {
@@ -906,7 +906,7 @@ public class Heapfile implements Filetype, GlobalConst {
         }
     } // end of freePage
 
-    private PageId newPage(Page page, int num)
+    protected PageId newPage(Page page, int num)
             throws HFBufMgrException {
 
         PageId tmpId = new PageId();
@@ -920,7 +920,7 @@ public class Heapfile implements Filetype, GlobalConst {
         return tmpId;
     } // end of newPage
 
-    private PageId get_file_entry(String filename)
+    protected PageId get_file_entry(String filename)
             throws HFDiskMgrException {
 
         PageId tmpId = new PageId();
@@ -934,7 +934,7 @@ public class Heapfile implements Filetype, GlobalConst {
         return tmpId;
     } // end of get_file_entry
 
-    private void add_file_entry(String filename, PageId pageno)
+    protected void add_file_entry(String filename, PageId pageno)
             throws HFDiskMgrException {
 
         try {
@@ -944,7 +944,7 @@ public class Heapfile implements Filetype, GlobalConst {
         }
     } // end of add_file_entry
 
-    private void delete_file_entry(String filename)
+    protected void delete_file_entry(String filename)
             throws HFDiskMgrException {
 
         try {
