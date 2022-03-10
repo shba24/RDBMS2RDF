@@ -1,5 +1,5 @@
 JDKPATH = /usr
-LIBPATH = /p/course/cs784-raghu/minibase_share/javaminibase/construction
+LIBPATH = ../../
 CLASSPATH = $(JDKPATH)/lib/classes.zip:.:..:$(LIBPATH)
 BINPATH = $(JDKPATH)/bin
 JAVAC = $(JDKPATH)/bin/javac -classpath $(CLASSPATH)
@@ -9,23 +9,22 @@ PROGS = together
 
 all: $(PROGS)
 
-hf:Heapfile.java
-	$(JAVAC) Heapfile.java
+lhf:LabelHeapfile.java
+	$(JAVAC) LabelHeapfile.java
 
-hp:HFPage.java
-	$(JAVAC) HFPage.java
+lhp:LHFPage.java
+	$(JAVAC) LHFPage.java
 
-tuple:Tuple.java
-	$(JAVAC) Tuple.java
+label:Label.java
+	$(JAVAC) Label.java
 
-scan:Scan.java
-	$(JAVAC) Scan.java
+lscan:LScan.java
+	$(JAVAC) LScan.java
 
 quadruple:Quadruple.java
 	$(JAVAC) Quadruple.java
 
 together:*.java
-	make -C labelheap
 	$(JAVAC) *.java
 
 clean:

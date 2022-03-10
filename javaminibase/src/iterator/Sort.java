@@ -55,7 +55,7 @@ public class Sort extends Iterator implements GlobalConst {
    * @param am             an iterator for accessing the tuples
    * @param sort_fld       the field number of the field to sort on
    * @param sort_order     the sorting order (ASCENDING, DESCENDING)
-   * @param sort_field_len the length of the sort field
+   * @param sort_fld_len the length of the sort field
    * @param n_pages        amount of memory (in pages) available for sorting
    * @throws IOException   from lower layers
    * @throws SortException something went wrong in the lower layer.

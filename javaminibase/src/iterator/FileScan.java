@@ -32,8 +32,8 @@ public class FileScan extends Iterator {
    * constructor
    *
    * @param file_name  heapfile to be opened
-   * @param in1[]      array showing what the attributes of the input fields are.
-   * @param s1_sizes[] shows the length of the string fields.
+   * @param in1      array showing what the attributes of the input fields are.
+   * @param s1_sizes shows the length of the string fields.
    * @param len_in1    number of attributes in the input tuple
    * @param n_out_flds number of fields in the out tuple
    * @param proj_list  shows what input fields go where in the output tuple

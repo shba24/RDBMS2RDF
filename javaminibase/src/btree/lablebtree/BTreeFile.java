@@ -23,7 +23,7 @@ import global.GlobalConst;
 import global.PageId;
 import global.LID;
 import global.SystemDefs;
-import heap.LHFPage;
+import heap.labelheap.LHFPage;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;

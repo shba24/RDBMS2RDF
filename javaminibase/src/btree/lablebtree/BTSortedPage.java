@@ -13,7 +13,7 @@ import diskmgr.Page;
 import global.PageId;
 import global.LID;
 import global.SystemDefs;
-import heap.LHFPage;
+import heap.labelheap.LHFPage;
 import heap.InvalidSlotNumberException;
 import java.io.IOException;
 import btree.ConstructPageException;
