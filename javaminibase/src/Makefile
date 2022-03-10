@@ -8,7 +8,6 @@ JARFILES=bufmgr/*.class \
 		 global/*.class \
 		 iterator/*.class\
          heap/*.class \
-         labelheap/*.class \
          chainexception/*.class \
          btree/**/*.class \
          index/*.class \
