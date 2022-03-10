@@ -379,4 +379,34 @@ public class Quadruple {
   public void quadrupleSet(byte[] fromquadruple, int offset) {
     tuple.tupleSet(fromquadruple, offset, 4);
   }
+
+  public int getIntFld(int q1_fld_no) throws FieldNumberOutOfBoundException, IOException {
+    return tuple.getIntFld(q1_fld_no);
+  }
+
+
+  public float getFloFld(int q1_fld_no) throws FieldNumberOutOfBoundException, IOException {
+    return tuple.getFloFld(q1_fld_no);
+  }
+
+  public String getStrFld(int q1_fld_no) throws FieldNumberOutOfBoundException, IOException {
+    return tuple.getStrFld(q1_fld_no);
+  }
+
+  public void setIntFld(int fld_no, int intFld) throws FieldNumberOutOfBoundException, IOException {
+    tuple.setIntFld(fld_no, intFld);
+  }
+
+  public void setFloFld(int fld_no, float floFld) throws FieldNumberOutOfBoundException, IOException {
+    tuple.setFloFld(fld_no, floFld);
+  }
+
+  public void setStrFld(int fld_no, String strFld) throws FieldNumberOutOfBoundException, IOException {
+    tuple.setStrFld(fld_no, strFld);
+  }
+
+  public void setHdr(AttrType[] res_attrs, short[] attrSize) throws InvalidTupleSizeException, IOException, InvalidTypeException {
+    tuple.setHdr((short) 4, res_attrs, attrSize);
+  }
+
 }
