@@ -12,7 +12,7 @@ import btree.ConstructPageException;
 import diskmgr.Page;
 import global.PageId;
 import global.SystemDefs;
-import heap.THFPage;
+import heap.quadrupleheap.THFPage;
 import java.io.IOException;
 
 /**
