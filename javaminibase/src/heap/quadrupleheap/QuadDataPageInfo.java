@@ -1,7 +1,7 @@
 package heap.quadrupleheap;
 
 /**
- * File DataPageInfo.java
+ * File QuadDataPageInfo.java
  */
 
 import global.Convert;
@@ -13,7 +13,7 @@ import heap.Quadruple;
 import java.io.IOException;
 
 /**
- * DataPageInfo class : the type of records stored on a directory page.
+ * QuadDataPageInfo class : the type of records stored on a directory page.
  * <p>
  * April 9, 1998
  */
@@ -21,12 +21,12 @@ import java.io.IOException;
 public class QuadDataPageInfo implements GlobalConst {
 
   /**
-   * auxiliary fields of DataPageInfo
+   * auxiliary fields of QuadDataPageInfo
    */
 
-  public static final int size = 12;// size of DataPageInfo object in bytes
+  public static final int size = 12;// size of QuadDataPageInfo object in bytes
   /**
-   * HFPage returns int for avail space, so we use int here
+   * THFPage returns int for avail space, so we use int here
    */
   int availspace;
   /**
@@ -34,7 +34,7 @@ public class QuadDataPageInfo implements GlobalConst {
    */
   int recct;
   /**
-   * obvious: id of this particular data page (a HFPage)
+   * obvious: id of this particular data page (a THFPage)
    */
   PageId pageId = new PageId();
   private byte[] data;  // a data buffer
@@ -42,7 +42,7 @@ public class QuadDataPageInfo implements GlobalConst {
   private int offset;
 
   /**
-   *  We can store roughly pagesize/sizeof(DataPageInfo) records per
+   *  We can store roughly pagesize/sizeof(QuadDataPageInfo) Quadruples per
    *  directory page; for any given HeapFile insertion, it is likely
    *  that at least one of those referenced data pages will have
    *  enough free space to satisfy the request.
@@ -52,7 +52,7 @@ public class QuadDataPageInfo implements GlobalConst {
    * Default constructor
    */
   public QuadDataPageInfo() {
-    data = new byte[12]; // size of datapageinfo
+    data = new byte[12]; // size of QuadDataPageInfo
     int availspace = 0;
     recct = 0;
     pageId.pid = INVALID_PAGE;
@@ -70,8 +70,8 @@ public class QuadDataPageInfo implements GlobalConst {
   }
 
   /**
-   * constructor: translate a QUadruple to a DataPageInfo object
-   * it will make a copy of the data in the tuple
+   * constructor: translate a QUadruple to a QuadDataPageInfo object it will make a copy of the data in
+   * the tuple
    */
   public QuadDataPageInfo(Quadruple quadruple)
       throws InvalidTupleSizeException, IOException, InvalidTupleSizeException {
@@ -90,13 +90,12 @@ public class QuadDataPageInfo implements GlobalConst {
   }
 
 
-
   public byte[] returnByteArray() {
     return data;
   }
 
   /**
-   * convert this class objcet to a tuple(like cast a DataPageInfo to Tuple)
+   * convert this class objcet to a QuadDataPageInfo(like cast a QuadDataPageInfo to Quadruple)
    */
   public Quadruple convertToQuadruple()
       throws Exception {
@@ -109,13 +108,13 @@ public class QuadDataPageInfo implements GlobalConst {
     // 2) creat a Quadruple object using this array
     Quadruple quadruple = new Quadruple(data, offset, size);
 
-    // 3) return tuple object
+    // 3) return Quadruple object
     return quadruple;
   }
 
   /**
-   * write this object's useful fields(availspace, recct, pageId)
-   * to the data[](may be in buffer pool)
+   * write this object's useful fields(availspace, recct, pageId) to the data[](may be in buffer
+   * pool)
    */
   public void flushToQuadruple() throws IOException {
     // write availspace, recct, pageId into "data[]"
