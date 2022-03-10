@@ -1,12 +1,12 @@
-package global;
+package heap;
 
-import lombok.Data;
+import global.Convert;
+import java.io.IOException;
 
 /**
  * Label
  * Tuple is modified into label which can be used by subject, predicate or object
  */
-@Data
 public class Label {
 
   /**
@@ -15,10 +15,24 @@ public class Label {
   private String labelName;
 
   /**
-   * Constructor to label class
+   * Label constructor
+   *
+   * @param name
    */
-  public Label() {
+  public Label(String name) {
+    labelName = name;
+  }
 
+  /**
+   * Label constructor
+   *
+   * @param data      byte array
+   * @param offset    offset in the data array
+   * @param len       length of data
+   * @throws IOException
+   */
+  public Label(byte[] data, int offset, int len) throws IOException {
+    labelName = Convert.getStrValue(offset, data, len);
   }
 
   /**
@@ -27,21 +41,18 @@ public class Label {
    * @return
    */
   public String getLabel() {
-    return this.getLabelName();
+    return this.labelName;
   }
 
   /**
    * sets the label
    *
-   * @param labelName given label
+   * @param name given label
    * @return
    */
-  public Label setLabel(String labelName) {
-
-    Label newLabel = new Label();
-    newLabel.setLabelName(labelName);
-
-    return newLabel;
+  public Label setLabel(String name) {
+    labelName = name;
+    return this;
   }
 
   /**
