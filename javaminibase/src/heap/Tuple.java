@@ -195,7 +195,6 @@ public class Tuple implements GlobalConst {
      * @throws IOException                    I/O errors
      * @throws FieldNumberOutOfBoundException Tuple field number out of bound
      */
-
     public int getIntFld(int fldNo)
             throws IOException, FieldNumberOutOfBoundException {
         int val;

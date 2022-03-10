@@ -3,13 +3,16 @@ package iterator;
 import global.AttrType;
 import heap.FieldNumberOutOfBoundException;
 import heap.Label;
+import heap.Tuple;
 
 import java.io.IOException;
 
 /**
  * some useful method when processing Label
  */
-public class LabelUtils {
+public class LabelUtils extends TupleUtils {
+  
+  private static Tuple tuple;
 
   /**
    * This function compares a label with another label in respective field, and
@@ -44,8 +47,8 @@ public class LabelUtils {
 
     switch (fldType.attrType) {
       case AttrType.attrInteger:                // Compare two integers.
-        l1_i = l1.getIntFld(l1_fld_no);
-        l2_i = l2.getIntFld(l2_fld_no);
+        l1_i = tuple.getIntFld(l1_fld_no);
+        l2_i = tuple.getIntFld(l2_fld_no);
         if (l1_i == l2_i) {
           return 0;
         }
@@ -57,8 +60,8 @@ public class LabelUtils {
         }
 
       case AttrType.attrReal:                // Compare two floats
-        l1_r = l1.getFloFld(l1_fld_no);
-        l2_r = l2.getFloFld(l2_fld_no);
+        l1_r = tuple.getFloFld(l1_fld_no);
+        l2_r = tuple.getFloFld(l2_fld_no);
         if (l1_r == l2_r) {
           return 0;
         }
@@ -70,8 +73,8 @@ public class LabelUtils {
         }
 
       case AttrType.attrString:                // Compare two strings
-        l1_s = l1.getStrFld(l1_fld_no);
-        l2_s = l2.getStrFld(l2_fld_no);
+        l1_s = tuple.getStrFld(l1_fld_no);
+        l2_s = tuple.getStrFld(l2_fld_no);
 
         // Now handle the special case that is posed by the max_values for strings...
         if (l1_s.compareTo(l2_s) > 0) {
@@ -149,7 +152,7 @@ public class LabelUtils {
           throws IOException,
           LabelUtilsException, FieldNumberOutOfBoundException {
     String temp;
-    temp = label.getStrFld(fldno);
+    temp = tuple.getStrFld(fldno);
     return temp;
   }
 
