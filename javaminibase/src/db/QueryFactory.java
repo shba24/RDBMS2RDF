@@ -9,15 +9,15 @@ package db;
  * 2. SelectQuery
  */
 public class QueryFactory {
-  public static IQuery getQuery(String type, String query) {
-    if (type == null) {
+  public static IQuery getQuery(QueryType queryType, String query) {
+    if (queryType == null) {
       return null;
     }
 
-    IParser parser = ParserFactory.getParser(type);
-    if (type.equalsIgnoreCase("INSERT")) {
+    IParser parser = ParserFactory.getParser(queryType);
+    if (queryType == QueryType.INSERT) {
       return parser.parse(query);
-    } else if (type.equalsIgnoreCase("SELECT")) {
+    } else if (queryType == QueryType.SELECT) {
       return parser.parse(query);
     }
     return null;

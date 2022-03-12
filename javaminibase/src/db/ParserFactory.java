@@ -9,14 +9,14 @@ package db;
  * 2. SelectQueryParser
  */
 public class ParserFactory {
-  public static IParser getParser(String type) {
-    if (type == null) {
+  public static IParser getParser(QueryType queryType) {
+    if (queryType == null) {
       return null;
     }
 
-    if (type.equalsIgnoreCase("INSERT")) {
+    if (queryType == QueryType.INSERT) {
       return new InsertQueryParser();
-    } else if (type.equalsIgnoreCase("SELECT")) {
+    } else if (queryType == QueryType.SELECT) {
       return new SelectQueryParser();
     }
     return null;
