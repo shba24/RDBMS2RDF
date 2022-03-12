@@ -12,7 +12,9 @@ JARFILES=bufmgr/*.class \
          btree/**/*.class \
          index/*.class \
          tests/*.class \
-         catalog/*.class
+         catalog/*.class \
+         db/*.class \
+         programs/*.class
 
 JDKPATH = /usr
 LIBPATH = .:..
@@ -55,4 +57,21 @@ test:
 
 clean:
 	rm -f $(CLASSPATH)/*.class *~ \#* core $(JARFILES) TRACE
+
+rdfdb:
+	make -C db
+	make -C global
+	make -C chainexception
+	make -C btree
+	make -C bufmgr
+	make -C diskmgr
+	make -C heap
+	make -C index
+	make -C iterator
+	make -C catalog
+	make -C programs
+
+rdfdb_test:
+	make -C tests -f Makefile_rdf rdfdb
+
 
