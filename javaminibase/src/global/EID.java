@@ -11,7 +11,6 @@ public class EID implements IEID {
 
   private int slotNo;
   private PageId pageNo = new PageId();
-  private ILID lid;
 
 
   /**
@@ -20,7 +19,6 @@ public class EID implements IEID {
   public EID() {
     this.slotNo = -1;
     this.pageNo = new PageId(INVALID_PAGE);
-    this.lid = new LID();
   }
 
   /**
@@ -31,7 +29,6 @@ public class EID implements IEID {
   public EID(LID lid) {
     this.slotNo = lid.getSlotNo();
     this.pageNo = lid.getPageNo();
-    this.lid = lid;
   }
 
   /**
@@ -43,7 +40,6 @@ public class EID implements IEID {
   public EID(PageId pageNo, int slotNo) {
     this.slotNo = slotNo;
     this.pageNo = pageNo;
-    this.lid=new LID();
   }
 
   /**
@@ -54,7 +50,6 @@ public class EID implements IEID {
   public EID(EID entityID) {
     this.slotNo = entityID.getSlotNo();
     this.pageNo = entityID.getPageNo();
-    this.lid = entityID.lid;
   }
 
 
@@ -108,7 +103,6 @@ public class EID implements IEID {
   public void copyEid(EID eid) {
     this.pageNo = new PageId(eid.getPageNo().pid);
     this.slotNo = eid.getSlotNo();
-    this.lid = eid.lid;
   }
 
   /**
@@ -120,7 +114,7 @@ public class EID implements IEID {
   @Override
   public boolean equals(EID eid) {
     if ((this.pageNo.pid == eid.pageNo.pid)
-            && (this.slotNo == eid.slotNo) && (this.lid == eid.lid)) {
+            && (this.slotNo == eid.slotNo) ) {
       return true;
     } else {
       return false;
@@ -134,7 +128,8 @@ public class EID implements IEID {
    */
   @Override
   public ILID returnLID() {
-    return this.lid;
+    ILID lid=new LID(pageNo,slotNo);
+    return lid;
   }
 
   /**
@@ -149,7 +144,6 @@ public class EID implements IEID {
   public void writeToByteArray(byte[] array, int offset) throws IOException {
     Convert.setIntValue(slotNo, offset, array);
     Convert.setIntValue(pageNo.pid, offset + 4, array);
-    lid.writeToByteArray(array,offset+8);
   }
 
   @Override
@@ -157,7 +151,6 @@ public class EID implements IEID {
     return "EID{" +
             "pageNo=" + this.pageNo +
             ", slotNo=" + this.slotNo +
-            ", LID=" + this.lid +
             '}';
   }
 }
