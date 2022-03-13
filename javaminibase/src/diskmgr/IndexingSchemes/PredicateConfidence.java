@@ -14,6 +14,12 @@ import heap.quadrupleheap.TScan;
 
 public class PredicateConfidence implements IndexSchemes{
 
+  /**
+   * Create Index
+   * @param bTreeFile BTree Index
+   * @param dbname    DB Name
+   * @throws Exception
+   */
   @Override
   public void createIndex(BTreeFile bTreeFile, String dbname) throws Exception {
     //destroy existing index first
