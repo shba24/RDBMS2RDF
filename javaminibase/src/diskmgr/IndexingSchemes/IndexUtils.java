@@ -11,48 +11,44 @@ import java.util.ArrayList;
 
 public class IndexUtils {
 
-  public static void destroyIndex(String fileName)
-  {
-    try
-    {
-      if(fileName != null)
-      {
+  /**
+   * Destroys the existing indexfile
+   *
+   * @param fileName
+   */
+  public static void destroyIndex(String fileName) {
+    try {
+      if (fileName != null) {
 
         BTreeFile bfile = new BTreeFile(fileName);
 
-        BTFileScan scan = bfile.new_scan(null,null);
-        QID tid = null;
+        BTFileScan scan = bfile.new_scan(null, null);
+        QID qid = null;
         KeyDataEntry entry = null;
         ArrayList<KeyClass> keys = new ArrayList<KeyClass>();
-        ArrayList<QID> tids = new ArrayList<QID>();
+        ArrayList<QID> qids = new ArrayList<QID>();
         int count = 0;
 
-        while((entry = scan.get_next())!= null)
-        {
-          tid =  ((LeafData)entry.data).getData();
+        while ((entry = scan.get_next()) != null) {
+          qid = ((LeafData) entry.data).getData();
           keys.add(entry.key);
-          tids.add(tid);
+          qids.add(qid);
           count++;
         }
         scan.DestroyBTreeFileScan();
 
-        for(int i = 0; i < count ;i++)
-        {
+        for (int i = 0; i < count; i++) {
           //System.out.println("Deleting record having Key : " + keys.get(i) + " TID " + tids.get(i));
-          bfile.Delete(keys.get(i),tids.get(i));
+          bfile.Delete(keys.get(i), qids.get(i));
         }
 
         bfile.close();
 
       }
-    }
-    catch(GetFileEntryException e1)
-    {
+    } catch (GetFileEntryException e1) {
       System.out.println("Firsttime No index present.. Expected");
-    }
-    catch(Exception e)
-    {
-      System.err.println ("*** Error destroying Index " + e);
+    } catch (Exception e) {
+      System.err.println("*** Error destroying Index " + e);
       e.printStackTrace();
       Runtime.getRuntime().exit(1);
     }

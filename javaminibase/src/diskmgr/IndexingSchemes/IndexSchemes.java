@@ -30,9 +30,10 @@ import java.io.IOException;
 public interface IndexSchemes {
 
   /**
-   * Create Index
+   * Create Index method implemented using different index schemes on Unclustered BTree File.
+   *
    * @param bTreeFile BTree Index
-   * @param dbname DB Name
+   * @param dbname    DB Name
    * @throws Exception
    */
   void createIndex(BTreeFile bTreeFile, String dbname)
