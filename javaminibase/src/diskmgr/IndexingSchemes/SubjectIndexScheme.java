@@ -12,11 +12,12 @@ import global.QID;
 import heap.Label;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
+import heap.quadrupleheap.QuadrupleHeapFile;
 
-public class EntityIndexScheme implements IndexSchemes{
+public class SubjectIndexScheme implements IndexSchemes{
 
   @Override
-  public void createIndex(String curr_dbname, BTreeFile QuadBTreeIndex) {
+  public void createIndex(BTreeFile QuadBTreeIndex, String curr_dbname) {
     //Unclustered BTree Index file on subject
     try
     {
