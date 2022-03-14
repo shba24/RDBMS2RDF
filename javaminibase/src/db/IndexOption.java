@@ -1,5 +1,10 @@
 package db;
 
 public enum IndexOption {
-  TestOption
+  Confidence,
+  Object,
+  Subject,
+  SubjectConfidence,
+  PredicateConfidence,
+  ObjectConfidence;
 }
