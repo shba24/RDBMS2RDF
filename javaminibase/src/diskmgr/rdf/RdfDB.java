@@ -1,12 +1,20 @@
 package diskmgr.rdf;
 
 
+import btree.KeyClass;
+import btree.StringKey;
+import btree.lablebtree.BTFileScan;
+import btree.lablebtree.BTreeFile;
+import btree.lablebtree.KeyDataEntry;
+import btree.lablebtree.LeafData;
 import db.IndexOption;
 import diskmgr.DB;
+import global.AttrType;
 import global.EID;
 import global.GlobalConst;
 import global.LID;
 import global.PID;
+import global.PageId;
 import global.QID;
 import heap.Label;
 import heap.labelheap.LabelHeapFile;
@@ -28,6 +36,9 @@ public class RdfDB extends DB implements GlobalConst {
   private final String QUADRUPLE_IDENTIFIER = "quadruple";
   private final String ENTITY_IDENTIFIER = "entity";
   private final String PREDICATE_IDENTIFIER = "predicate";
+  private final String LABEL_IDENTIFIER = "label";
+  private final String SUBJECT_IDENTIFIER = "subject";
+  private final String OBJECT_IDENTIFIER = "object";
   IndexOption indexOption;
   private String rdfDBName;
 
@@ -40,6 +51,18 @@ public class RdfDB extends DB implements GlobalConst {
   private QuadrupleHeapFile quadrupleHeapFile;
   private LabelHeapFile entityHeapFile;
   private LabelHeapFile predicateHeapFile;
+
+  private String quadrupleBTreeFileName;
+  private btree.quadbtree.BTreeFile quadrupleBTreeFile;
+
+
+  private String entityBTreeFileName;
+  private BTreeFile entityBTreeFile;
+  private String dublicateSubjectBTreeFileName;
+  private BTreeFile dublicateSubjectBTreeFile;
+
+  private String dublicateObjectBTreeFileName;
+  private BTreeFile dublicateObjectBTreeFile;
 
   /** TODO
    *
@@ -131,13 +154,74 @@ public class RdfDB extends DB implements GlobalConst {
   }
 
   private void initIndexFiles(IndexOption indexOption) {
+    try {
+      String[] entityBTreeFileNameIdentifiers = new String[]{
+          rdfDBName,
+          BTREE_FILE_IDENTIFIER,
+          ENTITY_IDENTIFIER
+      };
+      entityBTreeFileName = generateFileName(entityBTreeFileNameIdentifiers);
+      entityBTreeFile = new BTreeFile(entityBTreeFileName);
+
+    } catch (Exception e) {
+      System.err.println("" + e);
+      e.printStackTrace();
+      Runtime.getRuntime().exit(1);
+    }
+
+    try {
+      String[] quadrupleBTreeNameIdentifiers = new String[]{
+          rdfDBName,
+          BTREE_FILE_IDENTIFIER,
+          QUADRUPLE_IDENTIFIER
+      };
+      quadrupleBTreeFileName = generateFileName(quadrupleBTreeNameIdentifiers);
+      quadrupleBTreeFile = new btree.quadbtree.BTreeFile(quadrupleBTreeFileName);
+
+    } catch (Exception e) {
+      System.err.println("" + e);
+      e.printStackTrace();
+      Runtime.getRuntime().exit(1);
+    }
+
+    try {
+      String[] dupSubjectBTreeNameIdentifiers = new String[]{
+          rdfDBName,
+          BTREE_FILE_IDENTIFIER,
+          "Duplicate",
+          SUBJECT_IDENTIFIER
+      };
+      dublicateSubjectBTreeFileName = generateFileName(dupSubjectBTreeNameIdentifiers);
+      dublicateSubjectBTreeFile = new BTreeFile(dublicateSubjectBTreeFileName);
+
+    } catch (Exception e) {
+      System.err.println("" + e);
+      e.printStackTrace();
+      Runtime.getRuntime().exit(1);
+    }
+
+    try {
+      String[] dupObjectBTreeNameIdentifiers = new String[]{
+          rdfDBName,
+          BTREE_FILE_IDENTIFIER,
+          "Duplicate",
+          OBJECT_IDENTIFIER
+      };
+      dublicateObjectBTreeFileName = generateFileName(dupObjectBTreeNameIdentifiers);
+      dublicateObjectBTreeFile = new BTreeFile(dublicateObjectBTreeFileName);
+
+    } catch (Exception e) {
+      System.err.println("" + e);
+      e.printStackTrace();
+      Runtime.getRuntime().exit(1);
+    }
 
   }
 
   public int getQuadrupleCount() {
     int quadrupleCount = -1;
     try {
-      if(quadrupleHeapFile != null) {
+      if (quadrupleHeapFile != null) {
         quadrupleCount = quadrupleHeapFile.getQuadrupleCnt();
       }
     } catch (Exception e) {
@@ -149,7 +233,7 @@ public class RdfDB extends DB implements GlobalConst {
   public int getEntityCount() {
     int entityCount = -1;
     try {
-      if(entityHeapFile != null) {
+      if (entityHeapFile != null) {
         entityCount = entityHeapFile.getRecCnt();
       }
     } catch (Exception e) {
@@ -161,31 +245,138 @@ public class RdfDB extends DB implements GlobalConst {
   public int getPredicateCount() {
     int predicatesCount = -1;
     try {
-      if(predicateHeapFile != null) {
+      if (predicateHeapFile != null) {
         predicatesCount = predicateHeapFile.getRecCnt();
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return predicatesCount;
   }
 
   /**
-   * TODO
+   * get count of the unique Subject count from the RDFDB.
    *
    * @return
    */
   public int getSubjectCount() {
-    return -1;
+    int subjectCount = -1;
+    btree.quadbtree.KeyDataEntry entry = null;
+    KeyDataEntry duplicateEntry = null;
+
+    try {
+      int keyType = AttrType.attrString;
+      btree.quadbtree.BTFileScan scan = quadrupleBTreeFile.new_scan(null, null);
+      do {
+        entry = scan.get_next();
+        if (entry != null) {
+          String quadrupleKey = ((StringKey) (entry.key)).getKey();
+          String[] temp = quadrupleKey.split(":");
+
+          String subject = temp[0] + temp[1];
+
+          KeyClass lowKey = new StringKey(subject);
+          KeyClass highKey = new StringKey(subject);
+
+          BTFileScan duplicateLabelBTScan = dublicateSubjectBTreeFile.new_scan(lowKey, highKey);
+          duplicateEntry = duplicateLabelBTScan.get_next();
+
+          if (duplicateEntry == null) {
+            dublicateSubjectBTreeFile.insert(lowKey,
+                new LID(new PageId(Integer.parseInt(temp[1])), Integer.parseInt(temp[0])));
+          }
+
+          duplicateLabelBTScan.DestroyBTreeFileScan();
+        }
+      } while (entry != null);
+      scan.DestroyBTreeFileScan();
+      quadrupleBTreeFile.close();
+
+      KeyClass lowKey = null;
+      KeyClass highKey = null;
+
+      BTFileScan duplicateLabelBTScan = dublicateSubjectBTreeFile.new_scan(lowKey, highKey);
+
+      do {
+        duplicateEntry = duplicateLabelBTScan.get_next();
+        if (duplicateEntry != null) {
+          subjectCount++;
+        }
+      } while (duplicateEntry != null);
+      duplicateLabelBTScan.DestroyBTreeFileScan();
+      dublicateSubjectBTreeFile.close();
+    } catch (Exception e) {
+      System.err.println("" + e);
+      e.printStackTrace();
+      Runtime.getRuntime().exit(1);
+
+
+    }
+
+    return subjectCount;
+
+
   }
 
   /**
-   * TODO
+   * Returns unique object count from RDFDB
    *
    * @return
    */
   public int getObjectCount() {
-    return -1;
+    int objectCount = -1;
+
+    btree.quadbtree.KeyDataEntry quadrupleBTreeEntry = null;
+    KeyDataEntry duplicateLabelBTreeEntry = null;
+
+    try {
+      int keyType = AttrType.attrString;
+      btree.quadbtree.BTFileScan quadrupleScan = quadrupleBTreeFile.new_scan(null, null);
+      do {
+        quadrupleBTreeEntry = quadrupleScan.get_next();
+        if (quadrupleBTreeEntry != null) {
+          String quadrupleKey = ((StringKey) (quadrupleBTreeEntry.key)).getKey();
+          String[] temp = quadrupleKey.split(":");
+          String object = temp[4] + temp[5];
+
+          KeyClass lowKey = new StringKey(object);
+          KeyClass highKey = new StringKey(object);
+
+          BTFileScan duplicateObjectBTFileScan = dublicateObjectBTreeFile.new_scan(lowKey, highKey);
+          duplicateLabelBTreeEntry = duplicateObjectBTFileScan.get_next();
+          if (duplicateLabelBTreeEntry != null) {
+            dublicateObjectBTreeFile.insert(lowKey,
+                new LID(new PageId(Integer.parseInt(temp[4])), Integer.parseInt(temp[5])));
+
+          }
+          duplicateObjectBTFileScan.DestroyBTreeFileScan();
+        }
+      } while (quadrupleBTreeEntry != null);
+      quadrupleScan.DestroyBTreeFileScan();
+      quadrupleBTreeFile.close();
+
+      KeyClass lowKey = null;
+      KeyClass highKey = null;
+
+      BTFileScan duplicateScan = dublicateObjectBTreeFile.new_scan(lowKey, highKey);
+
+      do {
+        duplicateLabelBTreeEntry = duplicateScan.get_next();
+        if (duplicateLabelBTreeEntry != null) {
+          objectCount++;
+        }
+
+      } while (duplicateLabelBTreeEntry != null);
+      duplicateScan.DestroyBTreeFileScan();
+      dublicateObjectBTreeFile.close();
+    } catch (Exception e) {
+      System.err.println("" + e);
+      e.printStackTrace();
+      Runtime.getRuntime().exit(1);
+
+    }
+
+    return objectCount;
   }
 
   EID insertEntity(String entityLabelName) {
@@ -195,7 +386,7 @@ public class RdfDB extends DB implements GlobalConst {
     byte[] entityLabelBytes = entityLabel.returnTupleByteArray();
     try {
       entityLabelId = entityHeapFile.insertLabel(entityLabelBytes);
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.err.println("");
       return null;
     }
@@ -204,6 +395,12 @@ public class RdfDB extends DB implements GlobalConst {
     return entityId;
   }
 
+  /**
+   * Delete
+   *
+   * @param entityLabelName
+   * @return
+   */
   boolean deleteEntity(String entityLabelName) {
     Label entityLabel = new Label(entityLabelName);
     LID entityLabelId = new LID();
@@ -211,17 +408,44 @@ public class RdfDB extends DB implements GlobalConst {
 //    entityHeapFile.deleteLabel(entityLabel);
 
 //    entityHeapFile.deleteLabel();
-    return false;
+
+    boolean success = false;
+
+    try {
+      KeyClass lowKey = new StringKey(entityLabelName);
+      KeyClass highKey = new StringKey(entityLabelName);
+
+      KeyDataEntry entry = null;
+
+      BTFileScan scan = entityBTreeFile.new_scan(lowKey, highKey);
+      entry = scan.get_next();
+
+      if (entry != null) {
+        if (entityLabel.equals(((StringKey) (entry.key)).getKey())) {
+          entityLabelId = ((LeafData) entry.data).getData();
+          success = entityHeapFile.deleteLabel(entityLabelId) && entityBTreeFile.Delete(lowKey,
+              entityLabelId);
+        }
+        scan.DestroyBTreeFileScan();
+        entityBTreeFile.close();
+      }
+    } catch (Exception e) {
+      System.err.println("*** Error deleting entity " + e);
+      e.printStackTrace();
+    }
+
+    return true;
   }
 
-  PID insertPredicate(String predicateLabelName) {
+
+  public PID insertPredicate(String predicateLabelName) {
     Label predicateLabel = new Label(predicateLabelName);
     LID predicateLabelId = null;
 
     byte[] predicateLabelBytes = predicateLabel.returnTupleByteArray();
     try {
       predicateLabelId = predicateHeapFile.insertLabel(predicateLabelBytes);
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.err.println("");
       return null;
     }
@@ -236,7 +460,7 @@ public class RdfDB extends DB implements GlobalConst {
 
     try {
       predicateHeapFile.deleteLabel(predicateLabelId);
-    } catch(Exception e) {
+    } catch (Exception e) {
       System.err.println("");
     }
     return false;
@@ -246,7 +470,7 @@ public class RdfDB extends DB implements GlobalConst {
     QID quadrupleId = null;
     try {
       quadrupleId = quadrupleHeapFile.insertQuadruple(quadrupleBytes);
-    } catch(Exception e) {
+    } catch (Exception e) {
 
     }
     return quadrupleId;
@@ -256,6 +480,7 @@ public class RdfDB extends DB implements GlobalConst {
 //    quadrupleHeapFile.delete
     return false;
   }
+
   private String generateFileName(String[] identifiers) {
     StringBuilder fileName = new StringBuilder();
 
