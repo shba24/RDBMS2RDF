@@ -24,6 +24,7 @@ import bufmgr.InvalidFrameNumberException;
 import bufmgr.PageUnpinnedException;
 import bufmgr.ReplacerException;
 import heap.FieldNumberOutOfBoundException;
+import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
 import java.io.IOException;
 
@@ -33,10 +34,10 @@ public interface IndexSchemes {
    * Create Index method implemented using different index schemes on Unclustered BTree File.
    *
    * @param bTreeFile BTree Index
-   * @param dbname    DB Name
+   * @param  quadrupleHeapFile QuadrupleHeapFile
    * @throws Exception
    */
-  void createIndex(BTreeFile bTreeFile, String dbname)
+  void createIndex(BTreeFile bTreeFile, QuadrupleHeapFile quadrupleHeapFile, LabelHeapFile entityHeapFile)
       throws Exception;
 
 }

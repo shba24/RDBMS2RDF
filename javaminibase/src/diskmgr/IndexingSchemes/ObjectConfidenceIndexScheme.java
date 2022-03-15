@@ -3,7 +3,6 @@ package diskmgr.IndexingSchemes;
 import btree.KeyClass;
 import btree.StringKey;
 import btree.quadbtree.BTreeFile;
-import global.AttrType;
 import global.LID;
 import global.QID;
 import heap.Label;
@@ -12,35 +11,18 @@ import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
 import heap.quadrupleheap.TScan;
 
-public class ObjectConfidenceIndexSchemes implements IndexSchemes{
+public class ObjectConfidenceIndexScheme implements IndexSchemes{
 
   /**
    *  Create Index
    * @param bTreeFile BTree Index
-   * @param dbname    DB Name
+   * @param quadrupleHeapFile    QuadrupleHeapFile
    * @throws Exception
    */
   @Override
-  public void createIndex(BTreeFile bTreeFile, String dbname)
+  public void createIndex(BTreeFile bTreeFile, QuadrupleHeapFile quadrupleHeapFile, LabelHeapFile entityHeapFile)
       throws Exception {
-    //destroy existing index first
-    if(bTreeFile != null)
-    {
-      bTreeFile.close();
-      bTreeFile.destroyFile();
-      IndexUtils.destroyIndex(dbname+"/Quadruple_BTreeIndex");
-    }
-
-    //create new
-    int keytype = AttrType.attrString;
-    bTreeFile = new BTreeFile(dbname+"/Quadruple_BTreeIndex",keytype,255,1);
-    bTreeFile.close();
-
-    //scan sorted heap file and insert into btree index
-    bTreeFile = new BTreeFile(dbname+"/Quadruple_BTreeIndex");
-    QuadrupleHeapFile qHeapFile = new QuadrupleHeapFile(dbname+"/QuadrupleHF");
-    LabelHeapFile entityHeapFile = new LabelHeapFile(dbname+"/EntityHF");
-    TScan scan = new TScan(qHeapFile);
+    TScan scan = new TScan(quadrupleHeapFile);
     Quadruple quadruple;
     QID qid = new QID();
     double confidence;

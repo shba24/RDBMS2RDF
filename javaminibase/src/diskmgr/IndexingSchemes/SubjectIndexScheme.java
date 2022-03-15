@@ -21,35 +21,21 @@ public class SubjectIndexScheme implements IndexSchemes {
    * Unclustered BTree Index on Subject
    *
    * @param QuadBTreeIndex
-   * @param curr_dbname
+   * @param quadrupleHeapFile
    */
   @Override
-  public void createIndex(BTreeFile QuadBTreeIndex, String curr_dbname) {
+  public void createIndex(BTreeFile QuadBTreeIndex, QuadrupleHeapFile quadrupleHeapFile, LabelHeapFile entityHeapFile) {
     //Unclustered BTree Index file on subject
     try {
-      //destroy existing index first
-      if (QuadBTreeIndex != null) {
-        QuadBTreeIndex.close();
-        QuadBTreeIndex.destroyFile();
-        destroyIndex(curr_dbname + "/QuadBTreeIndex");
-      }
 
-      //create new
-      int keytype = AttrType.attrString;
-      QuadBTreeIndex = new BTreeFile(curr_dbname + "/QuadBTreeIndex", keytype, 255, 1);
-
-      //scan sorted heap file and insert into btree index
-      QuadrupleHeapFile QuadrupleHF = new QuadrupleHeapFile(curr_dbname + "/quadrupleHF");
-
-      LabelHeapFile Entity_HF = new LabelHeapFile(curr_dbname + "/entityHF");
-      TScan am = new TScan(QuadrupleHF);
+      TScan am = new TScan(quadrupleHeapFile);
       Quadruple quadruple = null;
       QID qid = new QID();
       KeyDataEntry entry = null;
       BTFileScan scan = null;
 
       while ((quadruple = am.getNext(qid)) != null) {
-        Label subject = Entity_HF.getLabel((LID) quadruple.getSubjectID().returnLID());
+        Label subject = entityHeapFile.getLabel((LID) quadruple.getSubjectID().returnLID());
         KeyClass key = new StringKey(subject.getLabel());
 
         QuadBTreeIndex.insert(key, qid);
