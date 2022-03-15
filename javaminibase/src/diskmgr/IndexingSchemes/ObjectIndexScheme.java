@@ -41,7 +41,7 @@ public class ObjectIndexScheme implements IndexSchemes {
 
       }
       am.closescan();
-      QuadBTreeIndex.close();
+
     } catch (Exception e) {
       System.err.println("*** Error creating Index for Subject " + e);
       e.printStackTrace();

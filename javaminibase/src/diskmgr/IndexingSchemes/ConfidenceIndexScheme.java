@@ -33,6 +33,6 @@ public class ConfidenceIndexScheme implements IndexSchemes{
     }
 
     scan.closescan();
-    bTreeFile.close();
+
   }
 }

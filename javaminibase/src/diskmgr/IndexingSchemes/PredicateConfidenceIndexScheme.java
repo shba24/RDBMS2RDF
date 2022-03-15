@@ -36,6 +36,6 @@ public class PredicateConfidenceIndexScheme implements IndexSchemes{
       bTreeFile.insert(key,qid);
     }
     scan.closescan();
-    bTreeFile.close();
+
   }
 }

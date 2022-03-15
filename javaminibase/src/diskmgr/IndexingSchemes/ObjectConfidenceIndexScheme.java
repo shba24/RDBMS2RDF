@@ -35,6 +35,6 @@ public class ObjectConfidenceIndexScheme implements IndexSchemes{
       bTreeFile.insert(key,qid);
     }
     scan.closescan();
-    bTreeFile.close();
+
   }
 }
