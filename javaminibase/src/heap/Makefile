@@ -24,8 +24,10 @@ scan:Scan.java
 quadruple:Quadruple.java
 	$(JAVAC) Quadruple.java
 
+
 together:*.java
 	make -C labelheap
+	make -C quadrupleheap
 	$(JAVAC) *.java
 
 clean:
