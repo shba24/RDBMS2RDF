@@ -38,7 +38,6 @@ public class IndexUtils {
         scan.DestroyBTreeFileScan();
 
         for (int i = 0; i < count; i++) {
-          //System.out.println("Deleting record having Key : " + keys.get(i) + " TID " + tids.get(i));
           bfile.Delete(keys.get(i), qids.get(i));
         }
 
