@@ -3,6 +3,7 @@ package tests;
 import db.IndexOption;
 import global.GlobalConst;
 import global.PageId;
+import global.RDFSystemDefs;
 import global.SystemDefs;
 import java.io.IOException;
 
@@ -124,9 +125,9 @@ public class RdfDBTest {
       int numberOfPages = 10000;
       int bufferPoolSize = 1000;
       String replacementPolicy = "Clock";
-      IndexOption indexOption = IndexOption.TestOption;
+      IndexOption indexOption = IndexOption.Confidence;
 
-      sysdef = new SystemDefs(rdfDBName, numberOfPages, bufferPoolSize, replacementPolicy, indexOption);
+      sysdef = new RDFSystemDefs(rdfDBName, numberOfPages, bufferPoolSize, replacementPolicy, indexOption);
       return true;
     }
   }

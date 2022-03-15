@@ -16,9 +16,13 @@ import global.LID;
 import global.PID;
 import global.PageId;
 import global.QID;
+import heap.FieldNumberOutOfBoundException;
+import heap.InvalidTupleSizeException;
+import heap.InvalidTypeException;
 import heap.Label;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
+import java.io.IOException;
 
 /**
  * This class is an abstraction of the RDF database. Responsibilities of this class include 1.
@@ -379,7 +383,8 @@ public class RdfDB extends DB implements GlobalConst {
     return objectCount;
   }
 
-  EID insertEntity(String entityLabelName) {
+  EID insertEntity(String entityLabelName)
+      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
     Label entityLabel = new Label(entityLabelName);
     LID entityLabelId = null;
 
@@ -401,7 +406,8 @@ public class RdfDB extends DB implements GlobalConst {
    * @param entityLabelName
    * @return
    */
-  boolean deleteEntity(String entityLabelName) {
+  boolean deleteEntity(String entityLabelName)
+      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
     Label entityLabel = new Label(entityLabelName);
     LID entityLabelId = new LID();
 
@@ -438,7 +444,8 @@ public class RdfDB extends DB implements GlobalConst {
   }
 
 
-  public PID insertPredicate(String predicateLabelName) {
+  public PID insertPredicate(String predicateLabelName)
+      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
     Label predicateLabel = new Label(predicateLabelName);
     LID predicateLabelId = null;
 
@@ -454,7 +461,8 @@ public class RdfDB extends DB implements GlobalConst {
     return predicateId;
   }
 
-  boolean deletePredicate(String predicateLabelName) {
+  boolean deletePredicate(String predicateLabelName)
+      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
     Label predicateLabel = new Label(predicateLabelName);
     LID predicateLabelId = new LID();
 
