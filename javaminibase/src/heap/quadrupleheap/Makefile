@@ -9,19 +9,6 @@ PROGS = together
 
 all: $(PROGS)
 
-qhf:QuadrupleHeapFile.java
-	$(JAVAC) QuadrupleHeapFile.java
-
-thp:THFPage.java
-	$(JAVAC) THFPage.java
-
-
-tscan:TScan.java
-	$(JAVAC) TScan.java
-
-qdpi:QuadDataPageInfo.java
-	$(JAVAC) QuadDataPageInfo.java
-
 together:*.java
 	$(JAVAC) *.java
 

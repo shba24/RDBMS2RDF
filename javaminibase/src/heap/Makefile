@@ -24,19 +24,6 @@ scan:Scan.java
 quadruple:Quadruple.java
 	$(JAVAC) Quadruple.java
 
-qhf:QuadrupleHeapFile.java
-	$(JAVAC) QuadrupleHeapFile.java
-
-thp:THFPage.java
-	$(JAVAC) THFPage.java
-
-
-tscan:TScan.java
-	$(JAVAC) TScan.java
-
-qdpi:QuadDataPageInfo.java
-	$(JAVAC) QuadDataPageInfo.java
-
 
 together:*.java
 	make -C labelheap

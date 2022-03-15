@@ -2,22 +2,11 @@ package heap.quadrupleheap;
 
 
 import diskmgr.Page;
-import global.GlobalConst;
-import global.IQID;
 import global.PageId;
 import global.QID;
 import global.SystemDefs;
 import heap.*;
-import heap.FileAlreadyDeletedException;
-import heap.HFBufMgrException;
-import heap.HFDiskMgrException;
-import heap.HFException;
-import heap.HFPage;
-import heap.Heapfile;
-import heap.InvalidSlotNumberException;
-import heap.InvalidTupleSizeException;
-import heap.InvalidUpdateException;
-import heap.Quadruple;
+
 
 import heap.SpaceNotAvailableException;
 
@@ -116,7 +105,7 @@ public class QuadrupleHeapFile extends Heapfile {
 
   }// end of constructor
 
-  private THFPage _newDatapage(QuadDataPageInfo dpinfop) throws HFException,
+  private THFPage _newDatapage(DataPageInfo dpinfop) throws HFException,
       HFBufMgrException,
       HFDiskMgrException,
       IOException {
@@ -150,7 +139,7 @@ public class QuadrupleHeapFile extends Heapfile {
       QID qid,
       PageId dirPageId, THFPage dirpage,
       PageId dataPageId, THFPage datapage,
-      IQID rpDataPageQid)
+      QID rpDataPageQid)
       throws InvalidSlotNumberException,
       InvalidTupleSizeException,
       HFException,
@@ -183,7 +172,7 @@ public class QuadrupleHeapFile extends Heapfile {
           return false;
         }
 
-        QuadDataPageInfo dpinfo = new QuadDataPageInfo(aquadruple);
+        DataPageInfo dpinfo = new DataPageInfo(aquadruple);
         try {
           pinPage(dpinfo.pageId, currentDataPage, false/*Rddisk*/);
 
@@ -263,7 +252,7 @@ public class QuadrupleHeapFile extends Heapfile {
       for (qid = currentDirPage.firstQuadruple(); qid != null;
           qid = currentDirPage.nextQuadruple(qid)) {
         aquadruple = currentDirPage.getQuadruple(qid);
-        QuadDataPageInfo dataPageInfo = new QuadDataPageInfo(aquadruple);
+        DataPageInfo dataPageInfo = new DataPageInfo(aquadruple);
         answer += dataPageInfo.recct;
       }
       // ASSERTIONS: no more Quadruple
@@ -315,7 +304,7 @@ public class QuadrupleHeapFile extends Heapfile {
 
     found = false;
     Quadruple quadruple;
-    QuadDataPageInfo dpinfo = new QuadDataPageInfo();
+    DataPageInfo dpinfo = new DataPageInfo();
 
     while (found == false) {//Start While01
       // look for suitable dpinfo-struct
@@ -324,7 +313,7 @@ public class QuadrupleHeapFile extends Heapfile {
           currentDataPageQid =
               currentDirPage.nextQuadruple(currentDataPageQid)) {
         quadruple = currentDirPage.getQuadruple(currentDataPageQid);
-        dpinfo = new QuadDataPageInfo(quadruple);
+        dpinfo = new DataPageInfo(quadruple);
         // need check the Quadruple length == QuadDataPageInfo'slength
 
         if (quadLen <= dpinfo.availspace) {
@@ -376,7 +365,7 @@ public class QuadrupleHeapFile extends Heapfile {
 
           currentDataPageQid = currentDirPage.insertQuadruple(tmpdata);
 
-          IQID tmpQid = currentDirPage.firstQuadruple();
+          QID tmpQid = currentDirPage.firstQuadruple();
 
           if (currentDataPageQid == null) {
             throw new HFException(null, "no space to insert Quadruple.");
@@ -477,7 +466,7 @@ public class QuadrupleHeapFile extends Heapfile {
       throw new HFException(null, "can't find Data page");
     }
 
-    IQID qid;
+    QID qid;
     qid = currentDataPage.insertQuadruple(quadruplePtr);
 
     dpinfo.recct++;
@@ -487,7 +476,7 @@ public class QuadrupleHeapFile extends Heapfile {
 
     // DataPage is now released
     quadruple = currentDirPage.returnQuadruple(currentDataPageQid);
-    QuadDataPageInfo dpinfo_ondirpage = new QuadDataPageInfo(quadruple);
+    DataPageInfo dpinfo_ondirpage = new DataPageInfo(quadruple);
 
     dpinfo_ondirpage.availspace = dpinfo.availspace;
     dpinfo_ondirpage.recct = dpinfo.recct;
@@ -536,7 +525,7 @@ public class QuadrupleHeapFile extends Heapfile {
     Quadruple quadruple;
 
     quadruple = currentDirPage.returnQuadruple(currentDataPageQid);
-    QuadDataPageInfo pdpinfo = new QuadDataPageInfo(quadruple);
+    DataPageInfo pdpinfo = new DataPageInfo(quadruple);
 
     // delete the quadruple on the datapage
     currentDataPage.deleteQuadruple(qid);
@@ -651,7 +640,7 @@ public class QuadrupleHeapFile extends Heapfile {
     PageId currentDirPageId = new PageId();
     THFPage dataPage = new THFPage();
     PageId currentDataPageId = new PageId();
-    IQID currentDataPageQid = new QID();
+    QID currentDataPageQid = new QID();
 
     status = _findDataPage(qid,
         currentDirPageId, dirPage,
@@ -708,7 +697,7 @@ public class QuadrupleHeapFile extends Heapfile {
     PageId currentDirPageId = new PageId();
     THFPage dataPage = new THFPage();
     PageId currentDataPageId = new PageId();
-    IQID currentDataPageQid = new QID();
+    QID currentDataPageQid = new QID();
 
     status = _findDataPage(qid,
         currentDirPageId, dirPage,
@@ -778,7 +767,7 @@ public class QuadrupleHeapFile extends Heapfile {
           throw new HFBufMgrException(e, "QuadrupleHeapfile.java: deleteFile() failed");
         }
 
-        QuadDataPageInfo dpinfo = new QuadDataPageInfo(quadruple);
+        DataPageInfo dpinfo = new DataPageInfo(quadruple);
         //int dpinfoLen = aQuadruple.length;
 
         freePage(dpinfo.pageId);

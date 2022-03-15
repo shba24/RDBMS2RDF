@@ -217,7 +217,7 @@ public class TScan implements GlobalConst {
   private boolean firstDataPage()
       throws InvalidTupleSizeException,
       IOException, InvalidTupleSizeException {
-    QuadDataPageInfo dpinfo;
+    DataPageInfo dpinfo;
     Quadruple recQuadruple = null;
     Boolean bst;
 
@@ -248,7 +248,7 @@ public class TScan implements GlobalConst {
         e.printStackTrace();
       }
 
-      dpinfo = new QuadDataPageInfo(recQuadruple);
+      dpinfo = new DataPageInfo(recQuadruple);
       datapageId.pid = dpinfo.pageId.pid;
     } else {
 
@@ -300,11 +300,11 @@ public class TScan implements GlobalConst {
             e.printStackTrace();
           }
 
-          if (recQuadruple.getLength() != QuadDataPageInfo.size) {
+          if (recQuadruple.getLength() != DataPageInfo.size) {
             return false;
           }
 
-          dpinfo = new QuadDataPageInfo(recQuadruple);
+          dpinfo = new DataPageInfo(recQuadruple);
           datapageId.pid = dpinfo.pageId.pid;
         } else {
           // heapfile empty
@@ -349,7 +349,7 @@ public class TScan implements GlobalConst {
   private boolean nextDataPage()
       throws InvalidTupleSizeException,
       IOException {
-    QuadDataPageInfo dpinfo;
+    DataPageInfo dpinfo;
 
     boolean nextDataPageStatus;
     PageId nextDirPageId = new PageId();
@@ -486,11 +486,11 @@ public class TScan implements GlobalConst {
       System.err.println("HeapFile: Error in Scan" + e);
     }
 
-    if (recQuadruple.getLength() != QuadDataPageInfo.size) {
+    if (recQuadruple.getLength() != DataPageInfo.size) {
       return false;
     }
 
-    dpinfo = new QuadDataPageInfo(recQuadruple);
+    dpinfo = new DataPageInfo(recQuadruple);
     datapageId.pid = dpinfo.pageId.pid;
 
     try {

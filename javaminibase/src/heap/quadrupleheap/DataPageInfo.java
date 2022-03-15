@@ -18,7 +18,7 @@ import java.io.IOException;
  * April 9, 1998
  */
 
-public class QuadDataPageInfo implements GlobalConst {
+public class DataPageInfo implements GlobalConst {
 
   /**
    * auxiliary fields of QuadDataPageInfo
@@ -51,7 +51,7 @@ public class QuadDataPageInfo implements GlobalConst {
   /**
    * Default constructor
    */
-  public QuadDataPageInfo() {
+  public DataPageInfo() {
     data = new byte[12]; // size of QuadDataPageInfo
     int availspace = 0;
     recct = 0;
@@ -64,7 +64,7 @@ public class QuadDataPageInfo implements GlobalConst {
    *
    * @param array a byte array
    */
-  public QuadDataPageInfo(byte[] array) {
+  public DataPageInfo(byte[] array) {
     data = array;
     offset = 0;
   }
@@ -73,7 +73,7 @@ public class QuadDataPageInfo implements GlobalConst {
    * constructor: translate a QUadruple to a QuadDataPageInfo object it will make a copy of the data in
    * the tuple
    */
-  public QuadDataPageInfo(Quadruple quadruple)
+  public DataPageInfo(Quadruple quadruple)
       throws InvalidTupleSizeException, IOException, InvalidTupleSizeException {
     // need check _atuple size == this.size ?otherwise, throw new exception
     if (quadruple.getLength() != 12) {
