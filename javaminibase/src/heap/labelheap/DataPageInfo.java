@@ -115,7 +115,7 @@ class DataPageInfo implements GlobalConst {
      * write this object's useful fields(availspace, recct, pageId)
      * to the data[](may be in buffer pool)
      */
-    public void flushToTuple() throws IOException {
+    public void flushToLabel() throws IOException {
         // write availspace, recct, pageId into "data[]"
         Convert.setIntValue(availspace, offset, data);
         Convert.setIntValue(recct, offset + 4, data);
