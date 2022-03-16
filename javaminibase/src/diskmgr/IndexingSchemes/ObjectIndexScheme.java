@@ -30,8 +30,6 @@ public class ObjectIndexScheme implements IndexSchemes {
       TScan am = new TScan(quadrupleHeapFile);
       Quadruple quadruple = null;
       QID qid = new QID();
-      KeyDataEntry entry = null;
-      BTFileScan scan = null;
 
       while ((quadruple = am.getNext(qid)) != null) {
         Label subject = entityHeapFile.getLabel((LID) quadruple.getObjectID().returnLID());
