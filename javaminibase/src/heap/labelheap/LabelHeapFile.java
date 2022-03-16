@@ -413,7 +413,7 @@ public class LabelHeapFile extends Heapfile {
         dpinfo_ondirpage.availspace = dpinfo.availspace;
         dpinfo_ondirpage.recct = dpinfo.recct;
         dpinfo_ondirpage.pageId.pid = dpinfo.pageId.pid;
-        dpinfo_ondirpage.flushToTuple();
+        dpinfo_ondirpage.flushToLabel();
 
         unpinPage(currentDirPageId, true /* = DIRTY */);
 
@@ -468,13 +468,13 @@ public class LabelHeapFile extends Heapfile {
         currentDataPage.deleteLabel(lid);
 
         pdpinfo.recct--;
-        pdpinfo.flushToTuple();  //Write to the buffer pool
+        pdpinfo.flushToLabel();  //Write to the buffer pool
         if (pdpinfo.recct >= 1) {
             // more records remain on datapage so it still hangs around.
             // we just need to modify its directory entry
 
             pdpinfo.availspace = currentDataPage.available_space();
-            pdpinfo.flushToTuple();
+            pdpinfo.flushToLabel();
             unpinPage(currentDataPageId, true /* = DIRTY*/);
 
             unpinPage(currentDirPageId, true /* = DIRTY */);

@@ -9,9 +9,9 @@ import global.QID;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 
-public class SubjectIndexScheme extends BaseIndexScheme {
+public class SubjectPredicateObjectScheme extends BaseIndexScheme {
 
-  public SubjectIndexScheme(String bTreeFilePath)
+  public SubjectPredicateObjectScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException {
     super(bTreeFilePath);
   }
@@ -19,7 +19,9 @@ public class SubjectIndexScheme extends BaseIndexScheme {
   public static String getFilePath(String rootFolderPath) {
     String[] tokens = new String[]{
         GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.SUBJECT_IDENTIFIER
+        GlobalConst.SUBJECT_IDENTIFIER,
+        GlobalConst.PREDICATE_IDENTIFIER,
+        GlobalConst.OBJECT_IDENTIFIER
     };
     return generateFilePath(rootFolderPath, tokens);
   }
@@ -27,7 +29,9 @@ public class SubjectIndexScheme extends BaseIndexScheme {
   @Override
   public StringKey getKey(
       Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
-    return new StringKey(
-        entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel());
+    String subject = entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel();
+    String object = entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel();
+    String predicate = predicateHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel();
+    return new StringKey(subject+":"+predicate+":"+object);
   }
 }

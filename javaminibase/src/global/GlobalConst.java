@@ -4,6 +4,7 @@ public interface GlobalConst {
 
   public static final int MINIBASE_MAXARRSIZE = 50;
   public static final int NUMBUF = 50;
+  public static final int DEFAULT_DB_PAGES = 1024;
 
   /**
    * Size of page.
@@ -40,4 +41,25 @@ public interface GlobalConst {
   public static short MAX_FLOAT_SIZE = 8;
 
   public static final int INVALID_PAGE = -1;
+
+  /**
+   * Global constants for directory, path, files and folder names
+   */
+  public static String ROOT_FOLDER = "data";
+  public static String CURR_DIR_ENV = "user.dir";
+  public static String DEFAULT_LOG_FILENAME = "default.log";
+  public static String HEAP_FILE_IDENTIFIER = "heapfile";
+  public static String BTREE_FILE_IDENTIFIER = "btreefile";
+  public static String QUADRUPLE_IDENTIFIER = "quadruple";
+  public static String ENTITY_IDENTIFIER = "entity";
+  public static String PREDICATE_IDENTIFIER = "predicate";
+  public static String LABEL_IDENTIFIER = "label";
+  public static String SUBJECT_IDENTIFIER = "subject";
+  public static String OBJECT_IDENTIFIER = "object";
+  public static String CONFIDENCE_IDENTIFIER = "confidence";
+
+  /**
+   * Global constants for basics
+   */
+  public static String DEFAULT_REPLACEMENT_POLICY = "Clock";
 }

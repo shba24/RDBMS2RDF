@@ -130,9 +130,9 @@ public class PID implements IPID {
    * @return the label ID (LID) object
    */
   @Override
-  public ILID returnLID() {
+  public LID returnLID() {
 
-    ILID lid = new LID(pageNo,slotNo);
+    LID lid = new LID(pageNo,slotNo);
     return lid;
   }
 

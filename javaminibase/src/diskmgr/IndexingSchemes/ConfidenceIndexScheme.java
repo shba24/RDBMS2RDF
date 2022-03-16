@@ -1,46 +1,37 @@
 package diskmgr.IndexingSchemes;
 
-import btree.KeyClass;
+import btree.ConstructPageException;
+import btree.GetFileEntryException;
+import btree.PinPageException;
 import btree.StringKey;
-import btree.quadbtree.BTreeFile;
+import global.GlobalConst;
 import global.QID;
+import heap.FieldNumberOutOfBoundException;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
-import heap.quadrupleheap.QuadrupleHeapFile;
-import heap.quadrupleheap.TScan;
+import java.io.IOException;
 
-public class ConfidenceIndexScheme implements IndexSchemes {
+public class ConfidenceIndexScheme extends BaseIndexScheme {
 
-  /**
-   * Create Index
-   *
-   * @param bTreeFile         BTree Index
-   * @param quadrupleHeapFile QuadrupleHeapFile
-   * @throws Exception
-   */
+  public ConfidenceIndexScheme(String rootFolderPath)
+      throws ConstructPageException, GetFileEntryException, PinPageException {
+    super(getFilePath(rootFolderPath));
+  }
+
+  public static String getFilePath(String rootFolderPath) {
+    String[] tokens = new String[]{
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.CONFIDENCE_IDENTIFIER
+    };
+    return generateFilePath(rootFolderPath, tokens);
+  }
+
   @Override
-  public void createIndex(BTreeFile bTreeFile, QuadrupleHeapFile quadrupleHeapFile,
-      LabelHeapFile entityHeapFile)
-      throws Exception {
-    try {
-      TScan scan = new TScan(quadrupleHeapFile);
-      Quadruple quadruple;
-      QID qid = new QID();
-      double confidence;
-      while ((quadruple = scan.getNext(qid)) != null) {
-        confidence = quadruple.getConfidence();
-        String temp = Double.toString(confidence);
-        KeyClass key = new StringKey(temp);
-        bTreeFile.insert(key, qid);
-      }
-
-      scan.closescan();
-
-    } catch (Exception e) {
-      System.err.println("*** Error creating Index for Confidence " + e);
-      e.printStackTrace();
-    }
-
-
+  public StringKey getKey(
+      Quadruple quadruple,
+      QID qid,
+      LabelHeapFile entityHeapFile,
+      LabelHeapFile predicateHeapFile) throws FieldNumberOutOfBoundException, IOException {
+    return new StringKey(Double.toString(quadruple.getConfidence()));
   }
 }

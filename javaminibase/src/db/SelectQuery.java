@@ -1,5 +1,7 @@
 package db;
 
+import global.RDFSystemDefs;
+
 public class SelectQuery extends BaseQuery implements IQuery {
   private IndexOption indexOption;
   private String order;
@@ -219,7 +221,7 @@ public class SelectQuery extends BaseQuery implements IQuery {
   /**
    * Executes the query
    */
-  public void execute() {
+  public void execute(RDFSystemDefs rdfSystemDefs) {
     // to be implemented
   }
 }

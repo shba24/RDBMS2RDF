@@ -1,5 +1,10 @@
 package db;
 
+import global.EID;
+import global.PID;
+import global.RDFSystemDefs;
+import heap.Quadruple;
+
 public class InsertQuery extends BaseQuery implements IQuery {
   private String dataFileName;
   private IndexOption indexOption;
@@ -23,7 +28,7 @@ public class InsertQuery extends BaseQuery implements IQuery {
   /**
    * get data file name
    *
-   * @return  String data file name
+   * @return String data file name
    */
   public String getDataFileName() {
     return dataFileName;
@@ -41,7 +46,7 @@ public class InsertQuery extends BaseQuery implements IQuery {
   /**
    * get indexOption
    *
-   * @return  IndexOption
+   * @return IndexOption
    */
   public IndexOption getIndexOption() {
     return indexOption;
@@ -67,9 +72,22 @@ public class InsertQuery extends BaseQuery implements IQuery {
 
   /**
    * Executes the query
-   *
    */
-  public void execute() {
-    // to be implemented
+  public void execute(RDFSystemDefs rdfSystemDefs) throws Exception {
+    DataFileReader fileReader = new DataFileReader(dataFileName);
+    String[] tokens = fileReader.read_next();
+    while (tokens != null) {
+      Quadruple quad = new Quadruple();
+      EID subjectID = rdfSystemDefs.rdfDB.insertEntity(tokens[0]);
+      PID predicateID = rdfSystemDefs.rdfDB.insertPredicate(tokens[1]);
+      EID objectID = rdfSystemDefs.rdfDB.insertEntity(tokens[2]);
+      double confidence = Double.parseDouble(tokens[3]);
+      quad.setSubjectID(subjectID)
+          .setPredicateID(predicateID)
+          .setObjectID(objectID)
+          .setConfidence(confidence);
+      rdfSystemDefs.rdfDB.insertQuadruple(quad.getQuadrupleByteArray());
+      tokens = fileReader.read_next();
+    }
   }
 }

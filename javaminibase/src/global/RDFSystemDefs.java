@@ -3,89 +3,73 @@ package global;
 import bufmgr.BufMgr;
 import db.IndexOption;
 import diskmgr.rdf.RdfDB;
+import java.nio.file.Paths;
 
-public class RDFSystemDefs extends SystemDefs {
+/**
+ * Implements the RDFSystemDefs using the Builder
+ * design Pattern.
+ *
+ */
+public class RDFSystemDefs {
+  private String dbPath;
+  private IndexOption indexOption;
+  private String logFilePath;
+  private int numPgs = GlobalConst.DEFAULT_DB_PAGES;
+  private int logSize = 3 * GlobalConst.DEFAULT_DB_PAGES;
+  private int bufPoolSize = GlobalConst.NUMBUF;
+  private String replacementPolicy = GlobalConst.DEFAULT_REPLACEMENT_POLICY;
+
   /**
-   *
-   * @param rdfDBName
-   * @param num_pgs
-   * @param bufpoolsize
-   * @param replacement_policy
-   * @param indexOption
+   * Global Constants
    */
-  public RDFSystemDefs(String rdfDBName, int num_pgs, int bufpoolsize, String replacement_policy, IndexOption indexOption)
-  {
-    int logsize;
+  public BufMgr bufMgr;
+  public RdfDB rdfDB;
 
-    String logFileName = new String(rdfDBName);
-
-    System.out.println(rdfDBName);
-
-    if (num_pgs == 0) {
-      logsize = 500;
-    }
-    else {
-      logsize = 3 * num_pgs;
-    }
-
-    if (replacement_policy == null) {
-      replacement_policy = new String("Clock");
-    }
-
-    initRdfDB(rdfDBName, logFileName, num_pgs, logsize, bufpoolsize, replacement_policy, indexOption);
+  /**
+   * Default constructor for the RDFSystemDefs
+   *
+   * @param rdfDbPath
+   * @param _indexOption
+   */
+  public RDFSystemDefs(
+      String rdfDbPath,
+      IndexOption _indexOption) {
+    dbPath = rdfDbPath;
+    indexOption = _indexOption;
+    logFilePath = Paths.get(
+        dbPath,
+        GlobalConst.DEFAULT_LOG_FILENAME
+    ).toString();
   }
 
-  public void initRdfDB(String rdfDBName, String logFileName, int numberOfPages, int maxLogSize, int bufferPoolSize, String replacementPolicy, IndexOption indexOption)
-  {
+  public RDFSystemDefs setNumPages(int _numPgs) {
+    numPgs = _numPgs;
+    return this;
+  }
 
-    boolean status = true;
-    JavabaseBM = null;
-    JavabaseDB = null;
-    JavabaseDBName = null;
-    JavabaseLogName = null;
-    JavabaseCatalog = null;
+  public RDFSystemDefs setLogSize(int _logSize) {
+    logSize = _logSize;
+    return this;
+  }
 
+  public RDFSystemDefs setBufPoolSize(int _bufPoolSize) {
+    bufPoolSize = _bufPoolSize;
+    return this;
+  }
+
+  public RDFSystemDefs setReplacementPolicy(String _replacementPolicy) {
+    replacementPolicy = _replacementPolicy;
+    return this;
+  }
+
+  public void initRdfDB() {
     try {
-      JavabaseBM = new BufMgr(bufferPoolSize, replacementPolicy);
-      JavabaseDB = new RdfDB();
-			/*
-			   JavabaseCatalog = new Catalog();
-			 */
-    }
-    catch (Exception e) {
-      System.err.println (""+e);
+      bufMgr = new BufMgr(bufPoolSize, replacementPolicy);
+      rdfDB = new RdfDB(dbPath, numPgs, indexOption);
+      rdfDB.initRdfDB();
+    } catch (Exception e) {
+      System.err.println("Error while initializing RDFSystemDef");
       e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
-
-    JavabaseDBName = new String(rdfDBName);
-    JavabaseLogName = new String(logFileName);
-    MINIBASE_DBNAME = new String(JavabaseDBName);
-
-    // create or open the DB
-
-    if ((MINIBASE_RESTART_FLAG)||(numberOfPages == 0)){//open an existing database
-      try {
-        System.out.println("***Opening existing database***");
-        ((RdfDB)JavabaseDB).openRdfDB(JavabaseDBName, indexOption); //open exisiting rdf database
-      }
-      catch (Exception e) {
-        System.err.println (""+e);
-        e.printStackTrace();
-        Runtime.getRuntime().exit(1);
-      }
-    }
-    else {
-      try {
-        System.out.println("***Creating new database***");
-        ((RdfDB)JavabaseDB).createRdfDB(rdfDBName, numberOfPages, indexOption);
-        JavabaseBM.flushAllPages();
-      }
-      catch (Exception e) {
-        System.err.println (""+e);
-        e.printStackTrace();
-        Runtime.getRuntime().exit(1);
-      }
     }
   }
 }

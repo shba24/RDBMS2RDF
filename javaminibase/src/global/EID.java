@@ -127,8 +127,8 @@ public class EID implements IEID {
    * @return the label ID (LID) object
    */
   @Override
-  public ILID returnLID() {
-    ILID lid=new LID(pageNo,slotNo);
+  public LID returnLID() {
+    LID lid=new LID(pageNo,slotNo);
     return lid;
   }
 

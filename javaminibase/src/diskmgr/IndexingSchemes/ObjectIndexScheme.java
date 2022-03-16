@@ -1,48 +1,39 @@
 package diskmgr.IndexingSchemes;
 
-import static diskmgr.IndexingSchemes.IndexUtils.destroyIndex;
-
-import btree.KeyClass;
-import btree.KeyDataEntry;
+import btree.ConstructPageException;
+import btree.GetFileEntryException;
+import btree.PinPageException;
 import btree.StringKey;
-import btree.quadbtree.*;
-import global.LID;
+import global.GlobalConst;
 import global.QID;
-import heap.Label;
+import heap.FieldNumberOutOfBoundException;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
-import heap.quadrupleheap.TScan;
+import java.io.IOException;
 
-public class ObjectIndexScheme implements IndexSchemes {
+public class ObjectIndexScheme extends BaseIndexScheme {
 
-  /**
-   * * Unclustered BTree Index on Object
-   *
-   * @param QuadBTreeIndex
-   * @param quadrupleHeapFile
-   */
+  public ObjectIndexScheme(String bTreeFilePath)
+      throws ConstructPageException, GetFileEntryException, PinPageException {
+    super(bTreeFilePath);
+  }
+
+  public static String getFilePath(String rootFolderPath) {
+    String[] tokens = new String[]{
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.OBJECT_IDENTIFIER
+    };
+    return generateFilePath(rootFolderPath, tokens);
+  }
+
   @Override
-  public void createIndex(BTreeFile QuadBTreeIndex, QuadrupleHeapFile quadrupleHeapFile,
-      LabelHeapFile entityHeapFile) {
-
-    try {
-      TScan am = new TScan(quadrupleHeapFile);
-      Quadruple quadruple = null;
-      QID qid = new QID();
-
-      while ((quadruple = am.getNext(qid)) != null) {
-        Label subject = entityHeapFile.getLabel((LID) quadruple.getObjectID().returnLID());
-        KeyClass key = new StringKey(subject.getLabel());
-
-        QuadBTreeIndex.insert(key, qid);
-
-      }
-      am.closescan();
-
-    } catch (Exception e) {
-      System.err.println("*** Error creating Index for Object " + e);
-      e.printStackTrace();
-    }
+  public StringKey getKey(
+      Quadruple quadruple,
+      QID qid,
+      LabelHeapFile entityHeapFile,
+      LabelHeapFile predicateHeapFile) throws Exception {
+    return new StringKey(
+        entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel());
   }
 }

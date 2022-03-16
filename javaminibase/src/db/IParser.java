@@ -6,5 +6,5 @@ public interface IParser {
    * @param query
    * @return  Query object
    */
-  public IQuery parse(String query);
+  public IQuery parse(String query) throws IllegalArgumentException;
 }
