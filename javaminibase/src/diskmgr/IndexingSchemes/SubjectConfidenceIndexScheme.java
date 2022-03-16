@@ -1,12 +1,9 @@
 package diskmgr.IndexingSchemes;
 
-import static diskmgr.IndexingSchemes.IndexUtils.destroyIndex;
 
 import btree.KeyClass;
-import btree.KeyDataEntry;
 import btree.StringKey;
 import btree.quadbtree.*;
-import global.AttrType;
 import global.LID;
 import global.QID;
 import heap.Label;
@@ -24,13 +21,12 @@ public class SubjectConfidenceIndexScheme implements IndexSchemes {
    * @param quadrupleHeapFile
    */
   @Override
-  public void createIndex(BTreeFile QuadBTreeIndex, QuadrupleHeapFile quadrupleHeapFile, LabelHeapFile entityHeapFile) {
-    try{
+  public void createIndex(BTreeFile QuadBTreeIndex, QuadrupleHeapFile quadrupleHeapFile,
+      LabelHeapFile entityHeapFile) {
+    try {
       TScan am = new TScan(quadrupleHeapFile);
       Quadruple quadruple = null;
       QID qid = new QID();
-      KeyDataEntry entry = null;
-      BTFileScan scan = null;
       double confidence = 0.0;
 
       while ((quadruple = am.getNext(qid)) != null) {
@@ -45,9 +41,8 @@ public class SubjectConfidenceIndexScheme implements IndexSchemes {
       am.closescan();
 
     } catch (Exception e) {
-      System.err.println("*** Error creating Index for Subject " + e);
+      System.err.println("*** Error creating Index for Subject Confidence" + e);
       e.printStackTrace();
-      Runtime.getRuntime().exit(1);
     }
   }
 }

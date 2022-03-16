@@ -6,7 +6,6 @@ import btree.KeyClass;
 import btree.KeyDataEntry;
 import btree.StringKey;
 import btree.quadbtree.*;
-import global.AttrType;
 import global.LID;
 import global.QID;
 import heap.Label;
@@ -24,9 +23,10 @@ public class ObjectIndexScheme implements IndexSchemes {
    * @param quadrupleHeapFile
    */
   @Override
-  public void createIndex(BTreeFile QuadBTreeIndex, QuadrupleHeapFile quadrupleHeapFile, LabelHeapFile entityHeapFile) {
+  public void createIndex(BTreeFile QuadBTreeIndex, QuadrupleHeapFile quadrupleHeapFile,
+      LabelHeapFile entityHeapFile) {
 
-    try{
+    try {
       TScan am = new TScan(quadrupleHeapFile);
       Quadruple quadruple = null;
       QID qid = new QID();
@@ -43,9 +43,8 @@ public class ObjectIndexScheme implements IndexSchemes {
       am.closescan();
 
     } catch (Exception e) {
-      System.err.println("*** Error creating Index for Subject " + e);
+      System.err.println("*** Error creating Index for Object " + e);
       e.printStackTrace();
-      Runtime.getRuntime().exit(1);
     }
   }
 }
