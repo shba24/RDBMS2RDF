@@ -11,6 +11,15 @@ public class AttrType {
   public static final int attrReal = 2;
   public static final int attrSymbol = 3;
   public static final int attrNull = 4;
+  /**
+   * We need  attrBytes to store the Entity
+   * structure in the heap files.
+   * With String, the encoding and decoding
+   * of the string according to UTF-8
+   * increases the size of the quadruple
+   * in the heap files
+   */
+  public static final int attrBytes = 5;
 
   public int attrType;
 
@@ -46,6 +55,8 @@ public class AttrType {
         return "attrSymbol";
       case attrNull:
         return "attrNull";
+      case attrBytes:
+        return "attrBytes";
     }
     return ("Unexpected AttrType " + attrType);
   }

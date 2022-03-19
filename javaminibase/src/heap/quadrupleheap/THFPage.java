@@ -40,18 +40,15 @@ public class THFPage extends HFPage {
    *                                  recLen, RID& rid)
    * @throws IllegalArgumentException thrown when the byte array is empty
    */
-  public QID insertQuadruple(byte[] quadruple) throws IOException, IllegalArgumentException {
-    if (quadruple.length == 0) {
-      throw new IllegalArgumentException(
-          "[THFPage] Received empty byte array in insertQuadruple()");
-    }
+  public QID insertQuadruple(byte[] quadruple) throws IOException {
 
     RID rid;
 
     try {
       rid = this.insertRecord(quadruple);
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.err.println("[THFPage] I/O error in inserting quadruple.");
+      e.printStackTrace();
       throw e;
     }
 
@@ -76,21 +73,14 @@ public class THFPage extends HFPage {
    * @throws NullPointerException       NPE when qid is null
    */
   public void deleteQuadruple(QID qid) throws IOException, InvalidSlotNumberException {
-    if (qid == null) {
-      throw new NullPointerException("[THFPage] The argument is null in deleteQuadruple()");
-    }
-
     RID rid = new RID();
     rid.pageNo = qid.getPageNo();
     rid.slotNo = qid.getSlotNo();
 
     try {
       this.deleteRecord(rid);
-    } catch (IOException e) {
-      System.err.println("[THFPage] I/O error in deleting quadruple.");
-      throw e;
-    } catch (InvalidSlotNumberException e) {
-      System.err.println("[THFPage] InvalidSlotNumberException in deleting quadruple.");
+    } catch (Exception e) {
+      System.err.println("[THFPage] Error in deleting Quadruple.");
       throw e;
     }
   }
@@ -107,7 +97,7 @@ public class THFPage extends HFPage {
 
     try {
       rid = this.firstRecord();
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.err.println("[THFPage] I/O exception in retrieving first quadruple.");
       throw e;
     }
@@ -128,10 +118,6 @@ public class THFPage extends HFPage {
    * @throws NullPointerException NPE when curQuad is null from the page
    */
   public QID nextQuadruple(QID curQuad) throws IOException, NullPointerException {
-    if (curQuad == null) {
-      throw new NullPointerException("[THFPage] The argument is null in nextQuadruple()");
-    }
-
     RID curRid = new RID();
     curRid.pageNo = curQuad.getPageNo();
     curRid.slotNo = curQuad.getSlotNo();
@@ -140,8 +126,8 @@ public class THFPage extends HFPage {
 
     try {
       nextRid = this.nextRecord(curRid);
-    } catch (IOException e) {
-      System.err.println("[THFPage] I/O exception in retrieving next quadruple.");
+    } catch (Exception e) {
+      System.err.println("[THFPage] Exception in retrieving next quadruple.");
       throw e;
     }
 
@@ -163,10 +149,6 @@ public class THFPage extends HFPage {
    */
   public Quadruple getQuadruple(QID qid)
       throws Exception {
-    if (qid == null) {
-      throw new NullPointerException("[THFPage] qid is null in getQuadruple()");
-    }
-
     RID rid = new RID();
 
     rid.pageNo = qid.getPageNo();
@@ -176,11 +158,8 @@ public class THFPage extends HFPage {
 
     try {
       tuple = this.getRecord(rid);
-    } catch (IOException e) {
-      System.err.println("[THFPage] I/O exception in getting quadruple.");
-      throw e;
-    } catch (InvalidSlotNumberException e) {
-      System.err.println("[THFPage] Invalid slot number in getting quadruple.");
+    } catch (Exception e) {
+      System.err.println("[THFPage] Exception in getting quadruple.");
       throw e;
     }
 
@@ -203,12 +182,8 @@ public class THFPage extends HFPage {
    */
   public Quadruple returnQuadruple(QID qid)
       throws Exception {
-    if (qid == null) {
-      throw new NullPointerException("[THFPage] qid is null in returnQuadruple()");
-    }
-
     RID rid = new RID();
-    rid.pageNo = qid.getPageNo();
+    rid.pageNo.pid = qid.getPageNo().pid;
     rid.slotNo = qid.getSlotNo();
     Tuple tuple;
 
@@ -220,7 +195,7 @@ public class THFPage extends HFPage {
     }
 
     if (tuple != null) {
-      return new Quadruple(tuple.getTupleByteArray(), tuple.getOffset(), tuple.getLength());
+      return new Quadruple(tuple.returnTupleByteArray(), tuple.getOffset(), tuple.getLength());
     } else {
       return null;
     }

@@ -14,17 +14,17 @@ import java.io.IOException;
  * April 9, 1998
  */
 
-class DataPageInfo implements GlobalConst {
+public class DataPageInfo implements GlobalConst {
 
   /** auxiliary fields of DataPageInfo */
 
   public static final int size = 12;// size of DataPageInfo object in bytes
   /** HFPage returns int for avail space, so we use int here */
-  int availspace;
+  public int availspace;
   /** for efficient implementation of getRecCnt() */
-  int recct;
+  public int recct;
   /** obvious: id of this particular data page (a HFPage) */
-  PageId pageId = new PageId();
+  public PageId pageId = new PageId();
   private byte[] data;  // a data buffer
 
   private int offset;
@@ -40,7 +40,7 @@ class DataPageInfo implements GlobalConst {
    */
   public DataPageInfo() {
     data = new byte[12]; // size of datapageinfo
-    int availspace = 0;
+    availspace = 0;
     recct = 0;
     pageId.pid = INVALID_PAGE;
     offset = 0;

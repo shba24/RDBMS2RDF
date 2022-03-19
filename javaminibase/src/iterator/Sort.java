@@ -8,6 +8,7 @@ import heap.FieldNumberOutOfBoundException;
 import heap.Heapfile;
 import heap.Tuple;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * The Sort class sorts a file. All necessary information are passed as
@@ -19,31 +20,31 @@ import java.io.IOException;
 public class Sort extends Iterator implements GlobalConst {
   private static final int ARBIT_RUNS = 10;
 
-  private AttrType[] _in;
-  private short n_cols;
-  private short[] str_lens;
-  private Iterator _am;
-  private int _sort_fld;
-  private TupleOrder order;
-  private int _n_pages;
-  private byte[][] bufs;
-  private boolean first_time;
-  private int Nruns;
-  private int max_elems_in_heap;
-  private int sortFldLen;
-  private int tuple_size;
+  protected AttrType[] _in;
+  protected short n_cols;
+  protected short[] str_lens;
+  protected Iterator _am;
+  protected int _sort_fld;
+  protected TupleOrder order;
+  protected int _n_pages;
+  protected byte[][] bufs;
+  protected boolean first_time;
+  protected int Nruns;
+  protected int max_elems_in_heap;
+  protected int sortFldLen;
+  protected int tuple_size;
 
-  private pnodeSplayPQ Q;
-  private Heapfile[] temp_files;
-  private int n_tempfiles;
-  private Tuple output_tuple;
-  private int[] n_tuples;
-  private int n_runs;
-  private Tuple op_buf;
-  private OBuf o_buf;
-  private SpoofIbuf[] i_buf;
-  private PageId[] bufs_pids;
-  private boolean useBM = true; // flag for whether to use buffer manager
+  protected pnodeSplayPQ Q;
+  protected Heapfile[] temp_files;
+  protected int n_tempfiles;
+  protected Tuple output_tuple;
+  protected int[] n_tuples;
+  protected int n_runs;
+  protected Tuple op_buf;
+  protected OBuf o_buf;
+  protected SpoofIbuf[] i_buf;
+  protected PageId[] bufs_pids;
+  protected boolean useBM = true; // flag for whether to use buffer manager
 
   /**
    * Class constructor, take information about the tuples, and set up
@@ -76,7 +77,7 @@ public class Sort extends Iterator implements GlobalConst {
 
     for (int i = 0; i < len_in; i++) {
       _in[i] = new AttrType(in[i].attrType);
-      if (in[i].attrType == AttrType.attrString) {
+      if (in[i].attrType == AttrType.attrString || in[i].attrType == AttrType.attrBytes) {
         n_strs++;
       }
     }
@@ -85,7 +86,7 @@ public class Sort extends Iterator implements GlobalConst {
 
     n_strs = 0;
     for (int i = 0; i < len_in; i++) {
-      if (_in[i].attrType == AttrType.attrString) {
+      if (_in[i].attrType == AttrType.attrString || _in[i].attrType == AttrType.attrBytes) {
         str_lens[n_strs] = str_sizes[n_strs];
         n_strs++;
       }
@@ -241,7 +242,7 @@ public class Sort extends Iterator implements GlobalConst {
    * @throws SortException  something went wrong in the lower layer.
    * @throws JoinsException from <code>Iterator.get_next()</code>
    */
-  private int generate_runs(int max_elems, AttrType sortFldType, int sortFldLen)
+  protected int generate_runs(int max_elems, AttrType sortFldType, int sortFldLen)
       throws IOException,
       SortException,
       UnknowAttrType,
@@ -565,7 +566,7 @@ public class Sort extends Iterator implements GlobalConst {
    * @throws IOException    from lower layers
    * @throws UnknowAttrType attrSymbol or attrNull encountered
    */
-  private void MIN_VAL(Tuple lastElem, AttrType sortFldType)
+  protected void MIN_VAL(Tuple lastElem, AttrType sortFldType)
       throws IOException,
       FieldNumberOutOfBoundException,
       UnknowAttrType {
@@ -576,6 +577,8 @@ public class Sort extends Iterator implements GlobalConst {
     char[] c = new char[1];
     c[0] = Character.MIN_VALUE;
     String s = new String(c);
+    byte[] p = new byte[8];
+    Arrays.fill(p, Byte.MIN_VALUE);
     //    short fld_no = 1;
 
     switch (sortFldType.attrType) {
@@ -590,6 +593,9 @@ public class Sort extends Iterator implements GlobalConst {
       case AttrType.attrString:
         //      lastElem.setHdr(fld_no, junk, s_size);
         lastElem.setStrFld(_sort_fld, s);
+        break;
+      case AttrType.attrBytes:
+        lastElem.setBytesFld(_sort_fld, p);
         break;
       default:
         // don't know how to handle attrSymbol, attrNull
@@ -608,7 +614,7 @@ public class Sort extends Iterator implements GlobalConst {
    * @throws IOException    from lower layers
    * @throws UnknowAttrType attrSymbol or attrNull encountered
    */
-  private void MAX_VAL(Tuple lastElem, AttrType sortFldType)
+  protected void MAX_VAL(Tuple lastElem, AttrType sortFldType)
       throws IOException,
       FieldNumberOutOfBoundException,
       UnknowAttrType {
@@ -619,6 +625,8 @@ public class Sort extends Iterator implements GlobalConst {
     char[] c = new char[1];
     c[0] = Character.MAX_VALUE;
     String s = new String(c);
+    byte[] p = new byte[8];
+    Arrays.fill(p, Byte.MAX_VALUE);
     //    short fld_no = 1;
 
     switch (sortFldType.attrType) {
@@ -633,6 +641,9 @@ public class Sort extends Iterator implements GlobalConst {
       case AttrType.attrString:
         //      lastElem.setHdr(fld_no, junk, s_size);
         lastElem.setStrFld(_sort_fld, s);
+        break;
+      case AttrType.attrBytes:
+        lastElem.setBytesFld(_sort_fld, p);
         break;
       default:
         // don't know how to handle attrSymbol, attrNull

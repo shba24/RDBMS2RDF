@@ -248,6 +248,25 @@ public class Tuple implements GlobalConst {
     }
 
     /**
+     * Gets the byte array for the fldNo
+     *
+     * @param fldNo
+     * @return
+     * @throws FieldNumberOutOfBoundException
+     */
+    public byte[] getBytesFld(int fldNo)
+        throws FieldNumberOutOfBoundException {
+        byte[] val;
+        if ((fldNo > 0) && (fldNo <= fldCnt)) {
+            val = Convert.getBytesValue(fldOffset[fldNo - 1], data,
+                fldOffset[fldNo] - fldOffset[fldNo - 1]);
+            return val;
+        } else {
+            throw new FieldNumberOutOfBoundException(null, "TUPLE:TUPLE_FLDNO_OUT_OF_BOUND");
+        }
+    }
+
+    /**
      * Convert this field into a character
      *
      * @param fldNo the field number
@@ -325,6 +344,25 @@ public class Tuple implements GlobalConst {
     }
 
     /**
+     * Sets the byte array for the fldNo
+     *
+     * @param fldNo
+     * @param val
+     * @return
+     * @throws IOException
+     * @throws FieldNumberOutOfBoundException
+     */
+    public Tuple setBytesFld(int fldNo, byte[] val)
+        throws IOException, FieldNumberOutOfBoundException {
+        if ((fldNo > 0) && (fldNo <= fldCnt)) {
+            Convert.setBytesValue(val, fldOffset[fldNo - 1], data);
+            return this;
+        } else {
+            throw new FieldNumberOutOfBoundException(null, "TUPLE:TUPLE_FLDNO_OUT_OF_BOUND");
+        }
+    }
+
+    /**
      * setHdr will set the header of this tuple.
      *
      * @param numFlds  number of fields
@@ -366,6 +404,10 @@ public class Tuple implements GlobalConst {
                 case AttrType.attrReal:
                     incr = 4;
                     break;
+                case AttrType.attrBytes:
+                    incr = strSizes[strCount];
+                    strCount++;
+                    break;
 
                 case AttrType.attrString:
                     incr = (short) (strSizes[strCount] + 2);  //strlen in bytes = strlen +2
@@ -387,6 +429,10 @@ public class Tuple implements GlobalConst {
 
             case AttrType.attrReal:
                 incr = 4;
+                break;
+
+            case AttrType.attrBytes:
+                incr = strSizes[strCount];
                 break;
 
             case AttrType.attrString:
@@ -443,6 +489,7 @@ public class Tuple implements GlobalConst {
         int i, val;
         float fval;
         String sval;
+        byte[] buff;
 
         System.out.print("[");
         for (i = 0; i < fldCnt - 1; i++) {
@@ -461,6 +508,11 @@ public class Tuple implements GlobalConst {
                 case AttrType.attrString:
                     sval = Convert.getStrValue(fldOffset[i], data, fldOffset[i + 1] - fldOffset[i]);
                     System.out.print(sval);
+                    break;
+
+                case AttrType.attrBytes:
+                    buff = Convert.getBytesValue(fldOffset[i], data, fldOffset[i + 1] - fldOffset[i]);
+                    System.out.println(buff);
                     break;
 
                 case AttrType.attrNull:
@@ -485,6 +537,10 @@ public class Tuple implements GlobalConst {
             case AttrType.attrString:
                 sval = Convert.getStrValue(fldOffset[i], data, fldOffset[i + 1] - fldOffset[i]);
                 System.out.print(sval);
+                break;
+            case AttrType.attrBytes:
+                buff = Convert.getBytesValue(fldOffset[i], data, fldOffset[i + 1] - fldOffset[i]);
+                System.out.println(buff);
                 break;
 
             case AttrType.attrNull:

@@ -4,10 +4,10 @@
 #the assignment to be generated
 
 JARFILES=bufmgr/*.class \
-		 diskmgr/*.class \
+		 diskmgr/**/*.class \
 		 global/*.class \
 		 iterator/*.class\
-         heap/*.class \
+         heap/**/*.class \
          chainexception/*.class \
          btree/**/*.class \
          index/*.class \
@@ -38,7 +38,7 @@ PACKAGEINDEX=$(ASSIGN)/javadoc
 JAVADOC=javadoc -public -d $(PACKAGEINDEX)
 
 ### Generate jar and javadoc files.  Apply to most assignments.
-db: 
+all:
 	make -C global
 	make -C chainexception
 	make -C btree
@@ -56,7 +56,7 @@ test:
 	cd tests; make bmtest dbtest; whoami; make hftest bttest indextest jointest sorttest sortmerge
 
 clean:
-	rm -f $(CLASSPATH)/*.class *~ \#* core $(JARFILES) TRACE
+	rm -f $(CLASSPATH)/*.class ./**/*.class *~ \#* core $(JARFILES) TRACE
 
 rdfdb:
 	make -C db

@@ -1,10 +1,8 @@
 package heap.labelheap;
 
 import diskmgr.Page;
-import global.GlobalConst;
 import global.LID;
 import global.PageId;
-import global.SystemDefs;
 import heap.*;
 
 import java.io.IOException;
@@ -27,15 +25,11 @@ public class LabelHeapFile extends Heapfile {
      * @throws HFDiskMgrException exception thrown from diskmgr layer
      * @throws IOException        I/O errors
      */
-    public LabelHeapFile(String name) throws HFException, HFBufMgrException, HFDiskMgrException, IOException {
-        super(name);
-    }
-
-    public void labelHeapFile(String name) throws HFException,
+    public LabelHeapFile(String name) throws HFException,
             HFBufMgrException,
             HFDiskMgrException,
             IOException {
-
+        super();
         _file_deleted = true;
         _fileName = null;
 
@@ -91,13 +85,23 @@ public class LabelHeapFile extends Heapfile {
         //  - no datapage pinned yet
     }
 
-
+    /**
+     * Deletes the Label heap file.
+     *
+     * @throws FileAlreadyDeletedException
+     * @throws HFBufMgrException
+     * @throws HFDiskMgrException
+     * @throws IOException
+     * @throws InvalidSlotNumberException
+     * @throws InvalidTupleSizeException
+     */
     @Override
     public void deleteFile()
-            throws FileAlreadyDeletedException,
-            HFBufMgrException,
-            HFDiskMgrException,
-            IOException, InvalidSlotNumberException, InvalidTupleSizeException {
+        throws FileAlreadyDeletedException,
+        HFBufMgrException,
+        HFDiskMgrException,
+        IOException, InvalidSlotNumberException, InvalidTupleSizeException, FieldNumberOutOfBoundException,
+        InvalidTypeException {
         if (_file_deleted) {
             throw new FileAlreadyDeletedException(null, "file already deleted");
         }
@@ -154,7 +158,8 @@ public class LabelHeapFile extends Heapfile {
      * @throws IOException                I/O errors
      */
     public int getRecCnt()
-            throws IOException, HFBufMgrException, InvalidSlotNumberException, InvalidTupleSizeException {
+        throws IOException, HFBufMgrException, InvalidSlotNumberException, InvalidTupleSizeException,
+        FieldNumberOutOfBoundException, InvalidTypeException {
         int answer = 0;
         PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
@@ -208,8 +213,9 @@ public class LabelHeapFile extends Heapfile {
      * @throws IOException                I/O errors
      */
     public LID insertLabel(byte[] recPtr)
-            throws HFException,
-            IOException, HFBufMgrException, InvalidSlotNumberException, SpaceNotAvailableException, InvalidTupleSizeException {
+        throws HFException,
+        IOException, HFBufMgrException, InvalidSlotNumberException, SpaceNotAvailableException,
+        InvalidTupleSizeException, FieldNumberOutOfBoundException, InvalidTypeException {
         int dpinfoLen = 0;
         int recLen = recPtr.length;
         boolean found;
@@ -285,9 +291,9 @@ public class LabelHeapFile extends Heapfile {
                     // currentDataPage is pinned: insert its label
                     // calling a HFPage function
 
-                    Label newLabel = dpinfo.convertToLabel();
+                    Tuple newTuple = dpinfo.convertToTuple();
 
-                    byte[] tmpData = newLabel.returnTupleByteArray();
+                    byte[] tmpData = newTuple.getTupleByteArray();
                     currentDataPageLid = currentDirPage.insertLabel(tmpData);
 
                     LID tmpLid = currentDirPage.firstLabel();
@@ -436,7 +442,6 @@ public class LabelHeapFile extends Heapfile {
             InvalidTupleSizeException,
             HFException,
             HFBufMgrException,
-            HFDiskMgrException,
             Exception {
         boolean status;
         LHFPage currentDirPage = new LHFPage();
@@ -698,7 +703,8 @@ public class LabelHeapFile extends Heapfile {
             PageId dirPageId, HFPage dirpage,
             PageId dataPageId, HFPage datapage,
             LID rpDataPageLid)
-            throws HFBufMgrException, IOException, HFException, InvalidSlotNumberException, InvalidTupleSizeException {
+        throws HFBufMgrException, IOException, HFException, InvalidSlotNumberException, InvalidTupleSizeException,
+        FieldNumberOutOfBoundException, InvalidTypeException {
         PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
         LHFPage currentDirPage = new LHFPage();

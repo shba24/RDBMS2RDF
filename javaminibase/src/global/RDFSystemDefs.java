@@ -3,89 +3,53 @@ package global;
 import bufmgr.BufMgr;
 import db.IndexOption;
 import diskmgr.rdf.RdfDB;
+import java.nio.file.Paths;
 
+/**
+ * Implements the RDFSystemDefs using the Builder
+ * design Pattern.
+ *
+ */
 public class RDFSystemDefs extends SystemDefs {
+  private static IndexOption indexOption;
+  private static int numPgs = GlobalConst.DEFAULT_DB_PAGES;
+  private static int logSize = 3 * GlobalConst.DEFAULT_DB_PAGES;
+  private static int bufPoolSize = GlobalConst.NUMBUF;
+  private static String replacementPolicy = GlobalConst.DEFAULT_REPLACEMENT_POLICY;
+
   /**
+   * Default constructor for the RDFSystemDefs
    *
-   * @param rdfDBName
-   * @param num_pgs
-   * @param bufpoolsize
-   * @param replacement_policy
-   * @param indexOption
+   * @param rdfDbPath
+   * @param _indexOption
    */
-  public RDFSystemDefs(String rdfDBName, int num_pgs, int bufpoolsize, String replacement_policy, IndexOption indexOption)
-  {
-    int logsize;
-
-    String logFileName = new String(rdfDBName);
-
-    System.out.println(rdfDBName);
-
-    if (num_pgs == 0) {
-      logsize = 500;
-    }
-    else {
-      logsize = 3 * num_pgs;
-    }
-
-    if (replacement_policy == null) {
-      replacement_policy = new String("Clock");
-    }
-
-    initRdfDB(rdfDBName, logFileName, num_pgs, logsize, bufpoolsize, replacement_policy, indexOption);
+  public static void init(
+      String rdfDbPath,
+      IndexOption _indexOption,
+      int _bufPoolSize) {
+    bufPoolSize = _bufPoolSize;
+    JavabaseDBName = rdfDbPath;
+    indexOption = _indexOption;
+    JavabaseLogName = Paths.get(
+        JavabaseDBName,
+        GlobalConst.DEFAULT_LOG_FILENAME
+    ).toString();
+    initRdfDB();
   }
 
-  public void initRdfDB(String rdfDBName, String logFileName, int numberOfPages, int maxLogSize, int bufferPoolSize, String replacementPolicy, IndexOption indexOption)
-  {
-
-    boolean status = true;
-    JavabaseBM = null;
-    JavabaseDB = null;
-    JavabaseDBName = null;
-    JavabaseLogName = null;
-    JavabaseCatalog = null;
-
+  /**
+   * Initializes RDF DB
+   */
+  public static void initRdfDB() {
     try {
-      JavabaseBM = new BufMgr(bufferPoolSize, replacementPolicy);
-      JavabaseDB = new RdfDB();
-			/*
-			   JavabaseCatalog = new Catalog();
-			 */
-    }
-    catch (Exception e) {
-      System.err.println (""+e);
+      JavabaseBM = new BufMgr(bufPoolSize, replacementPolicy);
+      RdfDB rdfDB = new RdfDB(JavabaseDBName, numPgs, indexOption);
+      JavabaseDB = rdfDB;
+      rdfDB.openDB(numPgs);
+      rdfDB.initRdfDB();
+    } catch (Exception e) {
+      System.err.println("Error while initializing RDFSystemDef");
       e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
-
-    JavabaseDBName = new String(rdfDBName);
-    JavabaseLogName = new String(logFileName);
-    MINIBASE_DBNAME = new String(JavabaseDBName);
-
-    // create or open the DB
-
-    if ((MINIBASE_RESTART_FLAG)||(numberOfPages == 0)){//open an existing database
-      try {
-        System.out.println("***Opening existing database***");
-        ((RdfDB)JavabaseDB).openRdfDB(JavabaseDBName, indexOption); //open exisiting rdf database
-      }
-      catch (Exception e) {
-        System.err.println (""+e);
-        e.printStackTrace();
-        Runtime.getRuntime().exit(1);
-      }
-    }
-    else {
-      try {
-        System.out.println("***Creating new database***");
-        ((RdfDB)JavabaseDB).createRdfDB(rdfDBName, numberOfPages, indexOption);
-        JavabaseBM.flushAllPages();
-      }
-      catch (Exception e) {
-        System.err.println (""+e);
-        e.printStackTrace();
-        Runtime.getRuntime().exit(1);
-      }
     }
   }
 }

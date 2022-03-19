@@ -19,6 +19,7 @@ import diskmgr.Page;
 import global.LID;
 import global.PageId;
 import global.SystemDefs;
+import heap.DataPageInfo;
 import heap.HFBufMgrException;
 import heap.InvalidTupleSizeException;
 import heap.Label;

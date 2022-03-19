@@ -1,46 +1,125 @@
 package diskmgr.IndexingSchemes;
 
+import btree.AddFileEntryException;
+import btree.ConstructPageException;
+import btree.GetFileEntryException;
 import btree.KeyClass;
+import btree.PinPageException;
 import btree.StringKey;
-import btree.quadbtree.BTreeFile;
+import diskmgr.rdf.BTStream;
+import diskmgr.rdf.IStream;
+import diskmgr.rdf.TStream;
+import global.GlobalConst;
 import global.QID;
+import global.QuadOrder;
+import heap.FieldNumberOutOfBoundException;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
-import heap.quadrupleheap.TScan;
+import java.io.IOException;
 
-public class ConfidenceIndexScheme implements IndexSchemes {
+public class ConfidenceIndexScheme extends BaseIndexScheme {
 
   /**
-   * Create Index
+   * Public constructor
    *
-   * @param bTreeFile         BTree Index
-   * @param quadrupleHeapFile QuadrupleHeapFile
+   * @throws ConstructPageException
+   * @throws GetFileEntryException
+   * @throws PinPageException
+   * @throws AddFileEntryException
+   * @throws IOException
+   */
+  public ConfidenceIndexScheme()
+      throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
+    super(getFilePath());
+  }
+
+  /**
+   * Creates the file name for the btree file
+   * in which indexing is done.
+   * @return
+   */
+  private static String getFilePath() {
+    String[] tokens = new String[]{
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.CONFIDENCE_IDENTIFIER
+    };
+    return generateFilePath(tokens);
+  }
+
+  /**
+   * Gets the key for lookup in the Btree file
+   *
+   * @param quadruple
+   * @param qid
+   * @param entityHeapFile
+   * @param predicateHeapFile
+   * @return
+   * @throws FieldNumberOutOfBoundException
+   * @throws IOException
+   */
+  @Override
+  public StringKey getKey(
+      Quadruple quadruple,
+      QID qid,
+      LabelHeapFile entityHeapFile,
+      LabelHeapFile predicateHeapFile) throws FieldNumberOutOfBoundException, IOException {
+    return new StringKey(Double.toString(quadruple.getConfidence()));
+  }
+
+  /**
+   * Returns the IStream object of two different kinds
+   * depending on the filter provided the indexing
+   * scheme it was asked for.
+   * - TStream
+   * - BTStream
+   *
+   * @param orderType
+   * @param numBuf
+   * @param subjectFilter
+   * @param predicateFilter
+   * @param objectFilter
+   * @param confidenceFilter
+   * @param quadrupleHeapFile
+   * @param entityHeapFile
+   * @param predicateHeapFile
+   * @return
    * @throws Exception
    */
   @Override
-  public void createIndex(BTreeFile bTreeFile, QuadrupleHeapFile quadrupleHeapFile,
-      LabelHeapFile entityHeapFile)
-      throws Exception {
-    try {
-      TScan scan = new TScan(quadrupleHeapFile);
-      Quadruple quadruple;
-      QID qid = new QID();
-      double confidence;
-      while ((quadruple = scan.getNext(qid)) != null) {
-        confidence = quadruple.getConfidence();
-        String temp = Double.toString(confidence);
-        KeyClass key = new StringKey(temp);
-        bTreeFile.insert(key, qid);
-      }
-
-      scan.closescan();
-
-    } catch (Exception e) {
-      System.err.println("*** Error creating Index for Confidence " + e);
-      e.printStackTrace();
+  public IStream getStream(
+      QuadOrder orderType,
+      int numBuf,
+      String subjectFilter,
+      String predicateFilter,
+      String objectFilter,
+      Float confidenceFilter,
+      QuadrupleHeapFile quadrupleHeapFile,
+      LabelHeapFile entityHeapFile,
+      LabelHeapFile predicateHeapFile) throws Exception {
+    if (confidenceFilter == null) {
+      return new TStream(
+          orderType,
+          numBuf,
+          quadrupleHeapFile,
+          subjectFilter,
+          predicateFilter,
+          objectFilter,
+          confidenceFilter
+      );
+    } else {
+      KeyClass lo_key = new StringKey(confidenceFilter.toString());
+      KeyClass hi_key = new StringKey(confidenceFilter.toString());
+      return new BTStream(
+          orderType,
+          numBuf,
+          bTreeFile.new_scan(lo_key, hi_key),
+          subjectFilter,
+          predicateFilter,
+          objectFilter,
+          confidenceFilter,
+          quadrupleHeapFile
+      );
     }
-
-
   }
 }

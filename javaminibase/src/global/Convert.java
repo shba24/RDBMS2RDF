@@ -125,6 +125,21 @@ public class Convert {
   }
 
   /**
+   * reads the byte array from the position in data
+   *
+   * @param position
+   * @param data
+   * @param length
+   * @return
+   */
+  public static byte[] getBytesValue(int position, byte[] data, int length) {
+    byte tmp[] = new byte[length];
+    // copy the value from data array out to a tmp byte array
+    System.arraycopy(data, position, tmp, 0, length);
+    return tmp;
+  }
+
+  /**
    * reads 2 bytes from the given byte array at the specified position convert it to a character
    *
    * @param data     a byte array
@@ -264,6 +279,18 @@ public class Convert {
     int sz = outstr.size();
     // copies the contents of this byte array into data[]
     System.arraycopy(B, 0, data, position, sz);
+  }
+
+  /**
+   * Sets the Byte array with the value at position in data
+   *
+   * @param value
+   * @param position
+   * @param data
+   */
+  public static void setBytesValue(byte[] value, int position, byte[] data) {
+    // copies the contents of this byte array into data[]
+    System.arraycopy(value, 0, data, position, value.length);
   }
 
   /**

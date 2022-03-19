@@ -1,227 +1,298 @@
 package diskmgr.rdf;
 
-
-import btree.KeyClass;
+import btree.AddFileEntryException;
+import btree.ConstructPageException;
+import btree.GetFileEntryException;
+import btree.IteratorException;
+import btree.KeyNotMatchException;
+import btree.PinPageException;
+import btree.ScanIteratorException;
 import btree.StringKey;
-import btree.lablebtree.BTFileScan;
-import btree.lablebtree.BTreeFile;
-import btree.lablebtree.KeyDataEntry;
-import btree.lablebtree.LeafData;
+import btree.UnpinPageException;
 import db.IndexOption;
 import diskmgr.DB;
+import diskmgr.IndexingSchemes.IndexScheme;
+import diskmgr.IndexingSchemes.IndexSchemeFactory;
 import global.AttrType;
 import global.EID;
 import global.GlobalConst;
 import global.LID;
 import global.PID;
-import global.PageId;
 import global.QID;
+import global.QuadOrder;
 import heap.FieldNumberOutOfBoundException;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
 import heap.Label;
+import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
+import iterator.QuadrupleUtils;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
- * This class is an abstraction of the RDF database. Responsibilities of this class include 1.
- * Creating and managing storage files (heap files for entities, predicates and quadruples) and
- * indexes (btree index) 2. Maintaining counts of quadruples, entities, predicates, subjects,
- * objects in the database. 3. Insertion and deletion of entities, predicates, quadruples into their
+ * This class is an abstraction of the RDF database.
+ * Responsibilities of this class include
+ * 1. Creating and managing storage files (heap files for entities, predicates and quadruples) and
+ * indexes (btree index)
+ * 2. Maintaining counts of quadruples, entities, predicates, subjects,
+ * objects in the database.
+ * 3. Insertion and deletion of entities, predicates, quadruples into their
  * respective files.
  */
-public class RdfDB extends DB implements GlobalConst {
-//  private QuadrupleHeapFile tempQuadrupleHeapFile; //TEMPORARY HEAP FILE FOR SORTING
-
-
-  private final String HEAP_FILE_IDENTIFIER = "heapfile";
-  private final String BTREE_FILE_IDENTIFIER = "btreefile";
-  private final String QUADRUPLE_IDENTIFIER = "quadruple";
-  private final String ENTITY_IDENTIFIER = "entity";
-  private final String PREDICATE_IDENTIFIER = "predicate";
-  private final String LABEL_IDENTIFIER = "label";
-  private final String SUBJECT_IDENTIFIER = "subject";
-  private final String OBJECT_IDENTIFIER = "object";
-  IndexOption indexOption;
-  private String rdfDBName;
+public class RdfDB extends DB {
+  private IndexOption indexOption;
+  private String rdfDBPath;
 
   /**
    * Storage files for the database.
    */
-  private String quadrupleHeapFileName;
-  private String entityHeapFileName;
-  private String predicateHeapFileName;
   private QuadrupleHeapFile quadrupleHeapFile;
   private LabelHeapFile entityHeapFile;
   private LabelHeapFile predicateHeapFile;
 
-  private String quadrupleBTreeFileName;
-  private btree.quadbtree.BTreeFile quadrupleBTreeFile;
+  /**
+   * Index file for the predicate and entity.
+   * This helps with checking the duplicate
+   * predicate and entity.
+   */
+  private btree.lablebtree.BTreeFile predicateBtreeFile;
+  private btree.lablebtree.BTreeFile entityBtreeFile;
 
+  /**
+   * quadIndexScheme is created to check the duplicate
+   * quadruples in the database.
+   * As mentioned in the project description, we will
+   * have to detect duplicate quadruples.
+   */
+  private IndexScheme quadIndexScheme;
+  private IndexScheme indexScheme;
 
-  private String entityBTreeFileName;
-  private BTreeFile entityBTreeFile;
-  private String dublicateSubjectBTreeFileName;
-  private BTreeFile dublicateSubjectBTreeFile;
-
-  private String dublicateObjectBTreeFileName;
-  private BTreeFile dublicateObjectBTreeFile;
-
-  /** TODO
+  /**
+   * Default Constructor.
+   * Needs to call initRdfDB() to initialize the database
    *
+   * @param _rdfDBPath
+   * @param _numberOfPages
+   * @param _indexOption
    */
-//  private LabelBTreeFile entitiesBTreeFile;  		//BTree Index file on Entity Heap file
-//  private LabelBTreeFile predicatesBTreeFile; 	//BTree Predicate file on Predicate Heap file
-//  private QuadrupleBTreeFile quadruplesBTreeFile; 		//BTree Predicate file on Predicate Heap file
-
-//  private LabelBTreeFile dup_tree;        	//BTree file for duplicate subjects
-//  private LabelBTreeFile dup_Objtree;     	//BTree file for duplicate objects
-  /**
-   * To store the counts of quadruples, subjects, predicates, objects and entities. We have to store
-   * the count of distinct subjects and objects.
-   */
-
-  /**
-   * Default Constructor
-   */
-  public RdfDB() {
+  public RdfDB(String _rdfDBPath, int _numberOfPages, IndexOption _indexOption) throws IOException {
+    rdfDBPath = _rdfDBPath;
+    indexOption = _indexOption;
+    num_pages = _numberOfPages;
   }
 
-  public void createRdfDB(String rdfDBName, int numberOfPages, IndexOption indexOption) {
-    this.rdfDBName = rdfDBName;
-    this.indexOption = indexOption;
-
-    try {
-      openDB(this.rdfDBName, numberOfPages);
-
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
+  /**
+   * Opens the DB with num_pgs
+   * @param num_pgs
+   * @throws IOException
+   */
+  public void openDB(int num_pgs) throws IOException {
+    Path dbPath = Paths.get(rdfDBPath);
+    if (!Files.exists(dbPath.getParent())) {
+      Files.createDirectories(dbPath.getParent());
     }
-
-    initRdfDB(indexOption);
+    try {
+      this.openDB(rdfDBPath, num_pgs);
+    } catch (Exception e) {
+      System.err.println("Error in opening the DB.");
+      e.printStackTrace();
+    }
   }
 
-  public void initRdfDB(IndexOption indexOption) {
+  /**
+   * Does clean up of the index files and heap files.
+   *
+   * @throws Exception
+   */
+  public void close()
+      throws Exception {
+    predicateBtreeFile.close();
+    entityBtreeFile.close();
+    quadIndexScheme.close();
+    indexScheme.close();
+  }
+
+  /**
+   * Needs to be called after the constructor is called
+   * to initialize the database.
+   *
+   * @throws ConstructPageException
+   * @throws GetFileEntryException
+   * @throws PinPageException
+   */
+  public void initRdfDB()
+      throws ConstructPageException, GetFileEntryException, PinPageException, IOException, AddFileEntryException {
     initHeapFiles();
-    initIndexFiles(indexOption);
+    initIndexFiles();
+    QuadrupleUtils.init(entityHeapFile, predicateHeapFile);
   }
 
+  /**
+   * Creates Quadruple heap files
+   *
+   * @param fileNameTokens
+   * @return
+   */
+  private QuadrupleHeapFile createQuadHeapFile(String[] fileNameTokens) {
+    QuadrupleHeapFile heapFile = null;
+    try {
+      heapFile = new QuadrupleHeapFile(generateFilePath(fileNameTokens));
+    } catch (Exception e) {
+      System.err.println("Error while creating Quadruple Heap File.");
+      e.printStackTrace();
+    }
+    return heapFile;
+  }
+
+  /**
+   * Creates label heap files
+   *
+   * @param fileNameTokens
+   * @return
+   */
+  private LabelHeapFile createLabelHeapFile(String[] fileNameTokens) {
+    LabelHeapFile heapFile = null;
+    try {
+      heapFile = new LabelHeapFile(generateFilePath(fileNameTokens));
+    } catch (Exception e) {
+      System.err.println("Error while creating Label Heap File.");
+      e.printStackTrace();
+    }
+    return heapFile;
+  }
+
+  /**
+   * Creates three heap files
+   * 1. Quadruple Heap File
+   * 2. Entity Label Heap File
+   * 3. Predicate Label Heap File
+   */
   private void initHeapFiles() {
-    //Create QuadrupleS heap file
-    try {
-      String[] quadHFNameIdentifiers = new String[]{
-          rdfDBName,
-          HEAP_FILE_IDENTIFIER,
-          QUADRUPLE_IDENTIFIER
-      };
-      quadrupleHeapFileName = generateFileName(quadHFNameIdentifiers);
-      quadrupleHeapFile = new QuadrupleHeapFile(quadrupleHeapFileName);
+    /**
+     * Create Quadruple heap file
+     */
+    String[] quadFileNameToken = new String[] {
+        GlobalConst.HEAP_FILE_IDENTIFIER,
+        GlobalConst.QUADRUPLE_IDENTIFIER
+    };
+    quadrupleHeapFile = createQuadHeapFile(quadFileNameToken);
 
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
+    /**
+     * Create Entity Label file
+     */
+    String[] entityFileNameToken = new String[] {
+        GlobalConst.HEAP_FILE_IDENTIFIER,
+        GlobalConst.ENTITY_IDENTIFIER
+    };
+    entityHeapFile = createLabelHeapFile(entityFileNameToken);
 
-    try {
-      String[] entitiesHFNameIdentifiers = new String[]{
-          rdfDBName,
-          HEAP_FILE_IDENTIFIER,
-          ENTITY_IDENTIFIER
-      };
-      entityHeapFileName = generateFileName(entitiesHFNameIdentifiers);
-      entityHeapFile = new LabelHeapFile(entityHeapFileName);
-
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
-
-    try {
-      String[] predicatesHFNameIdentifiers = new String[]{
-          rdfDBName,
-          HEAP_FILE_IDENTIFIER,
-          PREDICATE_IDENTIFIER
-      };
-      predicateHeapFileName = generateFileName(predicatesHFNameIdentifiers);
-      predicateHeapFile = new LabelHeapFile(predicateHeapFileName);
-
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
+    /**
+     * Create Predicate Label file
+     */
+    String[] predicateFileNameToken = new String[] {
+        GlobalConst.HEAP_FILE_IDENTIFIER,
+        GlobalConst.PREDICATE_IDENTIFIER
+    };
+    predicateHeapFile = createLabelHeapFile(predicateFileNameToken);
   }
 
-  private void initIndexFiles(IndexOption indexOption) {
+  /**
+   * Creates Label Btree File
+   *
+   * @param fileNameTokens
+   * @return
+   */
+  private btree.lablebtree.BTreeFile createLabelBTreeFile(String[] fileNameTokens) {
+    btree.lablebtree.BTreeFile btreeFile = null;
     try {
-      String[] entityBTreeFileNameIdentifiers = new String[]{
-          rdfDBName,
-          BTREE_FILE_IDENTIFIER,
-          ENTITY_IDENTIFIER
-      };
-      entityBTreeFileName = generateFileName(entityBTreeFileNameIdentifiers);
-      entityBTreeFile = new BTreeFile(entityBTreeFileName);
-
+      btreeFile = new btree.lablebtree.BTreeFile(
+          generateFilePath(fileNameTokens),
+          AttrType.attrString,
+          GlobalConst.DEFAULT_KEY_SIZE,
+          GlobalConst.NAIVE_DELETE_FASHION);
     } catch (Exception e) {
-      System.err.println("" + e);
+      System.err.println("Error while creating BTree File.");
       e.printStackTrace();
-      Runtime.getRuntime().exit(1);
     }
-
-    try {
-      String[] quadrupleBTreeNameIdentifiers = new String[]{
-          rdfDBName,
-          BTREE_FILE_IDENTIFIER,
-          QUADRUPLE_IDENTIFIER
-      };
-      quadrupleBTreeFileName = generateFileName(quadrupleBTreeNameIdentifiers);
-      quadrupleBTreeFile = new btree.quadbtree.BTreeFile(quadrupleBTreeFileName);
-
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
-
-    try {
-      String[] dupSubjectBTreeNameIdentifiers = new String[]{
-          rdfDBName,
-          BTREE_FILE_IDENTIFIER,
-          "Duplicate",
-          SUBJECT_IDENTIFIER
-      };
-      dublicateSubjectBTreeFileName = generateFileName(dupSubjectBTreeNameIdentifiers);
-      dublicateSubjectBTreeFile = new BTreeFile(dublicateSubjectBTreeFileName);
-
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
-
-    try {
-      String[] dupObjectBTreeNameIdentifiers = new String[]{
-          rdfDBName,
-          BTREE_FILE_IDENTIFIER,
-          "Duplicate",
-          OBJECT_IDENTIFIER
-      };
-      dublicateObjectBTreeFileName = generateFileName(dupObjectBTreeNameIdentifiers);
-      dublicateObjectBTreeFile = new BTreeFile(dublicateObjectBTreeFileName);
-
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
-
+    return btreeFile;
   }
 
+  /**
+   * Creates Quadruple Btree file
+   *
+   * @param fileNameTokens
+   * @return
+   */
+  private btree.quadbtree.BTreeFile createQuadBTreeFile(String[] fileNameTokens) {
+    btree.quadbtree.BTreeFile btreeFile = null;
+    try {
+      btreeFile = new btree.quadbtree.BTreeFile(
+          generateFilePath(fileNameTokens),
+          AttrType.attrString,
+          GlobalConst.DEFAULT_KEY_SIZE,
+          GlobalConst.NAIVE_DELETE_FASHION);
+    } catch (Exception e) {
+      System.err.println("Error while creating BTree File.");
+      e.printStackTrace();
+    }
+    return btreeFile;
+  }
+
+  /**
+   * Default indexes that we need to create to get
+   * the predicate and Entity names.
+   * - Predicate Name Index
+   * - Entity Name Index
+   * - Quadruple (Subject Predicate Object) Index
+   * Additionally,
+   * Creates indexes according to the indexOption
+   * 1. IndexOption.Confidence
+   * - ConfidenceIndexScheme
+   * 2. IndexOption.Object
+   * - ObjectIndexScheme
+   * 3. IndexOption.Subject
+   * - SubjectIndexScheme
+   * 4. IndexOption.Predicate
+   * - PredicateIndexScheme
+   * 5. IndexOption.SubjectPredicateObjectConfidence
+   * - SubjectPredicateObjectConfidenceIndexScheme
+   */
+  private void initIndexFiles()
+      throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
+    /**
+     * Create Default BTree Files
+     */
+    String[] predicateBtreeFileToken = new String[] {
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.PREDICATE_IDENTIFIER
+    };
+    predicateBtreeFile = createLabelBTreeFile(predicateBtreeFileToken);
+
+    String[] entityBtreeFileToken = new String[] {
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.ENTITY_IDENTIFIER
+    };
+    entityBtreeFile = createLabelBTreeFile(entityBtreeFileToken);
+    /**
+     * Create index on quadruples to check the duplicate quadruples
+     */
+    quadIndexScheme = IndexSchemeFactory.createIndexScheme(IndexOption.SubjectPredicateObject);
+
+    /**
+     * Create BTreeFile According to Index Scheme
+     */
+    indexScheme = IndexSchemeFactory.createIndexScheme(indexOption);
+  }
+
+  /**
+   * Get the quadruple count in the database.
+   *
+   * @return
+   */
   public int getQuadrupleCount() {
     int quadrupleCount = -1;
     try {
@@ -234,6 +305,11 @@ public class RdfDB extends DB implements GlobalConst {
     return quadrupleCount;
   }
 
+  /**
+   * Get the entity count in the database.
+   *
+   * @return
+   */
   public int getEntityCount() {
     int entityCount = -1;
     try {
@@ -246,6 +322,11 @@ public class RdfDB extends DB implements GlobalConst {
     return entityCount;
   }
 
+  /**
+   * Get Predicate count in the database.
+   *
+   * @return
+   */
   public int getPredicateCount() {
     int predicatesCount = -1;
     try {
@@ -259,67 +340,12 @@ public class RdfDB extends DB implements GlobalConst {
   }
 
   /**
-   * get count of the unique Subject count from the RDFDB.
+   * Get count of the unique Subject count from the RDFDB.
    *
    * @return
    */
   public int getSubjectCount() {
-    int subjectCount = -1;
-    btree.quadbtree.KeyDataEntry entry = null;
-    KeyDataEntry duplicateEntry = null;
-
-    try {
-      int keyType = AttrType.attrString;
-      btree.quadbtree.BTFileScan scan = quadrupleBTreeFile.new_scan(null, null);
-      do {
-        entry = scan.get_next();
-        if (entry != null) {
-          String quadrupleKey = ((StringKey) (entry.key)).getKey();
-          String[] temp = quadrupleKey.split(":");
-
-          String subject = temp[0] + temp[1];
-
-          KeyClass lowKey = new StringKey(subject);
-          KeyClass highKey = new StringKey(subject);
-
-          BTFileScan duplicateLabelBTScan = dublicateSubjectBTreeFile.new_scan(lowKey, highKey);
-          duplicateEntry = duplicateLabelBTScan.get_next();
-
-          if (duplicateEntry == null) {
-            dublicateSubjectBTreeFile.insert(lowKey,
-                new LID(new PageId(Integer.parseInt(temp[1])), Integer.parseInt(temp[0])));
-          }
-
-          duplicateLabelBTScan.DestroyBTreeFileScan();
-        }
-      } while (entry != null);
-      scan.DestroyBTreeFileScan();
-      quadrupleBTreeFile.close();
-
-      KeyClass lowKey = null;
-      KeyClass highKey = null;
-
-      BTFileScan duplicateLabelBTScan = dublicateSubjectBTreeFile.new_scan(lowKey, highKey);
-
-      do {
-        duplicateEntry = duplicateLabelBTScan.get_next();
-        if (duplicateEntry != null) {
-          subjectCount++;
-        }
-      } while (duplicateEntry != null);
-      duplicateLabelBTScan.DestroyBTreeFileScan();
-      dublicateSubjectBTreeFile.close();
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-
-
-    }
-
-    return subjectCount;
-
-
+    return getEntityCount();
   }
 
   /**
@@ -328,168 +354,318 @@ public class RdfDB extends DB implements GlobalConst {
    * @return
    */
   public int getObjectCount() {
-    int objectCount = -1;
-
-    btree.quadbtree.KeyDataEntry quadrupleBTreeEntry = null;
-    KeyDataEntry duplicateLabelBTreeEntry = null;
-
-    try {
-      int keyType = AttrType.attrString;
-      btree.quadbtree.BTFileScan quadrupleScan = quadrupleBTreeFile.new_scan(null, null);
-      do {
-        quadrupleBTreeEntry = quadrupleScan.get_next();
-        if (quadrupleBTreeEntry != null) {
-          String quadrupleKey = ((StringKey) (quadrupleBTreeEntry.key)).getKey();
-          String[] temp = quadrupleKey.split(":");
-          String object = temp[4] + temp[5];
-
-          KeyClass lowKey = new StringKey(object);
-          KeyClass highKey = new StringKey(object);
-
-          BTFileScan duplicateObjectBTFileScan = dublicateObjectBTreeFile.new_scan(lowKey, highKey);
-          duplicateLabelBTreeEntry = duplicateObjectBTFileScan.get_next();
-          if (duplicateLabelBTreeEntry != null) {
-            dublicateObjectBTreeFile.insert(lowKey,
-                new LID(new PageId(Integer.parseInt(temp[4])), Integer.parseInt(temp[5])));
-
-          }
-          duplicateObjectBTFileScan.DestroyBTreeFileScan();
-        }
-      } while (quadrupleBTreeEntry != null);
-      quadrupleScan.DestroyBTreeFileScan();
-      quadrupleBTreeFile.close();
-
-      KeyClass lowKey = null;
-      KeyClass highKey = null;
-
-      BTFileScan duplicateScan = dublicateObjectBTreeFile.new_scan(lowKey, highKey);
-
-      do {
-        duplicateLabelBTreeEntry = duplicateScan.get_next();
-        if (duplicateLabelBTreeEntry != null) {
-          objectCount++;
-        }
-
-      } while (duplicateLabelBTreeEntry != null);
-      duplicateScan.DestroyBTreeFileScan();
-      dublicateObjectBTreeFile.close();
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-
-    }
-
-    return objectCount;
-  }
-
-  EID insertEntity(String entityLabelName)
-      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
-    Label entityLabel = new Label(entityLabelName);
-    LID entityLabelId = null;
-
-    byte[] entityLabelBytes = entityLabel.returnTupleByteArray();
-    try {
-      entityLabelId = entityHeapFile.insertLabel(entityLabelBytes);
-    } catch (Exception e) {
-      System.err.println("");
-      return null;
-    }
-
-    EID entityId = new EID(entityLabelId);
-    return entityId;
+    return getEntityCount();
   }
 
   /**
-   * Delete
+   * Gets the Entity if already exists.
+   *
+   * @param entityLabelName
+   * @return
+   * @throws IteratorException
+   * @throws ConstructPageException
+   * @throws KeyNotMatchException
+   * @throws PinPageException
+   * @throws IOException
+   * @throws UnpinPageException
+   * @throws ScanIteratorException
+   */
+  private EID getEntity(String entityLabelName)
+      throws Exception {
+    StringKey lo_key = new StringKey(entityLabelName);
+    StringKey hi_key = new StringKey(entityLabelName);
+    btree.lablebtree.BTFileScan scan = entityBtreeFile.new_scan(lo_key, hi_key);
+    btree.lablebtree.KeyDataEntry entry = scan.get_next();
+    scan.DestroyBTreeFileScan();
+    if (entry != null) {
+      return ((btree.lablebtree.LeafData) entry.data).getData().getEntityID();
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Insert the Entity in the EntityHeapFile.
+   * Also returns the existing entity id if
+   * already exists.
+   *
+   * @param entityLabelName
+   * @return
+   * @throws FieldNumberOutOfBoundException
+   * @throws InvalidTupleSizeException
+   * @throws IOException
+   * @throws InvalidTypeException
+   */
+  public EID insertEntity(String entityLabelName)
+      throws Exception {
+    EID eid = getEntity(entityLabelName);
+    if (eid == null) {
+      Label entityLabel = new Label(entityLabelName);
+      LID entityLabelId = null;
+
+      byte[] entityLabelBytes = entityLabel.getTupleByteArray();
+      try {
+        entityLabelId = entityHeapFile.insertLabel(entityLabelBytes);
+        entityBtreeFile.insert(new StringKey(entityLabelName), entityLabelId);
+      } catch (Exception e) {
+        System.err.println("Error while inserting entity into the database.");
+        e.printStackTrace();
+      }
+      return entityLabelId.getEntityID();
+    }
+    return eid;
+  }
+
+  /**
+   * Deletes the entity with entityLabelName
+   * if it exists in the entityBtreeFile.
+   * <p>
+   * Returns true if the entity was found and deleted
+   * Otherwise, returns false if the entity was not found.
    *
    * @param entityLabelName
    * @return
    */
-  boolean deleteEntity(String entityLabelName)
-      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
-    Label entityLabel = new Label(entityLabelName);
-    LID entityLabelId = new LID();
-
-//    entityHeapFile.deleteLabel(entityLabel);
-
-//    entityHeapFile.deleteLabel();
-
-    boolean success = false;
-
-    try {
-      KeyClass lowKey = new StringKey(entityLabelName);
-      KeyClass highKey = new StringKey(entityLabelName);
-
-      KeyDataEntry entry = null;
-
-      BTFileScan scan = entityBTreeFile.new_scan(lowKey, highKey);
-      entry = scan.get_next();
-
-      if (entry != null) {
-        if (entityLabel.equals(((StringKey) (entry.key)).getKey())) {
-          entityLabelId = ((LeafData) entry.data).getData();
-          success = entityHeapFile.deleteLabel(entityLabelId) && entityBTreeFile.Delete(lowKey,
-              entityLabelId);
-        }
-        scan.DestroyBTreeFileScan();
-        entityBTreeFile.close();
-      }
-    } catch (Exception e) {
-      System.err.println("*** Error deleting entity " + e);
-      e.printStackTrace();
+  public boolean deleteEntity(String entityLabelName)
+      throws Exception {
+    StringKey lo_key = new StringKey(entityLabelName);
+    StringKey hi_key = new StringKey(entityLabelName);
+    btree.lablebtree.BTFileScan scan = entityBtreeFile.new_scan(lo_key, hi_key);
+    btree.lablebtree.KeyDataEntry entry = scan.get_next();
+    if (entry != null) {
+      LID lid = ((btree.lablebtree.LeafData) entry.data).getData();
+      entityHeapFile.deleteLabel(lid);
+      scan.delete_current();
+      scan.DestroyBTreeFileScan();
+      return true;
     }
-
-    return true;
+    return false;
   }
 
-
-  public PID insertPredicate(String predicateLabelName)
-      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
-    Label predicateLabel = new Label(predicateLabelName);
-    LID predicateLabelId = null;
-
-    byte[] predicateLabelBytes = predicateLabel.returnTupleByteArray();
-    try {
-      predicateLabelId = predicateHeapFile.insertLabel(predicateLabelBytes);
-    } catch (Exception e) {
-      System.err.println("");
+  /**
+   * Gets the Predicate if already exists.
+   *
+   * @param predicateLabelName
+   * @return
+   * @throws IteratorException
+   * @throws ConstructPageException
+   * @throws KeyNotMatchException
+   * @throws PinPageException
+   * @throws IOException
+   * @throws UnpinPageException
+   * @throws ScanIteratorException
+   */
+  private PID getPredicate(String predicateLabelName)
+      throws Exception {
+    StringKey lo_key = new StringKey(predicateLabelName);
+    StringKey hi_key = new StringKey(predicateLabelName);
+    btree.lablebtree.BTFileScan scan = predicateBtreeFile.new_scan(lo_key, hi_key);
+    btree.lablebtree.KeyDataEntry entry = scan.get_next();
+    scan.DestroyBTreeFileScan();
+    if (entry != null) {
+      return ((btree.lablebtree.LeafData) entry.data).getData().getPredicateID();
+    } else {
       return null;
     }
-
-    PID predicateId = new PID(predicateLabelId);
-    return predicateId;
   }
 
-  boolean deletePredicate(String predicateLabelName)
-      throws FieldNumberOutOfBoundException, InvalidTupleSizeException, IOException, InvalidTypeException {
-    Label predicateLabel = new Label(predicateLabelName);
-    LID predicateLabelId = new LID();
+  /**
+   * Insert the Predicate in the PredicateHeapFile.
+   * Also returns the existing predicate id if
+   * already exists.
+   *
+   * @param predicateLabelName
+   * @return
+   * @throws FieldNumberOutOfBoundException
+   * @throws InvalidTupleSizeException
+   * @throws IOException
+   * @throws InvalidTypeException
+   */
+  public PID insertPredicate(String predicateLabelName)
+      throws Exception {
+    PID pid = getPredicate(predicateLabelName);
+    if (pid == null) {
+      Label predicateLabel = new Label(predicateLabelName);
+      LID predicateLabelId = null;
 
-    try {
-      predicateHeapFile.deleteLabel(predicateLabelId);
-    } catch (Exception e) {
-      System.err.println("");
+      byte[] predicateLabelBytes = predicateLabel.getTupleByteArray();
+      try {
+        predicateLabelId = predicateHeapFile.insertLabel(predicateLabelBytes);
+        predicateBtreeFile.insert(new StringKey(predicateLabelName), predicateLabelId);
+      } catch (Exception e) {
+        System.err.println("Error while inserting entity into the database.");
+        e.printStackTrace();
+      }
+      return predicateLabelId.getPredicateID();
+    }
+    return pid;
+  }
+
+  /**
+   * Deletes the predicate with predicateLabelName
+   * if it exists in the predicateBtreeFile.
+   *
+   * @param predicateLabelName
+   * @return
+   */
+  public boolean deletePredicate(String predicateLabelName)
+      throws Exception {
+    StringKey lo_key = new StringKey(predicateLabelName);
+    StringKey hi_key = new StringKey(predicateLabelName);
+    btree.lablebtree.BTFileScan scan = predicateBtreeFile.new_scan(lo_key, hi_key);
+    btree.lablebtree.KeyDataEntry entry = scan.get_next();
+    if (entry != null) {
+      LID lid = ((btree.lablebtree.LeafData) entry.data).getData();
+      predicateHeapFile.deleteLabel(lid);
+      scan.delete_current();
+      scan.DestroyBTreeFileScan();
+      return true;
     }
     return false;
   }
 
-  public QID insertQuadruple(byte[] quadrupleBytes) {
-    QID quadrupleId = null;
-    try {
-      quadrupleId = quadrupleHeapFile.insertQuadruple(quadrupleBytes);
-    } catch (Exception e) {
-
+  /**
+   * Searches for the quadruple with the <Subject, Predicate, Object>
+   * Doesn't include Confidence in the search as only one pair
+   * exits with same <Subject, Predicate, Object> as mentioned in the
+   * project details.
+   *
+   * @param quadruple
+   * @return
+   * @throws Exception
+   */
+  private QID getQuadrupleWithoutConfidence(Quadruple quadruple)
+      throws Exception {
+    String key = quadIndexScheme.getKey(quadruple, null, entityHeapFile, predicateHeapFile).getKey();
+    StringKey lo_key = new StringKey(key);
+    StringKey hi_key = new StringKey(key);
+    btree.quadbtree.BTFileScan scan = quadIndexScheme.getBtreeFile().new_scan(lo_key, hi_key);
+    btree.quadbtree.KeyDataEntry entry = scan.get_next();
+    if (entry != null) {
+      QID qid = ((btree.quadbtree.LeafData) entry.data).getData();
+      scan.DestroyBTreeFileScan();
+      return qid;
     }
-    return quadrupleId;
+    return null;
   }
 
-  boolean deleteQuadruple(byte[] quadrupleBytes) {
-//    quadrupleHeapFile.delete
+  /**
+   * Deletes the quadruples from all places it exists.
+   * - quadrupleHeapFile
+   * - quadIndexScheme
+   * - indexScheme
+   *
+   * @param qid
+   * @param quadruple
+   * @throws Exception
+   */
+  private void deleteQuadrupleInternal(QID qid, Quadruple quadruple) throws Exception {
+    StringKey key1 = quadIndexScheme.getKey(quadruple, null, entityHeapFile, predicateHeapFile);
+    StringKey key2 = indexScheme.getKey(quadruple, null, entityHeapFile, predicateHeapFile);
+    quadrupleHeapFile.deleteQuadruple(qid);
+    quadIndexScheme.getBtreeFile().Delete(key1, qid);
+    indexScheme.getBtreeFile().Delete(key2, qid);
+  }
+
+  /**
+   * Creates a new quadruple and pushes in the quadrupleHeapFile
+   * as well as adds to the index that we maintain,
+   * i.e. quadIndexScheme and indexScheme.
+   *
+   * @param quadruple
+   * @return
+   * @throws Exception
+   */
+  private QID createQuadruple(Quadruple quadruple) throws Exception {
+    QID newQid = quadrupleHeapFile.insertQuadruple(quadruple.getTupleByteArray());
+    quadIndexScheme.insert(quadruple, newQid, entityHeapFile, predicateHeapFile);
+    indexScheme.insert(quadruple, newQid, entityHeapFile, predicateHeapFile);
+    return newQid;
+  }
+
+  /**
+   * Inserts the quadruple bytes into quadruple heap file.
+   * Checks if quadruples already exists with less confidence
+   * if it does, it deletes the old one and inserts the new one
+   * into quadrupleHeapFile, quadIndexScheme and indexScheme.
+   * If it doesn't, then it creates the new one and inserts.
+   *
+   * @param quadruple
+   * @return
+   */
+  public QID insertQuadruple(Quadruple quadruple) throws Exception {
+    QID oldQid = getQuadrupleWithoutConfidence(quadruple);
+    if (oldQid != null) {
+      Quadruple oldQuad = quadrupleHeapFile.getQuadruple(oldQid);
+      oldQuad.setDefaultHeader();
+      if (oldQuad.getConfidence() < quadruple.getConfidence()) {
+        deleteQuadrupleInternal(oldQid, oldQuad);
+        return createQuadruple(quadruple);
+      }
+      return oldQid;
+    } else {
+      return createQuadruple(quadruple);
+    }
+  }
+
+  /**
+   * Deletes Quadruple from the Quadruple heap and
+   * current index
+   *
+   * @param quadrupleBytes
+   * @return
+   */
+  public boolean deleteQuadruple(byte[] quadrupleBytes) throws Exception {
+    Quadruple quadruple = new Quadruple(quadrupleBytes, 0, quadrupleBytes.length);
+    QID oldQid = getQuadrupleWithoutConfidence(quadruple);
+    if (oldQid != null) {
+      Quadruple oldQuad = quadrupleHeapFile.getQuadruple(oldQid);
+      // As there is only one tuple with same <Subject, Predicate, Object>
+      if (oldQuad.getConfidence() == quadruple.getConfidence()) {
+        deleteQuadrupleInternal(oldQid, oldQuad);
+        return true;
+      }
+    }
     return false;
   }
 
-  private String generateFileName(String[] identifiers) {
+  /**
+   * Initialize a stream of quadruples, where the subject
+   * label matches subjectFilter, predicate label matches
+   * predicateFilter, object label matches objectFilter,
+   * and confidence is greater than or equal to the
+   * confidenceFilter. If any of the filters are null strings
+   * or 0, then that filter is not considered (e.g., if
+   * subjectFilter is null, then all subject labels are OK).
+   *
+   * @param orderType
+   * @param subjectFilter
+   * @param predicateFilter
+   * @param objectFilter
+   * @param confidenceFilter
+   * @return
+   * @throws Exception
+   */
+  public IStream openStream(
+      QuadOrder orderType,
+      int numBuf,
+      String subjectFilter,
+      String predicateFilter,
+      String objectFilter,
+      Float confidenceFilter) throws Exception {
+    return indexScheme.getStream(
+        orderType,
+        numBuf,
+        subjectFilter,
+        predicateFilter,
+        objectFilter,
+        confidenceFilter,
+        quadrupleHeapFile,
+        entityHeapFile,
+        predicateHeapFile);
+  }
+
+  private String generateFilePath(String[] identifiers) {
     StringBuilder fileName = new StringBuilder();
 
     for (int i = 0; i < identifiers.length - 1; i++) {
@@ -499,23 +675,6 @@ public class RdfDB extends DB implements GlobalConst {
 
     fileName.append(identifiers[identifiers.length - 1]);
 
-    return fileName.toString();
+    return Paths.get(fileName.toString()).toString();
   }
-
-  /**
-   * TODO
-   * Opens an existing RDF database.
-   */
-  public void openRdfDB(String rdfDBName, IndexOption indexOption) {
-    this.rdfDBName = new String(rdfDBName);
-    try {
-      openDB(this.rdfDBName);
-    } catch (Exception e) {
-      System.err.println("" + e);
-      e.printStackTrace();
-      Runtime.getRuntime().exit(1);
-    }
-    initRdfDB(indexOption);
-  }
-
 }

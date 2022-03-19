@@ -1,48 +1,120 @@
 package diskmgr.IndexingSchemes;
 
-import static diskmgr.IndexingSchemes.IndexUtils.destroyIndex;
-
+import btree.AddFileEntryException;
+import btree.ConstructPageException;
+import btree.GetFileEntryException;
 import btree.KeyClass;
-import btree.KeyDataEntry;
+import btree.PinPageException;
 import btree.StringKey;
-import btree.quadbtree.*;
-import global.LID;
+import diskmgr.rdf.BTStream;
+import diskmgr.rdf.IStream;
+import diskmgr.rdf.TStream;
+import global.GlobalConst;
 import global.QID;
-import heap.Label;
+import global.QuadOrder;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
 import heap.quadrupleheap.TScan;
+import java.io.IOException;
 
-public class ObjectIndexScheme implements IndexSchemes {
+public class ObjectIndexScheme extends BaseIndexScheme {
 
   /**
-   * * Unclustered BTree Index on Object
+   * Public Constructor
    *
-   * @param QuadBTreeIndex
-   * @param quadrupleHeapFile
+   * @throws ConstructPageException
+   * @throws GetFileEntryException
+   * @throws PinPageException
+   * @throws AddFileEntryException
+   * @throws IOException
+   */
+  public ObjectIndexScheme()
+      throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
+    super(getFilePath());
+  }
+
+  public static String getFilePath() {
+    String[] tokens = new String[]{
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.OBJECT_IDENTIFIER
+    };
+    return generateFilePath(tokens);
+  }
+
+  /**
+   * Returns the key for the Quadruple according
+   * to this scheme.
+   *
+   * @param quadruple
+   * @param qid
+   * @param entityHeapFile
+   * @param predicateHeapFile
+   * @return
+   * @throws Exception
    */
   @Override
-  public void createIndex(BTreeFile QuadBTreeIndex, QuadrupleHeapFile quadrupleHeapFile,
-      LabelHeapFile entityHeapFile) {
+  public StringKey getKey(
+      Quadruple quadruple,
+      QID qid,
+      LabelHeapFile entityHeapFile,
+      LabelHeapFile predicateHeapFile) throws Exception {
+    return new StringKey(
+        entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel());
+  }
 
-    try {
-      TScan am = new TScan(quadrupleHeapFile);
-      Quadruple quadruple = null;
-      QID qid = new QID();
-
-      while ((quadruple = am.getNext(qid)) != null) {
-        Label subject = entityHeapFile.getLabel((LID) quadruple.getObjectID().returnLID());
-        KeyClass key = new StringKey(subject.getLabel());
-
-        QuadBTreeIndex.insert(key, qid);
-
-      }
-      am.closescan();
-
-    } catch (Exception e) {
-      System.err.println("*** Error creating Index for Object " + e);
-      e.printStackTrace();
+  /**
+   * Returns the IStream object of two different kinds
+   * depending on the filter provided the indexing
+   * scheme it was asked for.
+   * - TStream
+   * - BTStream
+   *
+   * @param orderType
+   * @param subjectFilter
+   * @param predicateFilter
+   * @param objectFilter
+   * @param confidenceFilter
+   * @param quadrupleHeapFile
+   * @param entityHeapFile
+   * @param predicateHeapFile
+   * @return
+   * @throws Exception
+   */
+  @Override
+  public IStream getStream(
+      QuadOrder orderType,
+      int numBuf,
+      String subjectFilter,
+      String predicateFilter,
+      String objectFilter,
+      Float confidenceFilter,
+      QuadrupleHeapFile quadrupleHeapFile,
+      LabelHeapFile entityHeapFile,
+      LabelHeapFile predicateHeapFile) throws Exception {
+    if (objectFilter == null) {
+      return new TStream(
+          orderType,
+          numBuf,
+          quadrupleHeapFile,
+          subjectFilter,
+          predicateFilter,
+          objectFilter,
+          confidenceFilter
+      );
+    } else {
+      KeyClass lo_key = new StringKey(objectFilter);
+      KeyClass hi_key = new StringKey(objectFilter);
+      return new BTStream(
+          orderType,
+          numBuf,
+          bTreeFile.new_scan(lo_key, hi_key),
+          subjectFilter,
+          predicateFilter,
+          objectFilter,
+          confidenceFilter,
+          quadrupleHeapFile
+      );
     }
   }
 }

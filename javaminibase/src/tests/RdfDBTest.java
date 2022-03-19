@@ -9,8 +9,6 @@ import java.io.IOException;
 
 public class RdfDBTest {
 
-  public static SystemDefs sysdef = null;
-
   private static class RdfDBDriver extends TestDriver implements GlobalConst {
     private PageId runStart = new PageId();
     private boolean OK = true;
@@ -121,13 +119,9 @@ public class RdfDBTest {
     @Override
     protected boolean test1() {
       String rdfDBName = "/tmp/rdf/test";
-      String rdfDBPath = "";
-      int numberOfPages = 10000;
-      int bufferPoolSize = 1000;
-      String replacementPolicy = "Clock";
       IndexOption indexOption = IndexOption.Confidence;
 
-      sysdef = new RDFSystemDefs(rdfDBName, numberOfPages, bufferPoolSize, replacementPolicy, indexOption);
+      RDFSystemDefs.init(rdfDBName, indexOption);
       return true;
     }
   }
