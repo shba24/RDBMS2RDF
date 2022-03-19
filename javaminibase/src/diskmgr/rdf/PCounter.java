@@ -1,4 +1,5 @@
 package diskmgr.rdf;
+
 import global.GlobalConst;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,9 +16,9 @@ public class PCounter {
 
   public static int readCounter;
   public static int writeCounter;
-  public static String fileName=null;
+  public static String fileName = null;
 
-  public static String getFileName(){
+  public static String getFileName() {
     fileName = Paths.get(
         Paths.get(System.getProperty(GlobalConst.CURR_DIR_ENV)).toString(),
         GlobalConst.ROOT_FOLDER,
@@ -59,10 +60,10 @@ public class PCounter {
    * @throws IOException
    * @throws ParseException
    */
-  public static void writeToJSONFile(String dbName, String qName) throws IOException, ParseException {
+  public static void writeToJSONFile(String dbName, String qName)
+      throws IOException, ParseException {
 
-
-    fileName=getFileName();
+    fileName = getFileName();
     File newFile = new File(fileName);
 
     if (newFile.length() != 0) {
@@ -75,7 +76,7 @@ public class PCounter {
         JSONObject queryObj = (JSONObject) reportJsonObject.get(dbName);
         if (queryObj.containsKey(qName)) {
 
-          JSONObject dataObj = (JSONObject)((JSONObject) reportJsonObject.get(dbName)).get(qName);
+          JSONObject dataObj = (JSONObject) ((JSONObject) reportJsonObject.get(dbName)).get(qName);
           dataObj.put("Reads", readCounter);
           dataObj.put("Writes", writeCounter);
           queryObj.put(qName, dataObj);
@@ -97,7 +98,7 @@ public class PCounter {
         newDataObj.put("Reads", readCounter);
         newDataObj.put("Writes", readCounter);
 
-        newQueryObj.put(qName,newDataObj);
+        newQueryObj.put(qName, newDataObj);
         reportJsonObject.put(dbName, newQueryObj);
       }
 
@@ -108,8 +109,7 @@ public class PCounter {
         e.printStackTrace();
       }
 
-    }
-    else{
+    } else {
       JSONObject newReportObj = new JSONObject();
       JSONObject newQueryObj = new JSONObject();
       JSONObject newDataObj = new JSONObject();
@@ -117,7 +117,7 @@ public class PCounter {
       newDataObj.put("Reads", readCounter);
       newDataObj.put("Writes", readCounter);
 
-      newQueryObj.put(qName,newDataObj);
+      newQueryObj.put(qName, newDataObj);
       newReportObj.put(dbName, newQueryObj);
 
       try (FileWriter file = new FileWriter(fileName)) {
@@ -131,7 +131,7 @@ public class PCounter {
 
   }
 
-  public static void printReadWriteCount(String dbName,String qName)
+  public static void printReadWriteCount(String dbName, String qName)
       throws IOException, ParseException {
     long rCount = -1;
     long wCount = -1;
@@ -140,20 +140,18 @@ public class PCounter {
     JSONObject reportJsonObject = (JSONObject) jsonParser.parse(
         new FileReader(fileName));
 
-    if(reportJsonObject.containsKey(dbName)){
-      JSONObject queryObject=(JSONObject) reportJsonObject.get(dbName);
-      if(queryObject.containsKey(qName)){
-        JSONObject dataObject=(JSONObject) queryObject.get(qName);
-        rCount=(long)dataObject.get("Reads");
-        wCount=(long)dataObject.get("Writes");
+    if (reportJsonObject.containsKey(dbName)) {
+      JSONObject queryObject = (JSONObject) reportJsonObject.get(dbName);
+      if (queryObject.containsKey(qName)) {
+        JSONObject dataObject = (JSONObject) queryObject.get(qName);
+        rCount = (long) dataObject.get("Reads");
+        wCount = (long) dataObject.get("Writes");
 
-        System.out.println("Reads : " + rCount+" Writes : " + wCount);
-      }
-      else{
+        System.out.println("Reads : " + rCount + " Writes : " + wCount);
+      } else {
         System.out.println("Query Data not present");
       }
-    }
-    else{
+    } else {
       System.out.println("DB Data not present");
     }
 
@@ -167,45 +165,5 @@ public class PCounter {
     System.out.println(reportJsonObject.toJSONString());
   }
 
-  public static void main(String args[]) throws IOException, ParseException {
-
-    writeToJSONFile("DBName1", "Query1");
-
-    readIncrement();
-    readIncrement();
-    writeIncrement();
-    writeToJSONFile("DBName2", "Query2");
-
-    readIncrement();
-    readIncrement();
-    writeIncrement();
-    writeIncrement();
-    writeToJSONFile("DBName3", "Query2");
-
-
-    readIncrement();
-    writeIncrement();
-
-    writeToJSONFile("DBName1", "Query1");
-
-    readIncrement();
-    readIncrement();
-    writeIncrement();
-    writeIncrement();
-    writeToJSONFile("DBName2", "Query2");
-
-    readIncrement();
-    readIncrement();
-    writeIncrement();
-    writeIncrement();
-    readIncrement();
-    writeToJSONFile("DBName3", "Query3");
-
-    printReadWriteCount("DBName3","Query3");
-    printJsonFile();
-
-
-
-  }
 
 }
