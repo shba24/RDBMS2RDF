@@ -67,6 +67,7 @@ public interface GlobalConst {
   /**
    * Global constants for directory, path, files and folder names
    */
+  public static String CURR_DIR_ENV = "user.dir";
   public static String DATA_FILE = "data.dat";
   public static String ROOT_FOLDER = "data";
   public static String DEFAULT_LOG_FILENAME = "default.log";
