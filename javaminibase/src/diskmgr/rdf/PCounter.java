@@ -75,8 +75,8 @@ public class PCounter {
           for (Object queryKey : dbObj.keySet()) {
             if (queryKey.equals(qName)) {
               JSONObject queryObject = (JSONObject) dbObj.get(queryKey);
-              queryObject.put("Reads", readCounter + 1);
-              queryObject.put("Writes", writeCounter + 1);
+              queryObject.put("Reads", readCounter );
+              queryObject.put("Writes", writeCounter );
               isNewQuery = false;
             }
           }
