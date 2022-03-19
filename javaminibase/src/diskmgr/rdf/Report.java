@@ -5,7 +5,7 @@ import org.json.simple.parser.ParseException;
 
 
 public class Report {
-  public static void printReportStat(ReportStats reportStats) throws IOException, ParseException {
+  protected static void printReportStat(ReportStats reportStats) throws IOException, ParseException {
 
     System.out.println("\n\n\n******************** Report - RDF DB Statistics ******************");
     System.out.printf("Quadruple Count: %d\n", reportStats.getQuadrupleCnt());

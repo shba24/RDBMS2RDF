@@ -21,7 +21,7 @@ public class PCounter {
   public static int writeCounter;
   public static String fileName = null;
 
-  private static String getFileName() {
+  protected static String getFileName() {
     fileName = Paths.get(
         Paths.get(System.getProperty(GlobalConst.CURR_DIR_ENV)).toString(),
         GlobalConst.ROOT_FOLDER,
@@ -34,7 +34,7 @@ public class PCounter {
   /**
    * Initialize the readCounter and writeCounter with 0
    */
-  private static void initialize() {
+  protected static void initialize() {
     readCounter = 0;
     writeCounter = 0;
   }
@@ -42,14 +42,14 @@ public class PCounter {
   /**
    * Increments the read counter
    */
-  private static void readIncrement() {
+  protected static void readIncrement() {
     readCounter++;
   }
 
   /**
    * Increments the write counter
    */
-  private static void writeIncrement() {
+  protected static void writeIncrement() {
     writeCounter++;
   }
 
@@ -134,7 +134,7 @@ public class PCounter {
 
   }
 
-  public void printReadWriteCount(String dbName, String qName)
+  protected void printReadWriteCount(String dbName, String qName)
       throws IOException, ParseException {
     long rCount = -1;
     long wCount = -1;
