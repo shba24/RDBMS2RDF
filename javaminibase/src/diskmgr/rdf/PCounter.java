@@ -1,5 +1,4 @@
 package diskmgr.rdf;
-
 import global.GlobalConst;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,11 +13,15 @@ import org.json.simple.parser.ParseException;
 
 public class PCounter {
 
+  public PCounter() {
+
+  }
+
   public static int readCounter;
   public static int writeCounter;
   public static String fileName = null;
 
-  public static String getFileName() {
+  private static String getFileName() {
     fileName = Paths.get(
         Paths.get(System.getProperty(GlobalConst.CURR_DIR_ENV)).toString(),
         GlobalConst.ROOT_FOLDER,
@@ -31,7 +34,7 @@ public class PCounter {
   /**
    * Initialize the readCounter and writeCounter with 0
    */
-  public static void initialize() {
+  private static void initialize() {
     readCounter = 0;
     writeCounter = 0;
   }
@@ -39,14 +42,14 @@ public class PCounter {
   /**
    * Increments the read counter
    */
-  public static void readIncrement() {
+  private static void readIncrement() {
     readCounter++;
   }
 
   /**
    * Increments the write counter
    */
-  public static void writeIncrement() {
+  private static void writeIncrement() {
     writeCounter++;
   }
 
@@ -60,7 +63,7 @@ public class PCounter {
    * @throws IOException
    * @throws ParseException
    */
-  public static void writeToJSONFile(String dbName, String qName)
+  protected void writeToJSONFile(String dbName, String qName)
       throws IOException, ParseException {
 
     fileName = getFileName();
@@ -131,7 +134,7 @@ public class PCounter {
 
   }
 
-  public static void printReadWriteCount(String dbName, String qName)
+  public void printReadWriteCount(String dbName, String qName)
       throws IOException, ParseException {
     long rCount = -1;
     long wCount = -1;
@@ -158,7 +161,7 @@ public class PCounter {
 
   }
 
-  public static void printJsonFile() throws IOException, ParseException {
+  protected void printJsonFile() throws IOException, ParseException {
     JSONParser jsonParser = new JSONParser();
     JSONObject reportJsonObject = (JSONObject) jsonParser.parse(
         new FileReader(fileName));
