@@ -47,7 +47,7 @@ public interface GlobalConst {
    * limited to 50 character in size, we
    * increased it to 300 characters.
    */
-  public static final int MAX_NAME = 50;
+  public static final int MAX_NAME = 300;
 
   public static final int INVALID_PAGE = -1;
   /**
@@ -62,7 +62,7 @@ public interface GlobalConst {
    */
   public static final int ALL_DELETE_FASHION = 1;
   public static final int NAIVE_DELETE_FASHION = 0;
-  public static final int DEFAULT_KEY_SIZE = 100;
+  public static final int DEFAULT_KEY_SIZE = 300;
 
   /**
    * Global constants for directory, path, files and folder names
