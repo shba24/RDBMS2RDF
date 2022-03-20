@@ -65,4 +65,12 @@ public class RDFDatabase {
   public void insert(InsertQuery query) throws Exception {
     query.execute();
   }
+
+  /**
+   * Cleans up RSFSystemDef
+   * @throws Exception
+   */
+  public void close() throws Exception {
+    RDFSystemDefs.close();
+  }
 }

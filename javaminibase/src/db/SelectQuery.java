@@ -245,10 +245,7 @@ public class SelectQuery extends BaseQuery implements IQuery {
       e.printStackTrace();
     }
     finally {
-      ((RdfDB) SystemDefs.JavabaseDB).close();
       if (stream!=null) stream.closeStream();
-      SystemDefs.JavabaseBM.printPinnedBuffer();
-      SystemDefs.JavabaseBM.flushAllPages();
     }
   }
 }

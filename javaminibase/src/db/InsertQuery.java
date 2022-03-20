@@ -90,15 +90,5 @@ public class InsertQuery extends BaseQuery implements IQuery {
       ((RdfDB)SystemDefs.JavabaseDB).insertQuadruple(quad);
       tokens = fileReader.read_next();
     }
-
-    /**
-     * Do the clean up the buffer manager,
-     * disk manager and database.
-     * This will flush the pages to the file
-     * which will help with starting this later.
-     */
-    ((RdfDB)SystemDefs.JavabaseDB).close();
-    SystemDefs.JavabaseBM.printPinnedBuffer();
-    SystemDefs.JavabaseBM.flushAllPages();
   }
 }

@@ -142,6 +142,22 @@ public class DB implements GlobalConst {
     DBfile.delete();
   }
 
+  private void add_read_page() throws FileIOException {
+    try {
+      SystemDefs.telemetry.addRead();
+    } catch (Exception e) {
+      throw new FileIOException(e, "Telemetry file I/O error");
+    }
+  }
+
+  private void add_write_page() throws FileIOException {
+    try {
+      SystemDefs.telemetry.addWrite();
+    } catch (Exception e) {
+      throw new FileIOException(e, "Telemetry file I/O error");
+    }
+  }
+
   /**
    * Read the contents of the specified page into a Page object
    *
@@ -167,6 +183,7 @@ public class DB implements GlobalConst {
     byte[] buffer = apage.getpage();  //new byte[MINIBASE_PAGESIZE];
     try {
       fp.read(buffer);
+      add_read_page();
     } catch (IOException e) {
       throw new FileIOException(e, "DB file I/O error");
     }
@@ -196,6 +213,7 @@ public class DB implements GlobalConst {
     // Write the appropriate number of bytes.
     try {
       fp.write(apage.getpage());
+      add_write_page();
     } catch (IOException e) {
       throw new FileIOException(e, "DB file I/O error");
     }

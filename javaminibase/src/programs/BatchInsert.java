@@ -18,6 +18,7 @@ public class BatchInsert {
     InsertQuery query = (InsertQuery) QueryFactory.getQuery(QueryType.INSERT, String.join(" ", args));
     RDFDatabase db = new RDFDatabase(query.getDbName(), query.getIndexOption());
     db.insert(query);
+    db.close();
   }
 }
 

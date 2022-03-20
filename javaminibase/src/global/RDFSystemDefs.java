@@ -2,6 +2,7 @@ package global;
 
 import bufmgr.BufMgr;
 import db.IndexOption;
+import db.Telemetry;
 import diskmgr.rdf.RdfDB;
 import java.nio.file.Paths;
 
@@ -27,6 +28,7 @@ public class RDFSystemDefs extends SystemDefs {
       String rdfDbPath,
       IndexOption _indexOption,
       int _bufPoolSize) {
+    telemetry = new Telemetry(rdfDbPath);
     bufPoolSize = _bufPoolSize;
     JavabaseDBName = rdfDbPath;
     indexOption = _indexOption;
@@ -51,5 +53,18 @@ public class RDFSystemDefs extends SystemDefs {
       System.err.println("Error while initializing RDFSystemDef");
       e.printStackTrace();
     }
+  }
+
+  public static void close() throws Exception {
+    /**
+     * Do the cleanup of the DB first to clean up
+     * Page pins then flush all buffer manager pages
+     * so that in-memory changes are persisted in files.
+     * Also flushes telemetry to the file.
+     */
+    telemetry.flush();
+    ((RdfDB)SystemDefs.JavabaseDB).close();
+    SystemDefs.JavabaseBM.printPinnedBuffer();
+    SystemDefs.JavabaseBM.flushAllPages();
   }
 }
