@@ -5,6 +5,7 @@ import global.GlobalConst;
 import global.QID;
 import global.PageId;
 import global.SystemDefs;
+import heap.DataPageInfo;
 import heap.HFBufMgrException;
 import heap.InvalidTupleSizeException;
 import heap.Quadruple;

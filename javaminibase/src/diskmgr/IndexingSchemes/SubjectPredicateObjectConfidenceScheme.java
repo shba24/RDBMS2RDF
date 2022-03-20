@@ -15,21 +15,11 @@ import global.QuadOrder;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
-import heap.quadrupleheap.TScan;
 import java.io.IOException;
 
-public class ObjectIndexScheme extends BaseIndexScheme {
+public class SubjectPredicateObjectConfidenceScheme extends BaseIndexScheme {
 
-  /**
-   * Public Constructor
-   *
-   * @throws ConstructPageException
-   * @throws GetFileEntryException
-   * @throws PinPageException
-   * @throws AddFileEntryException
-   * @throws IOException
-   */
-  public ObjectIndexScheme()
+  public SubjectPredicateObjectConfidenceScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
     super(getFilePath());
   }
@@ -37,7 +27,10 @@ public class ObjectIndexScheme extends BaseIndexScheme {
   public static String getFilePath() {
     String[] tokens = new String[]{
         GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.OBJECT_IDENTIFIER
+        GlobalConst.SUBJECT_IDENTIFIER,
+        GlobalConst.PREDICATE_IDENTIFIER,
+        GlobalConst.OBJECT_IDENTIFIER,
+        GlobalConst.CONFIDENCE_IDENTIFIER
     };
     return generateFilePath(tokens);
   }
@@ -55,12 +48,12 @@ public class ObjectIndexScheme extends BaseIndexScheme {
    */
   @Override
   public StringKey getKey(
-      Quadruple quadruple,
-      QID qid,
-      LabelHeapFile entityHeapFile,
-      LabelHeapFile predicateHeapFile) throws Exception {
-    return new StringKey(
-        entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel());
+      Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
+    String subject = entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel();
+    String object = entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel();
+    String predicate = predicateHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel();
+    double confidence = quadruple.getConfidence();
+    return new StringKey(subject+":"+predicate+":"+object+":"+confidence);
   }
 
   /**
@@ -92,7 +85,10 @@ public class ObjectIndexScheme extends BaseIndexScheme {
       QuadrupleHeapFile quadrupleHeapFile,
       LabelHeapFile entityHeapFile,
       LabelHeapFile predicateHeapFile) throws Exception {
-    if (objectFilter == null) {
+    if (subjectFilter == null ||
+        predicateFilter == null ||
+        objectFilter == null ||
+        confidenceFilter == null) {
       return new TStream(
           orderType,
           numBuf,
@@ -103,8 +99,9 @@ public class ObjectIndexScheme extends BaseIndexScheme {
           confidenceFilter
       );
     } else {
-      KeyClass lo_key = new StringKey(objectFilter);
-      KeyClass hi_key = new StringKey(objectFilter);
+      String filterKey = subjectFilter+":"+predicateFilter+":"+objectFilter+":"+confidenceFilter;
+      KeyClass lo_key = new StringKey(filterKey);
+      KeyClass hi_key = new StringKey(filterKey);
       return new BTStream(
           orderType,
           numBuf,

@@ -6,8 +6,6 @@ package global;
 
 import static global.GlobalConst.INVALID_PAGE;
 
-import java.io.*;
-
 public class PID implements IPID {
 
   private int slotNo;
@@ -130,10 +128,8 @@ public class PID implements IPID {
    * @return the label ID (LID) object
    */
   @Override
-  public ILID returnLID() {
-
-    ILID lid = new LID(pageNo,slotNo);
-    return lid;
+  public LID returnLID() {
+    return new LID(pageNo,slotNo);
   }
 
   /**

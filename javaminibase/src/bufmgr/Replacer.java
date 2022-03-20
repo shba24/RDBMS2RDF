@@ -65,7 +65,6 @@ abstract class Replacer implements GlobalConst {
 
       throw new InvalidFrameNumberException(null, "BUFMGR: BAD_BUFFRAMENO.");
     }
-
     (mgr.frameTable())[frameNo].pin();
     state_bit[frameNo].state = Pinned;
   }
@@ -110,7 +109,6 @@ abstract class Replacer implements GlobalConst {
 
       throw new PagePinnedException(null, "BUFMGR: PAGE_PINNED.");
     }
-
     (mgr.frameTable())[frameNo].unpin();
     state_bit[frameNo].state = Available;
   }
@@ -174,7 +172,7 @@ abstract class Replacer implements GlobalConst {
    * in the argument, gets the total number of buffer frames,
    * and mainstains the head of the clock.
    *
-   * @param mgr the buffer manage to be assigned to.
+   * @param mgrArg the buffer manage to be assigned to.
    */
   protected void setBufferManager(BufMgr mgrArg) {
 

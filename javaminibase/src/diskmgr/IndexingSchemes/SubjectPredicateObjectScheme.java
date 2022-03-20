@@ -10,26 +10,18 @@ import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
 import global.GlobalConst;
+import global.LID;
 import global.QID;
 import global.QuadOrder;
+import heap.Label;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
-import heap.quadrupleheap.TScan;
 import java.io.IOException;
 
-public class ObjectIndexScheme extends BaseIndexScheme {
+public class SubjectPredicateObjectScheme extends BaseIndexScheme {
 
-  /**
-   * Public Constructor
-   *
-   * @throws ConstructPageException
-   * @throws GetFileEntryException
-   * @throws PinPageException
-   * @throws AddFileEntryException
-   * @throws IOException
-   */
-  public ObjectIndexScheme()
+  public SubjectPredicateObjectScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
     super(getFilePath());
   }
@@ -37,6 +29,8 @@ public class ObjectIndexScheme extends BaseIndexScheme {
   public static String getFilePath() {
     String[] tokens = new String[]{
         GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.SUBJECT_IDENTIFIER,
+        GlobalConst.PREDICATE_IDENTIFIER,
         GlobalConst.OBJECT_IDENTIFIER
     };
     return generateFilePath(tokens);
@@ -55,12 +49,13 @@ public class ObjectIndexScheme extends BaseIndexScheme {
    */
   @Override
   public StringKey getKey(
-      Quadruple quadruple,
-      QID qid,
-      LabelHeapFile entityHeapFile,
-      LabelHeapFile predicateHeapFile) throws Exception {
-    return new StringKey(
-        entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel());
+      Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
+    String subject = entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel();
+    LID objectLid = quadruple.getObjectID().returnLID();
+    Label objectLabel = entityHeapFile.getLabel(objectLid);
+    String object = objectLabel.getLabel();
+    String predicate = predicateHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel();
+    return new StringKey(subject+":"+predicate+":"+object);
   }
 
   /**
@@ -92,7 +87,9 @@ public class ObjectIndexScheme extends BaseIndexScheme {
       QuadrupleHeapFile quadrupleHeapFile,
       LabelHeapFile entityHeapFile,
       LabelHeapFile predicateHeapFile) throws Exception {
-    if (objectFilter == null) {
+    if (subjectFilter == null ||
+        predicateFilter == null ||
+        objectFilter == null) {
       return new TStream(
           orderType,
           numBuf,
@@ -103,8 +100,9 @@ public class ObjectIndexScheme extends BaseIndexScheme {
           confidenceFilter
       );
     } else {
-      KeyClass lo_key = new StringKey(objectFilter);
-      KeyClass hi_key = new StringKey(objectFilter);
+      String filterKey = subjectFilter+":"+predicateFilter+":"+objectFilter;
+      KeyClass lo_key = new StringKey(filterKey);
+      KeyClass hi_key = new StringKey(filterKey);
       return new BTStream(
           orderType,
           numBuf,

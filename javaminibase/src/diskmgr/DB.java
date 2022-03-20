@@ -22,7 +22,7 @@ public class DB implements GlobalConst {
 
   private static final int bits_per_page = MAX_SPACE * 8;
   private RandomAccessFile fp;
-  private int num_pages;
+  protected int num_pages;
   private String name;
 
   /**
@@ -87,10 +87,13 @@ public class DB implements GlobalConst {
     num_pages = (num_pgs > 2) ? num_pgs : 2;
 
     File DBfile = new File(name);
+    if (DBfile.exists()) {
+      // Create a random access file
+      fp = new RandomAccessFile(fname, "rw");
+      return;
+    }
 
-    DBfile.delete();
-
-    // Creaat a random access file
+    // Create a random access file
     fp = new RandomAccessFile(fname, "rw");
 
     // Make the file num_pages pages long, filled with zeroes.
@@ -383,7 +386,6 @@ public class DB implements GlobalConst {
       FileIOException,
       IOException,
       DiskMgrException {
-
     if (fname.length() >= MAX_NAME) {
       throw new FileNameTooLongException(null, "DB filename too long");
     }
@@ -946,6 +948,14 @@ class DBHeaderPage implements PageUsedBytes, GlobalConst {
 
     int position = START_FILE_ENTRIES + entryNo * SIZE_OF_FILE_ENTRY;
     pageNo.pid = Convert.getIntValue(position, data);
+    /**
+     * Invalid pages are not initialized so it might cause problem
+     * while reading the file entry in the next step as it has to be
+     * a valid UTF-8 string which may not be always possible.
+     */
+    if (pageNo.pid==INVALID_PAGE) {
+      return null;
+    }
     return (Convert.getStrValue(position + 4, data, MAX_NAME + 2));
   }
 }

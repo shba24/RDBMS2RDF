@@ -2,8 +2,11 @@ package heap.labelheap;
 
 import diskmgr.Page;
 import global.*;
+import heap.FieldNumberOutOfBoundException;
 import heap.HFPage;
 import heap.InvalidSlotNumberException;
+import heap.InvalidTupleSizeException;
+import heap.InvalidTypeException;
 import heap.Label;
 import heap.Tuple;
 
@@ -253,7 +256,8 @@ public class LHFPage extends HFPage {
    * @see Tuple
    */
   public Label getLabel(LID lid)
-      throws InvalidSlotNumberException, IOException {
+      throws InvalidSlotNumberException, IOException, FieldNumberOutOfBoundException, InvalidTupleSizeException,
+      InvalidTypeException {
     try {
       short recLen;
       short offset;
@@ -268,7 +272,9 @@ public class LHFPage extends HFPage {
       if ((slotNo >= 0) && (slotNo < slotCnt) && (recLen > 0)
           && (pageNo.pid == curPage.pid)) {
         offset = getSlotOffset(slotNo);
-        return new Label(data, offset, recLen);
+        Label label = new Label();
+        label.tupleSet(data, offset, recLen);
+        return label;
       } else {
         throw new InvalidSlotNumberException(null, "HEAPFILE: INVALID_SLOTNO");
       }

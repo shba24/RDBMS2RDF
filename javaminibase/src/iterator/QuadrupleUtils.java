@@ -2,22 +2,96 @@ package iterator;
 
 import global.AttrType;
 import heap.FieldNumberOutOfBoundException;
+import heap.InvalidTupleSizeException;
+import heap.InvalidTypeException;
 import heap.Quadruple;
 
+import heap.labelheap.LabelHeapFile;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * some useful method when processing Quadruple
  */
 public class QuadrupleUtils {
+  public static LabelHeapFile entityHeapFile;
+  public static LabelHeapFile predicateHeapFile;
+  public static byte[] maxi = new byte[8];
+  public static byte[] mini = new byte[8];
+
+  public static void init(LabelHeapFile _entityHeapFile, LabelHeapFile _predicateHeapFile) {
+    entityHeapFile = _entityHeapFile;
+    predicateHeapFile = _predicateHeapFile;
+    Arrays.fill(maxi, Byte.MAX_VALUE);
+    Arrays.fill(mini, Byte.MIN_VALUE);
+  }
+
+  private static String getValid(Quadruple q, int fld_no) throws Exception {
+    byte[] value = q.getBytesFld(fld_no);
+    if (Arrays.equals(maxi, value)) {
+      return new String(String.valueOf(Character.MAX_VALUE));
+    } else if (Arrays.equals(mini, value)) {
+      return new String(String.valueOf(Character.MIN_VALUE));
+    }
+    if (fld_no==1) return q.getSubjectLabel();
+    else if (fld_no==2) return q.getPredicateLabel();
+    return q.getObjectLabel();
+  }
+
+  private static int CompareQuadrupleWithQuadruple(
+      Quadruple q1,
+      Quadruple q2,
+      int fld_no) throws TupleUtilsException {
+    if (fld_no==1) {
+      // Subject
+      try {
+        String subject1 = q1.getSubjectLabel();
+        String subject2 = getValid(q2, fld_no);
+        return subject1.compareTo(subject2);
+      } catch (Exception e) {
+        System.err.println("Error comparing subjects.");
+        e.printStackTrace();
+      }
+    } else if (fld_no==2) {
+      // Predicate
+      try {
+        String predicate1 = q1.getPredicateLabel();
+        String predicate2 = getValid(q2, fld_no);
+        return predicate1.compareTo(predicate2);
+      } catch (Exception e) {
+        System.err.println("Error comparing predicate.");
+        e.printStackTrace();
+      }
+    } else if (fld_no==3) {
+      // Object
+      try {
+        String object1 = q1.getObjectLabel();
+        String object2 = getValid(q2, fld_no);
+        return object1.compareTo(object2);
+      } catch (Exception e) {
+        System.err.println("Error comparing object.");
+        e.printStackTrace();
+      }
+    } else if (fld_no==4){
+      // Confidence
+      try {
+        Float confidence1 = q1.getConfidence();
+        Float confidence2 = q2.getConfidence();
+        int cmp = confidence1.compareTo(confidence2);
+        if (cmp<0) return -1;
+        else if (cmp==0) return 0;
+        else return 1;
+      } catch (Exception e) {
+        System.err.println("Error comparing confidence.");
+        e.printStackTrace();
+      }
+    }
+    throw new TupleUtilsException("Wrong field number fld_no="+fld_no);
+  }
 
   /**
-   * This function compares a quadruple with another quadruple in respective field, and
-   * returns:
-   * <p>
-   * 0        if the two are equal,
-   * 1        if the quadruple is greater,
-   * -1        if the quadruple is smaller,
+   * This function compares a quadruple with another quadruple
+   * in respective field by getting the string from label heap files.
    *
    * @param fldType   the type of the field being compared.
    * @param q1        one quadruple.
@@ -34,57 +108,12 @@ public class QuadrupleUtils {
   public static int CompareQuadrupleWithQuadruple(
       AttrType fldType,
       Quadruple q1, int q1_fld_no,
-      Quadruple q2, int q2_fld_no)
-          throws IOException,
-          UnknowAttrType,
-          QuadrupleUtilsException, FieldNumberOutOfBoundException {
-    int q1_i, q2_i;
-    float q1_r, q2_r;
-    String q1_s, q2_s;
-
-    switch (fldType.attrType) {
-      case AttrType.attrInteger:                // Compare two integers.
-        q1_i = q1.getIntFld(q1_fld_no);
-        q2_i = q2.getIntFld(q2_fld_no);
-        if (q1_i == q2_i) {
-          return 0;
-        }
-        if (q1_i < q2_i) {
-          return -1;
-        }
-        if (q1_i > q2_i) {
-          return 1;
-        }
-
-      case AttrType.attrReal:                // Compare two floats
-        q1_r = q1.getFloFld(q1_fld_no);
-        q2_r = q2.getFloFld(q2_fld_no);
-        if (q1_r == q2_r) {
-          return 0;
-        }
-        if (q1_r < q2_r) {
-          return -1;
-        }
-        if (q1_r > q2_r) {
-          return 1;
-        }
-
-      case AttrType.attrString:                // Compare two strings
-        q1_s = q1.getStrFld(q1_fld_no);
-        q2_s = q2.getStrFld(q2_fld_no);
-
-        // Now handle the special case that is posed by the max_values for strings...
-        if (q1_s.compareTo(q2_s) > 0) {
-          return 1;
-        }
-        if (q1_s.compareTo(q2_s) < 0) {
-          return -1;
-        }
-        return 0;
-      default:
-
-        throw new UnknowAttrType(null, "Don't know how to handle attrSymbol, attrNull");
+      Quadruple q2, int q2_fld_no) throws TupleUtilsException {
+    if (q1_fld_no!=q2_fld_no) {
+      throw new TupleUtilsException(
+          "Wrong field number q1_fld_no="+q1_fld_no+" q2_fld_no="+q2_fld_no);
     }
+    return CompareQuadrupleWithQuadruple(q1, q2, q1_fld_no);
   }
 
   /**
@@ -107,8 +136,7 @@ public class QuadrupleUtils {
       Quadruple q1, int q1_fld_no,
       Quadruple value)
           throws IOException,
-          UnknowAttrType,
-          QuadrupleUtilsException, FieldNumberOutOfBoundException {
+          UnknowAttrType, TupleUtilsException {
     return CompareQuadrupleWithQuadruple(fldType, q1, q1_fld_no, value, q1_fld_no);
   }
 
@@ -127,7 +155,7 @@ public class QuadrupleUtils {
    */
 
   public static boolean Equal(Quadruple q1, Quadruple q2, AttrType types[], int len)
-          throws IOException, UnknowAttrType, QuadrupleUtilsException, FieldNumberOutOfBoundException {
+          throws IOException, UnknowAttrType, QuadrupleUtilsException, TupleUtilsException {
     int i;
 
     for (i = 1; i <= len; i++) {
@@ -136,22 +164,6 @@ public class QuadrupleUtils {
       }
     }
     return true;
-  }
-
-  /**
-   * get the string specified by the field number
-   *
-   * @param quadruple the quadruple
-   * @param fldno the field number
-   * @return the content of the field number
-   * @throws QuadrupleUtilsException exception from this class
-   */
-  public static String Value(Quadruple quadruple, int fldno)
-          throws
-          QuadrupleUtilsException, FieldNumberOutOfBoundException, IOException {
-    String temp;
-    temp = quadruple.getStrFld(fldno);
-    return temp;
   }
 
   /**
@@ -168,7 +180,7 @@ public class QuadrupleUtils {
   public static void SetValue(Quadruple value, Quadruple quadruple, int fld_no, AttrType fldType)
           throws IOException,
           UnknowAttrType,
-          QuadrupleUtilsException, FieldNumberOutOfBoundException {
+          FieldNumberOutOfBoundException {
 
     switch (fldType.attrType) {
       case AttrType.attrInteger:
@@ -179,6 +191,9 @@ public class QuadrupleUtils {
         break;
       case AttrType.attrString:
         value.setStrFld(fld_no, quadruple.getStrFld(fld_no));
+        break;
+      case AttrType.attrBytes:
+        value.setBytesFld(fld_no, quadruple.getBytesFld(fld_no));
         break;
       default:
         throw new UnknowAttrType(null, "Don't know how to handle attrSymbol, attrNull");
@@ -209,59 +224,15 @@ public class QuadrupleUtils {
       int len_in2, short q1_str_sizes[],
       short q2_str_sizes[],
       FldSpec proj_list[], int nOutFlds)
-      throws IOException,
-      QuadrupleUtilsException {
-    short[] sizesQ1 = new short[len_in1];
-    short[] sizesQ2 = new short[len_in2];
-    int i, count = 0;
-
-    for (i = 0; i < len_in1; i++) {
-      if (in1[i].attrType == AttrType.attrString) {
-        sizesQ1[i] = q1_str_sizes[count++];
-      }
-    }
-
-    for (count = 0, i = 0; i < len_in2; i++) {
-      if (in2[i].attrType == AttrType.attrString) {
-        sizesQ2[i] = q2_str_sizes[count++];
-      }
-    }
-
-    int n_strs = 0;
-    for (i = 0; i < nOutFlds; i++) {
-      if (proj_list[i].relation.key == RelSpec.outer) {
-        res_attrs[i] = new AttrType(in1[proj_list[i].offset - 1].attrType);
-      } else if (proj_list[i].relation.key == RelSpec.innerRel) {
-        res_attrs[i] = new AttrType(in2[proj_list[i].offset - 1].attrType);
-      }
-    }
-
-    // Now construct the res_str_sizes array.
-    for (i = 0; i < nOutFlds; i++) {
-      if (proj_list[i].relation.key == RelSpec.outer && in1[proj_list[i].offset - 1].attrType == AttrType.attrString) {
-        n_strs++;
-      } else if (proj_list[i].relation.key == RelSpec.innerRel &&
-          in2[proj_list[i].offset - 1].attrType == AttrType.attrString) {
-        n_strs++;
-      }
-    }
-
-    short[] res_str_sizes = new short[n_strs];
-    count = 0;
-    for (i = 0; i < nOutFlds; i++) {
-      if (proj_list[i].relation.key == RelSpec.outer && in1[proj_list[i].offset - 1].attrType == AttrType.attrString) {
-        res_str_sizes[count++] = sizesQ1[proj_list[i].offset - 1];
-      } else if (proj_list[i].relation.key == RelSpec.innerRel &&
-          in2[proj_list[i].offset - 1].attrType == AttrType.attrString) {
-        res_str_sizes[count++] = sizesQ2[proj_list[i].offset - 1];
-      }
-    }
+      throws QuadrupleUtilsException {
     try {
-      Jquadruple.setHdr(res_attrs, res_str_sizes);
+      Jquadruple.setDefaultHeader();
     } catch (Exception e) {
-      throw new QuadrupleUtilsException(e, "setHdr() failed");
+      System.err.println("Error in setup_op_quadruple.");
+      e.printStackTrace();
+      throw new QuadrupleUtilsException("");
     }
-    return res_str_sizes;
+    return Quadruple.getDefaultAttrSize();
   }
 
   /**
@@ -284,50 +255,15 @@ public class QuadrupleUtils {
       AttrType in1[], int len_in1,
       short q1_str_sizes[],
       FldSpec proj_list[], int nOutFlds)
-      throws IOException,
-      QuadrupleUtilsException,
-      InvalidRelation {
-    short[] sizesQ1 = new short[len_in1];
-    int i, count = 0;
-
-    for (i = 0; i < len_in1; i++) {
-      if (in1[i].attrType == AttrType.attrString) {
-        sizesQ1[i] = q1_str_sizes[count++];
-      }
-    }
-
-    int n_strs = 0;
-    for (i = 0; i < nOutFlds; i++) {
-      if (proj_list[i].relation.key == RelSpec.outer) {
-        res_attrs[i] = new AttrType(in1[proj_list[i].offset - 1].attrType);
-      } else {
-        throw new InvalidRelation("Invalid relation -innerRel");
-      }
-    }
-
-    // Now construct the res_str_sizes array.
-    for (i = 0; i < nOutFlds; i++) {
-      if (proj_list[i].relation.key == RelSpec.outer
-          && in1[proj_list[i].offset - 1].attrType == AttrType.attrString) {
-        n_strs++;
-      }
-    }
-
-    short[] res_str_sizes = new short[n_strs];
-    count = 0;
-    for (i = 0; i < nOutFlds; i++) {
-      if (proj_list[i].relation.key == RelSpec.outer
-          && in1[proj_list[i].offset - 1].attrType == AttrType.attrString) {
-        res_str_sizes[count++] = sizesQ1[proj_list[i].offset - 1];
-      }
-    }
-
+      throws QuadrupleUtilsException {
     try {
-      Jquadruple.setHdr(res_attrs, res_str_sizes);
+      Jquadruple.setDefaultHeader();
     } catch (Exception e) {
-      throw new QuadrupleUtilsException(e, "setHdr() failed");
+      System.err.println("Error in setup_op_quadruple.");
+      e.printStackTrace();
+      throw new QuadrupleUtilsException("");
     }
-    return res_str_sizes;
+    return Quadruple.getDefaultAttrSize();
   }
 }
 

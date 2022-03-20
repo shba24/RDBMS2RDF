@@ -20,8 +20,6 @@ interface Filetype {
 } // end of Filetype
 
 public class QuadrupleHeapFile extends Heapfile {
-
-
   /**
    * Initialize.  A null name produces a temporary heapfile which will be deleted by the destructor.
    *  If the name already denotes a file, the file is opened; otherwise, a new empty file is
@@ -33,13 +31,8 @@ public class QuadrupleHeapFile extends Heapfile {
    * @throws IOException        I/O errors
    */
   public QuadrupleHeapFile(String name)
-      throws HFException, HFBufMgrException, HFDiskMgrException, IOException {
-    super(name);
-  }
-
-  public void quadrupleHeapFile(String name)
       throws HFDiskMgrException, HFException, HFBufMgrException, IOException {
-
+    super();
     // Give us a prayer of destructing cleanly if construction fails.
     _file_deleted = true;
     _fileName = null;
@@ -107,7 +100,6 @@ public class QuadrupleHeapFile extends Heapfile {
 
   private THFPage _newDatapage(DataPageInfo dpinfop) throws HFException,
       HFBufMgrException,
-      HFDiskMgrException,
       IOException {
     Page apage = new Page();
     PageId pageId = new PageId();
@@ -140,12 +132,7 @@ public class QuadrupleHeapFile extends Heapfile {
       PageId dirPageId, THFPage dirpage,
       PageId dataPageId, THFPage datapage,
       QID rpDataPageQid)
-      throws InvalidSlotNumberException,
-      InvalidTupleSizeException,
-      HFException,
-      HFBufMgrException,
-      HFDiskMgrException,
-      Exception {
+      throws Exception {
     PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
     THFPage currentDirPage = new THFPage();
@@ -156,7 +143,7 @@ public class QuadrupleHeapFile extends Heapfile {
 
     pinPage(currentDirPageId, currentDirPage, false/*read disk*/);
 
-    Quadruple aquadruple = new Quadruple();
+    Quadruple aquadruple = null;
 
     while (currentDirPageId.pid != INVALID_PAGE) {// Start While01
       // ASSERTIONS:
@@ -166,7 +153,7 @@ public class QuadrupleHeapFile extends Heapfile {
           currentDataPageQid != null;
           currentDataPageQid = currentDirPage.nextQuadruple(currentDataPageQid)) {
         try {
-          aquadruple = currentDirPage.returnQuadruple(currentDataPageQid);
+          aquadruple = currentDirPage.getQuadruple(currentDataPageQid);
         } catch (InvalidSlotNumberException e)// check error! return false(done)
         {
           return false;
@@ -199,7 +186,7 @@ public class QuadrupleHeapFile extends Heapfile {
           datapage.setpage(currentDataPage.getpage());
           dataPageId.pid = dpinfo.pageId.pid;
 
-          rpDataPageQid.getPageNo().pid = currentDataPageQid.getPageNo().pid;
+          rpDataPageQid.setPageNo(new PageId(currentDataPageQid.getPageNo().pid));
           rpDataPageQid.setSlotNo(currentDataPageQid.getSlotNo());
           return true;
         } else {
@@ -360,8 +347,8 @@ public class QuadrupleHeapFile extends Heapfile {
           // currentDataPage is pinned: insert its Quadruple
           // calling a HFPage function
 
-          quadruple = dpinfo.convertToQuadruple();
-          byte[] tmpdata = quadruple.getQuadrupleByteArray();
+          Tuple tuple = dpinfo.convertToTuple();
+          byte[] tmpdata = tuple.getTupleByteArray();
 
           currentDataPageQid = currentDirPage.insertQuadruple(tmpdata);
 
@@ -481,10 +468,10 @@ public class QuadrupleHeapFile extends Heapfile {
     dpinfo_ondirpage.availspace = dpinfo.availspace;
     dpinfo_ondirpage.recct = dpinfo.recct;
     dpinfo_ondirpage.pageId.pid = dpinfo.pageId.pid;
-    dpinfo_ondirpage.flushToQuadruple();
+    dpinfo_ondirpage.flushToTuple();
 
     unpinPage(currentDirPageId, true /* = DIRTY */);
-    return (QID) qid;
+    return qid;
 
   }//end of insert Quadruple
 
@@ -531,14 +518,14 @@ public class QuadrupleHeapFile extends Heapfile {
     currentDataPage.deleteQuadruple(qid);
 
     pdpinfo.recct--;
-    pdpinfo.flushToQuadruple();  //Write to the buffer pool
+    pdpinfo.flushToTuple();  //Write to the buffer pool
 
     if (pdpinfo.recct >= 1) {
       // more Quadruples remain on datapage so it still hangs around.
       // we just need to modify its directory entry
 
       pdpinfo.availspace = currentDataPage.available_space();
-      pdpinfo.flushToQuadruple();
+      pdpinfo.flushToTuple();
       unpinPage(currentDataPageId, true /* = DIRTY*/);
 
       unpinPage(currentDirPageId, true /* = DIRTY */);
@@ -628,11 +615,8 @@ public class QuadrupleHeapFile extends Heapfile {
    * @throws Exception                  other exception
    */
   public boolean updateQuadruple(QID qid, Quadruple newquadruple)
-      throws InvalidSlotNumberException,
-      InvalidUpdateException,
+      throws InvalidUpdateException,
       InvalidTupleSizeException,
-      HFException,
-      HFDiskMgrException,
       HFBufMgrException,
       Exception {
     boolean status;
@@ -686,11 +670,7 @@ public class QuadrupleHeapFile extends Heapfile {
    * @throws Exception                  other exception
    */
   public Quadruple getQuadruple(QID qid)
-      throws InvalidSlotNumberException,
-      InvalidTupleSizeException,
-      HFException,
-      HFDiskMgrException,
-      HFBufMgrException,
+      throws HFBufMgrException,
       Exception {
     boolean status;
     THFPage dirPage = new THFPage();
@@ -708,8 +688,7 @@ public class QuadrupleHeapFile extends Heapfile {
       return null; // Quadruple not found
     }
 
-    Quadruple quadruple = new Quadruple();
-    quadruple = dataPage.getQuadruple(qid);
+    Quadruple quadruple = dataPage.getQuadruple(qid);
 
     /*
      * getQuadruple has copied the contents of qid into recPtr and fixed up
@@ -726,15 +705,9 @@ public class QuadrupleHeapFile extends Heapfile {
 
   /**
    * Delete file from the DataBase
-   * @throws FileAlreadyDeletedException
-   * @throws HFBufMgrException
-   * @throws IOException
-   * @throws InvalidTupleSizeException
-   * @throws HFDiskMgrException
    */
   @Override
-  public void deleteFile()
-      throws FileAlreadyDeletedException, HFBufMgrException, IOException, InvalidTupleSizeException, HFDiskMgrException {
+  public void deleteFile() throws Exception {
 
     if (_file_deleted) {
       throw new FileAlreadyDeletedException(null, "file alread deleted");
@@ -760,13 +733,7 @@ public class QuadrupleHeapFile extends Heapfile {
       for (qid = currentDirPage.firstQuadruple();
           qid != null;
           qid = currentDirPage.nextQuadruple(qid)) {
-        try {
-          quadruple = currentDirPage.getQuadruple(qid);
-        }
-        catch (Exception e){
-          throw new HFBufMgrException(e, "QuadrupleHeapfile.java: deleteFile() failed");
-        }
-
+        quadruple = currentDirPage.getQuadruple(qid);
         DataPageInfo dpinfo = new DataPageInfo(quadruple);
         //int dpinfoLen = aQuadruple.length;
 
@@ -787,18 +754,6 @@ public class QuadrupleHeapFile extends Heapfile {
     }
 
     delete_file_entry(_fileName);
-  }
-
-
-  private void pinPage(PageId pageNo, THFPage apage, boolean dirty)
-      throws HFBufMgrException {
-    try {
-      Page page = new Page(apage.getpage());
-      SystemDefs.JavabaseBM.pinPage(pageNo, page, dirty);
-    } catch (Exception e) {
-      throw new HFBufMgrException(e, "Heapfile.java: pinPage() failed");
-    }
-
   }
 
   /**

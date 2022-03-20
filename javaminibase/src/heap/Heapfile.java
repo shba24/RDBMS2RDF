@@ -49,6 +49,8 @@ public class Heapfile implements Filetype, GlobalConst {
     protected boolean _file_deleted;
     protected String _fileName;
 
+    public Heapfile() {}
+
     /**
      * Initialize.  A null name produces a temporary heapfile which will be
      * deleted by the destructor.  If the name already denotes a file, the
@@ -274,11 +276,12 @@ public class Heapfile implements Filetype, GlobalConst {
      * @throws IOException                I/O errors
      */
     public int getRecCnt()
-            throws InvalidSlotNumberException,
-            InvalidTupleSizeException,
-            HFDiskMgrException,
-            HFBufMgrException,
-            IOException {
+        throws InvalidSlotNumberException,
+        InvalidTupleSizeException,
+        HFBufMgrException,
+        IOException,
+        FieldNumberOutOfBoundException,
+        InvalidTypeException {
         int answer = 0;
         PageId currentDirPageId = new PageId(_firstDirPageId.pid);
 
@@ -813,12 +816,7 @@ public class Heapfile implements Filetype, GlobalConst {
      * @throws IOException                 I/O errors
      */
     public void deleteFile()
-            throws InvalidSlotNumberException,
-            FileAlreadyDeletedException,
-            InvalidTupleSizeException,
-            HFBufMgrException,
-            HFDiskMgrException,
-            IOException {
+        throws Exception {
         if (_file_deleted) {
             throw new FileAlreadyDeletedException(null, "file alread deleted");
         }
@@ -869,7 +867,10 @@ public class Heapfile implements Filetype, GlobalConst {
     /**
      * short cut to access the pinPage function in bufmgr package.
      *
-     * @see bufmgr.pinPage
+     * @param pageno
+     * @param page
+     * @param emptyPage
+     * @throws HFBufMgrException
      */
     protected void pinPage(PageId pageno, Page page, boolean emptyPage)
             throws HFBufMgrException {
@@ -884,7 +885,9 @@ public class Heapfile implements Filetype, GlobalConst {
     /**
      * short cut to access the unpinPage function in bufmgr package.
      *
-     * @see bufmgr.unpinPage
+     * @param pageno
+     * @param dirty
+     * @throws HFBufMgrException
      */
     protected void unpinPage(PageId pageno, boolean dirty)
             throws HFBufMgrException {

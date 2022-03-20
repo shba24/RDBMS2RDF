@@ -1,8 +1,14 @@
 package db;
 
+import diskmgr.rdf.IStream;
+import diskmgr.rdf.RdfDB;
+import global.QuadOrder;
+import global.SystemDefs;
+import heap.Quadruple;
+
 public class SelectQuery extends BaseQuery implements IQuery {
   private IndexOption indexOption;
-  private String order;
+  private QuadOrder orderType;
   private String subjectFilter;
   private String predicateFilter;
   private String objectFilter;
@@ -14,7 +20,7 @@ public class SelectQuery extends BaseQuery implements IQuery {
    *
    * @param _dbName           database name
    * @param _indexOption      index option as string
-   * @param _order            order of the output
+   * @param _orderType        order of the output
    * @param _subjectFilter    subject filter, if '*' will be set to null
    * @param _predicateFilter  predicate filter, if '*' will be set to null
    * @param _objectFilter     object filter, if '*' will be set to null
@@ -22,11 +28,11 @@ public class SelectQuery extends BaseQuery implements IQuery {
    * @param _numBuf           number of max buffer pages to read from
    */
   public SelectQuery(
-      String _dbName, String _indexOption, String _order, String _subjectFilter,
+      String _dbName, String _indexOption, String _orderType, String _subjectFilter,
       String _predicateFilter, String _objectFilter, String _confidenceFilter, String _numBuf) {
     super(_dbName);
     indexOption = IndexOption.valueOf(_indexOption);
-    order = _order;
+    orderType = new QuadOrder(Integer.valueOf(_orderType));
     if (_subjectFilter.equals("*") ||
         _subjectFilter.isEmpty()) {
       subjectFilter = null;
@@ -48,7 +54,7 @@ public class SelectQuery extends BaseQuery implements IQuery {
     if (_confidenceFilter.equals("*") || _confidenceFilter.isEmpty()) {
       confidenceFilter = null;
     } else {
-      confidenceFilter = Float.valueOf(_confidenceFilter);
+      confidenceFilter = Float.parseFloat(_confidenceFilter);
     }
     numBuf = Integer.valueOf(_numBuf);
   }
@@ -85,17 +91,17 @@ public class SelectQuery extends BaseQuery implements IQuery {
    *
    * @return int order of the query
    */
-  public String getOrder() {
-    return order;
+  public QuadOrder getOrderType() {
+    return orderType;
   }
 
   /**
    * set the order of the query
    *
-   * @param order String order of the query
+   * @param _orderType int order of the query
    */
-  public void setOrder(String order) {
-    this.order = order;
+  public void setOrder(QuadOrder _orderType) {
+    this.orderType = _orderType;
   }
 
   /**
@@ -185,7 +191,7 @@ public class SelectQuery extends BaseQuery implements IQuery {
     if (confidenceFilter.equals("*") || confidenceFilter.isEmpty()) {
       this.confidenceFilter = null;
     } else {
-      this.confidenceFilter = Float.valueOf(confidenceFilter);
+      this.confidenceFilter = Float.parseFloat(confidenceFilter);
     }
   }
 
@@ -219,7 +225,30 @@ public class SelectQuery extends BaseQuery implements IQuery {
   /**
    * Executes the query
    */
-  public void execute() {
-    // to be implemented
+  public void execute() throws Exception {
+    IStream stream = null;
+    try {
+      stream = ((RdfDB) SystemDefs.JavabaseDB).openStream(
+          orderType,
+          numBuf,
+          subjectFilter,
+          predicateFilter,
+          objectFilter,
+          confidenceFilter
+      );
+      Quadruple quad = stream.getNext();
+      while (quad != null) {
+        quad.print();
+        quad = stream.getNext();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    finally {
+      ((RdfDB) SystemDefs.JavabaseDB).close();
+      if (stream!=null) stream.closeStream();
+      SystemDefs.JavabaseBM.printPinnedBuffer();
+      SystemDefs.JavabaseBM.flushAllPages();
+    }
   }
 }

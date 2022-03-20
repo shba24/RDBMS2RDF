@@ -1,11 +1,14 @@
 package db;
 
 public class SelectQueryParser implements IParser {
-  public IQuery parse(String query) {
+  public IQuery parse(String query) throws IllegalArgumentException {
     /**
      * RDFDBNAME INDEXOPTION ORDER SUBJECTFILTER PREDICATEFILTER OBJECTFILTER CONFIDENCEFILTER NUMBUF
      */
     String[] tokens = query.split(" ");
+    if (tokens.length != 8) {
+      throw new IllegalArgumentException("Number of arguments are not equal to 8");
+    }
     return new SelectQuery(
         tokens[0],  /* = rdfDBName*/
         tokens[1],  /* = indexOption */

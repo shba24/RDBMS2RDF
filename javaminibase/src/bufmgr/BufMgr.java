@@ -401,6 +401,19 @@ public class BufMgr implements GlobalConst {
   }
 
   /**
+   * Added to make sure the cleanup of pinned
+   * pages are happening correctly.
+   */
+  public void printPinnedBuffer() {
+    for (int i = 0; i < numBuffers; i++)   // write all valid dirty pages to disk
+    {
+      if (frmeTable[i].pin_count() != 0) {
+        System.out.println("Page: "+frmeTable[i].pageNo.pid+" Pins: "+frmeTable[i].pin_count());
+      }
+    }
+  }
+
+  /**
    * Factor out the common code for the two versions of Flush
    *
    * @param pageid    the page number of the page which needs
@@ -601,7 +614,6 @@ public class BufMgr implements GlobalConst {
       PageUnpinnedException,
       HashEntryNotFoundException,
       InvalidFrameNumberException {
-
     int frameNo;
 
     frameNo = hashTable.lookup(PageId_in_a_DB);

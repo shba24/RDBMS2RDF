@@ -8,17 +8,13 @@ public class LID implements ILID {
   public PageId pageNo;
   public int slotNo;
   private LabelType labelType;
-  private EID entityID;
-  private PID predicateID;
 
   /**
    * Default constructor. Nothing is being done in this constructor.
    */
   public LID() {
-    this.pageNo = new PageId(-1);
-    int slotNo = -1;
-    EID entityID = new EID();
-    PID predicateID = new PID();
+    this.pageNo = new PageId();
+    this.slotNo = 0;
   }
 
   /**
@@ -43,12 +39,6 @@ public class LID implements ILID {
 
     // will get a copy of the reference pointing to the singleton
     this.labelType = lid.getLabelType();
-
-    if (this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
-      this.entityID = new EID(lid.getEntityID());
-    } else if (this.labelType == LabelType.PREDICATE) {
-      this.predicateID = new PID(lid.getPredicateID());
-    }
   }
 
   /**
@@ -102,33 +92,13 @@ public class LID implements ILID {
   }
 
   /**
-   * Set the LabelType enum for the label ID.
-   *
-   * @param labelType
-   */
-  @Override
-  public void setLabelType(LabelType labelType) {
-    this.labelType = labelType;
-  }
-
-  /**
    * Returns the entity ID that this label ID is associated with.
    *
    * @return the entity ID (EID) object
    */
   @Override
   public EID getEntityID() {
-    return entityID;
-  }
-
-  /**
-   * Set the entity ID based on the entity that this label ID represents.
-   *
-   * @param entityID
-   */
-  @Override
-  public void setEntityID(EID entityID) {
-    this.entityID = entityID;
+    return new EID(this.pageNo, this.slotNo);
   }
 
   /**
@@ -138,17 +108,7 @@ public class LID implements ILID {
    */
   @Override
   public PID getPredicateID() {
-    return predicateID;
-  }
-
-  /**
-   * Set the predicate ID based on the predicate that this label ID represents.
-   *
-   * @param predicateID
-   */
-  @Override
-  public void setPredicateID(PID predicateID) {
-    this.predicateID = predicateID;
+    return new PID(this.pageNo, this.slotNo);
   }
 
   /**
@@ -164,12 +124,6 @@ public class LID implements ILID {
 
     // will get a copy of the reference pointing to the singleton
     this.labelType = lid.getLabelType();
-
-    if (this.labelType == LabelType.SUBJECT || this.labelType == LabelType.OBJECT) {
-      this.entityID = new EID(lid.getEntityID());
-    } else if (this.labelType == LabelType.PREDICATE) {
-      this.predicateID = new PID(lid.getPredicateID());
-    }
   }
 
   /**
@@ -181,26 +135,6 @@ public class LID implements ILID {
   @Override
   public boolean equals(LID lid) {
     return (this.pageNo.pid == lid.getPageNo().pid) && (this.slotNo == lid.slotNo);
-  }
-
-  /**
-   * Returns the entity ID that this label ID is associated with.
-   *
-   * @return the entity ID (EID) object
-   */
-  @Override
-  public EID returnEID() {
-    return this.entityID;
-  }
-
-  /**
-   * Returns the predicate ID that this label ID is associated with.
-   *
-   * @return the predicate ID (PID) object
-   */
-  @Override
-  public PID returnPID() {
-    return this.predicateID;
   }
 
   /**
@@ -242,8 +176,6 @@ public class LID implements ILID {
         "pageNo=" + pageNo +
         ", slotNo=" + slotNo +
         ", labelType=" + labelType +
-        ", entityID=" + entityID +
-        ", predicateID=" + predicateID +
         '}';
   }
 }

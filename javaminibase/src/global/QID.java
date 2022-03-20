@@ -12,6 +12,8 @@ public class QID implements IQID {
    * Default constructor. Nothing is being done in this constructor.
    */
   public QID() {
+    this.pageNo = new PageId();
+    this.slotNo = 0;
   }
 
   /**
@@ -120,8 +122,7 @@ public class QID implements IQID {
   @Override
   public String toString() {
     return "QID{" +
-        "pageNo=" + pageNo.pid +
-        ", slotNo=" + slotNo +
-        '}';
+        "pageNo=" + pageNo +
+        ", slotNo=" + slotNo + "}";
   }
 }

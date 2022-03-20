@@ -8,8 +8,8 @@ import global.IEID;
 import global.IPID;
 import global.PID;
 import global.PageId;
+import iterator.QuadrupleUtils;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Quadruple
@@ -18,9 +18,7 @@ import java.nio.charset.StandardCharsets;
  * Quadruple can't have arbitary number of fields
  * or arbitary field types.
  */
-public class Quadruple {
-  private Tuple tuple;
-
+public class Quadruple extends Tuple {
   /**
    * Constructor for the quadruple class with the size of Tuple.max_size
    *
@@ -29,25 +27,23 @@ public class Quadruple {
    * @throws InvalidTypeException
    */
   public Quadruple() throws InvalidTupleSizeException, IOException, InvalidTypeException {
-    AttrType[] attrType = new AttrType[4];
-    attrType[0] = new AttrType(AttrType.attrString);
-    attrType[1] = new AttrType(AttrType.attrString);
-    attrType[2] = new AttrType(AttrType.attrString);
-    attrType[3] = new AttrType(AttrType.attrReal);
+    setDefaultHeader();
+  }
 
-    short[] attrSize = new short[3];
-    attrSize[0] = GlobalConst.MAX_EID_OBJ_SIZE;
-    attrSize[1] = GlobalConst.MAX_PID_OBJ_SIZE;
-    attrSize[2] = GlobalConst.MAX_EID_OBJ_SIZE;
+  /**
+   * Public constructor
+   * @param quad_size
+   */
+  public Quadruple(int quad_size) {
+    super(quad_size);
+  }
 
-    tuple = new Tuple();
-    try {
-      tuple.setHdr((short) 4, attrType, attrSize);
-    } catch (Exception e) {
-      System.err.println("[Quadruple] Error in creating Quadruple object.");
-      e.printStackTrace();
-      throw e;
-    }
+  /**
+   * Public constructor
+   * @param fromQuadruple
+   */
+  public Quadruple(Quadruple fromQuadruple) {
+    super(fromQuadruple);
   }
 
   /**
@@ -58,57 +54,53 @@ public class Quadruple {
    * @param length     length of the byte array of the quadruple
    */
   public Quadruple(byte[] aquadruple, int offset, int length) throws Exception {
-    if (aquadruple.length > Tuple.max_size) {
-      throw new Exception("[Quadruple] Error, aquadruple byte " +
-          "array length exceeds max allowed size");
+    super(aquadruple, offset, length);
+  }
+
+  /**
+   * Returns the default attribute types in an array
+   * @return
+   */
+  public static AttrType[] getDefaultAttrType() {
+    AttrType[] attrType = new AttrType[4];
+    attrType[0] = new AttrType(AttrType.attrBytes);
+    attrType[1] = new AttrType(AttrType.attrBytes);
+    attrType[2] = new AttrType(AttrType.attrBytes);
+    attrType[3] = new AttrType(AttrType.attrReal);
+    return attrType;
+  }
+
+  /**
+   * Returns the default string and bytes attribute
+   * size in an array.
+   * @return
+   */
+  public static short[] getDefaultAttrSize() {
+    short[] attrSize = new short[3];
+    attrSize[0] = GlobalConst.MAX_EID_OBJ_SIZE;
+    attrSize[1] = GlobalConst.MAX_PID_OBJ_SIZE;
+    attrSize[2] = GlobalConst.MAX_EID_OBJ_SIZE;
+    return attrSize;
+  }
+
+  /**
+   * Sets the default header for the quadruple
+   *
+   * @throws InvalidTupleSizeException
+   * @throws IOException
+   * @throws InvalidTypeException
+   */
+  public void setDefaultHeader() throws InvalidTupleSizeException, IOException, InvalidTypeException {
+    AttrType[] attrType = getDefaultAttrType();
+    short[] attrSize = getDefaultAttrSize();
+
+    try {
+      this.setHdr((short) 4, attrType, attrSize);
+    } catch (Exception e) {
+      System.err.println("[Quadruple] Error in creating Quadruple object.");
+      e.printStackTrace();
+      throw e;
     }
-    tuple = new Tuple(aquadruple, offset, length);
-  }
-
-  /**
-   * Constructor for the quadruple class from another
-   * quadruple class through copy
-   *
-   * @param fromQuadruple a byte array which contains the quadruple
-   */
-  public Quadruple(Quadruple fromQuadruple) {
-    tuple = new Tuple(fromQuadruple.tuple);
-  }
-
-  /**
-   * Class constructor
-   * Creates a new quadruple with length = size,tuple offset = 0.
-   *
-   * @param size
-   */
-  public Quadruple(int size) {
-    tuple = new Tuple(size);
-  }
-
-  /**
-   * Gets the length of the byte array of the quadruple
-   *
-   * @return get the length of a tuple
-   */
-  public int getLength() {
-    return tuple.getLength();
-  }
-
-  /**
-   * get the offset of the quadruple
-   *
-   * @return offset of the quadruple in byte array
-   */
-  public int getOffset() { return tuple.getOffset(); }
-
-  /**
-   * Checks if the object is valid
-   *
-   * @return boolean representing the
-   * validity of object
-   */
-  private boolean IsValid() {
-    return tuple != null;
   }
 
   /**
@@ -120,18 +112,48 @@ public class Quadruple {
    */
   public IEID getSubjectID() throws FieldNumberOutOfBoundException, IOException {
     IEID subject = new EID();
-    String data;
+    byte[] buffer;
     try {
-      data = tuple.getStrFld(1);
+      buffer = this.getBytesFld(1);
+      subject.setPageNo(new PageId(Convert.getIntValue(0, buffer)));
+      subject.setSlotNo(Convert.getIntValue(4, buffer));
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in getting subject id of the quadruple.");
       e.printStackTrace();
       throw e;
     }
-    subject.setPageNo(new PageId(Convert.getIntValue(0, data.getBytes())));
-    subject.setSlotNo(Convert.getIntValue(4, data.getBytes()));
 
     return subject;
+  }
+
+  /**
+   * Get the subject label
+   *
+   * @return
+   * @throws Exception
+   */
+  public String getSubjectLabel() throws Exception {
+    return QuadrupleUtils.entityHeapFile.getLabel(getSubjectID().returnLID()).getLabel();
+  }
+
+  /**
+   * Get Predicate label
+   *
+   * @return
+   * @throws Exception
+   */
+  public String getPredicateLabel() throws Exception {
+    return QuadrupleUtils.predicateHeapFile.getLabel(getPredicateID().returnLID()).getLabel();
+  }
+
+  /**
+   * Get Object Label
+   *
+   * @return
+   * @throws Exception
+   */
+  public String getObjectLabel() throws Exception {
+    return QuadrupleUtils.entityHeapFile.getLabel(getObjectID().returnLID()).getLabel();
   }
 
   /**
@@ -143,15 +165,14 @@ public class Quadruple {
    * @throws FieldNumberOutOfBoundException
    */
   public Quadruple setSubjectID(IEID subjectId) throws IOException, FieldNumberOutOfBoundException {
-    byte[] data = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
+    byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
-      Convert.setIntValue(subjectId.getPageNo().pid, 0, data);
-      Convert.setIntValue(subjectId.getSlotNo(), 4, data);
-      tuple.setStrFld(1, new String(data, StandardCharsets.UTF_8));
+      Convert.setIntValue(subjectId.getPageNo().pid, 0, buffer);
+      Convert.setIntValue(subjectId.getSlotNo(), 4, buffer);
+      this.setBytesFld(1, buffer);
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in setting subject id of the quadruple.");
       e.printStackTrace();
-      throw e;
     }
     return this;
   }
@@ -165,16 +186,16 @@ public class Quadruple {
    */
   public IPID getPredicateID() throws FieldNumberOutOfBoundException, IOException {
     IPID predicate = new PID();
-    String data;
+    byte[] buffer;
     try {
-      data = tuple.getStrFld(2);
+      buffer = this.getBytesFld(2);
+      predicate.setPageNo(new PageId(Convert.getIntValue(0, buffer)));
+      predicate.setSlotNo(Convert.getIntValue(4, buffer));
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in getting predicate id of the quadruple.");
       e.printStackTrace();
       throw e;
     }
-    predicate.setPageNo(new PageId(Convert.getIntValue(0, data.getBytes())));
-    predicate.setSlotNo(Convert.getIntValue(4, data.getBytes()));
 
     return predicate;
   }
@@ -188,11 +209,11 @@ public class Quadruple {
    * @throws IOException
    */
   public Quadruple setPredicateID(IPID predicateId) throws FieldNumberOutOfBoundException, IOException {
-    byte[] data = new byte[GlobalConst.MAX_PID_OBJ_SIZE];
+    byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
-      Convert.setIntValue(predicateId.getPageNo().pid, 0, data);
-      Convert.setIntValue(predicateId.getSlotNo(), 4, data);
-      tuple.setStrFld(2, new String(data, StandardCharsets.UTF_8));
+      Convert.setIntValue(predicateId.getPageNo().pid, 0, buffer);
+      Convert.setIntValue(predicateId.getSlotNo(), 4, buffer);
+      this.setBytesFld(2, buffer);
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in setting predicate id of the quadruple.");
       e.printStackTrace();
@@ -210,16 +231,16 @@ public class Quadruple {
    */
   public IEID getObjectID() throws FieldNumberOutOfBoundException, IOException {
     IEID object = new EID();
-    String data;
+    byte[] buffer;
     try {
-      data = tuple.getStrFld(3);
+      buffer = this.getBytesFld(3);
+      object.setPageNo(new PageId(Convert.getIntValue(0, buffer)));
+      object.setSlotNo(Convert.getIntValue(4, buffer));
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in getting object id of the quadruple.");
       e.printStackTrace();
       throw e;
     }
-    object.setPageNo(new PageId(Convert.getIntValue(0, data.getBytes())));
-    object.setSlotNo(Convert.getIntValue(4, data.getBytes()));
 
     return object;
   }
@@ -233,11 +254,11 @@ public class Quadruple {
    * @throws IOException
    */
   public Quadruple setObjectID(IEID objectId) throws FieldNumberOutOfBoundException, IOException {
-    byte[] data = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
+    byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
-      Convert.setIntValue(objectId.getPageNo().pid, 0, data);
-      Convert.setIntValue(objectId.getSlotNo(), 4, data);
-      tuple.setStrFld(3, new String(data, StandardCharsets.UTF_8));
+      Convert.setIntValue(objectId.getPageNo().pid, 0, buffer);
+      Convert.setIntValue(objectId.getSlotNo(), 4, buffer);
+      this.setBytesFld(3, buffer);
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in setting object id of the quadruple.");
       e.printStackTrace();
@@ -253,10 +274,10 @@ public class Quadruple {
    * @throws FieldNumberOutOfBoundException
    * @throws IOException
    */
-  public double getConfidence() throws FieldNumberOutOfBoundException, IOException {
-    double confidence;
+  public Float getConfidence() throws FieldNumberOutOfBoundException, IOException {
+    Float confidence;
     try {
-      confidence = tuple.getFloFld(4);
+      confidence = this.getFloFld(4);
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in getting confidence of the quadruple.");
       e.printStackTrace();
@@ -274,11 +295,9 @@ public class Quadruple {
    * @throws FieldNumberOutOfBoundException
    * @throws IOException
    */
-  public Quadruple setConfidence(double confidence) throws FieldNumberOutOfBoundException, IOException {
-    byte[] data = new byte[GlobalConst.MAX_FLOAT_SIZE];
+  public Quadruple setConfidence(float confidence) throws FieldNumberOutOfBoundException, IOException {
     try {
-      Convert.setFloValue((float) confidence, 0, data);
-      tuple.setStrFld(4, new String(data, StandardCharsets.UTF_8));
+      this.setFloFld(4, confidence);
     } catch (Exception e) {
       System.err.println("[Quadruple] Error in setting confidence of the quadruple.");
       e.printStackTrace();
@@ -288,65 +307,23 @@ public class Quadruple {
   }
 
   /**
-   * Copy the quadruple to byte array out
-   *
-   * @return byte array of this quadruple object
-   */
-  public byte[] getQuadrupleByteArray() {
-    return tuple.getTupleByteArray();
-  }
-
-  /**
-   * return the data byte array
-   *
-   * @return data byte array
-   */
-  public byte[] returnQuadrupleByteArray() { return tuple.returnTupleByteArray(); }
-
-  /**
    * Print out the quadruple
    *
    * @throws FieldNumberOutOfBoundException
    * @throws IOException
    */
-  public void print() throws FieldNumberOutOfBoundException, IOException {
-    IEID subject = getSubjectID();
-    IPID predicate = getPredicateID();
-    IEID object = getObjectID();
-    double confidence = getConfidence();
+  public void print() throws Exception {
+    String subject = getSubjectLabel();
+    String predicate = getPredicateLabel();
+    String object = getObjectLabel();
+    float confidence = getConfidence();
 
     System.out.println("[");
-    System.out.println("subject.pageNo.pid = " + subject.getPageNo().pid);
-    System.out.println("subject.slotNo = " + subject.getSlotNo());
-    System.out.println("predicate.pageNo.pid = " + predicate.getPageNo().pid);
-    System.out.println("predicate.slotNo = " + predicate.getSlotNo());
-    System.out.println("object.pageNo.pid = " + object.getPageNo().pid);
-    System.out.println("object.slotNo = " + object.getSlotNo());
+    System.out.println("subject = " + subject);
+    System.out.println("predicate = " + predicate);
+    System.out.println("object = " + object);
     System.out.println("confidence = " + confidence);
     System.out.println("]");
-  }
-
-  /**
-   * Returns number of fields in this quadruple
-   *
-   * @return the number of fields in this quadruple
-   */
-  public short noOfFlds() { return tuple.noOfFlds(); }
-
-  /**
-   * Makes a copy of the fldOffset array
-   *
-   * @return a copuy of the fldOffset array
-   */
-  public short[] copyFldOffset() { return tuple.copyFldOffset(); }
-
-  /**
-   * Get the length of the quadruple
-   *
-   * @return size of the current tuple
-   */
-  public short size() {
-    return this.tuple.size();
   }
 
   /**
@@ -355,58 +332,7 @@ public class Quadruple {
    * @param fromQuadruple
    */
   public void quadrupleCopy(Quadruple fromQuadruple) {
-    tuple.tupleCopy(fromQuadruple.tuple);
-  }
-
-  /**
-   * This is used when you do not want
-   * to use the constructor
-   *
-   * @param aquadruple
-   * @param offset
-   */
-  public void quadrupleInit(byte[] aquadruple, int offset) {
-    tuple.tupleInit(aquadruple, offset, 4);
-  }
-
-  /**
-   * Set a quadruple with the given
-   * byte array and offset
-   *
-   * @param fromquadruple
-   * @param offset
-   */
-  public void quadrupleSet(byte[] fromquadruple, int offset) {
-    tuple.tupleSet(fromquadruple, offset, 4);
-  }
-
-  public int getIntFld(int q1_fld_no) throws FieldNumberOutOfBoundException, IOException {
-    return tuple.getIntFld(q1_fld_no);
-  }
-
-
-  public float getFloFld(int q1_fld_no) throws FieldNumberOutOfBoundException, IOException {
-    return tuple.getFloFld(q1_fld_no);
-  }
-
-  public String getStrFld(int q1_fld_no) throws FieldNumberOutOfBoundException, IOException {
-    return tuple.getStrFld(q1_fld_no);
-  }
-
-  public void setIntFld(int fld_no, int intFld) throws FieldNumberOutOfBoundException, IOException {
-    tuple.setIntFld(fld_no, intFld);
-  }
-
-  public void setFloFld(int fld_no, float floFld) throws FieldNumberOutOfBoundException, IOException {
-    tuple.setFloFld(fld_no, floFld);
-  }
-
-  public void setStrFld(int fld_no, String strFld) throws FieldNumberOutOfBoundException, IOException {
-    tuple.setStrFld(fld_no, strFld);
-  }
-
-  public void setHdr(AttrType[] res_attrs, short[] attrSize) throws InvalidTupleSizeException, IOException, InvalidTypeException {
-    tuple.setHdr((short) 4, res_attrs, attrSize);
+    this.tupleCopy(fromQuadruple);
   }
 
 }

@@ -4,7 +4,7 @@ public enum IndexOption {
   Confidence,
   Object,
   Subject,
-  SubjectConfidence,
-  PredicateConfidence,
-  ObjectConfidence;
+  Predicate,
+  SubjectPredicateObjectConfidence,
+  SubjectPredicateObject
 }

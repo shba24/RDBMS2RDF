@@ -15,21 +15,11 @@ import global.QuadOrder;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
-import heap.quadrupleheap.TScan;
 import java.io.IOException;
 
-public class ObjectIndexScheme extends BaseIndexScheme {
+public class PredicateIndexScheme extends BaseIndexScheme {
 
-  /**
-   * Public Constructor
-   *
-   * @throws ConstructPageException
-   * @throws GetFileEntryException
-   * @throws PinPageException
-   * @throws AddFileEntryException
-   * @throws IOException
-   */
-  public ObjectIndexScheme()
+  public PredicateIndexScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
     super(getFilePath());
   }
@@ -37,30 +27,16 @@ public class ObjectIndexScheme extends BaseIndexScheme {
   public static String getFilePath() {
     String[] tokens = new String[]{
         GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.OBJECT_IDENTIFIER
+        GlobalConst.PREDICATE_IDENTIFIER
     };
     return generateFilePath(tokens);
   }
 
-  /**
-   * Returns the key for the Quadruple according
-   * to this scheme.
-   *
-   * @param quadruple
-   * @param qid
-   * @param entityHeapFile
-   * @param predicateHeapFile
-   * @return
-   * @throws Exception
-   */
   @Override
   public StringKey getKey(
-      Quadruple quadruple,
-      QID qid,
-      LabelHeapFile entityHeapFile,
-      LabelHeapFile predicateHeapFile) throws Exception {
+      Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
     return new StringKey(
-        entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel());
+        entityHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel());
   }
 
   /**
@@ -92,7 +68,7 @@ public class ObjectIndexScheme extends BaseIndexScheme {
       QuadrupleHeapFile quadrupleHeapFile,
       LabelHeapFile entityHeapFile,
       LabelHeapFile predicateHeapFile) throws Exception {
-    if (objectFilter == null) {
+    if (predicateFilter == null) {
       return new TStream(
           orderType,
           numBuf,
@@ -103,8 +79,8 @@ public class ObjectIndexScheme extends BaseIndexScheme {
           confidenceFilter
       );
     } else {
-      KeyClass lo_key = new StringKey(objectFilter);
-      KeyClass hi_key = new StringKey(objectFilter);
+      KeyClass lo_key = new StringKey(predicateFilter);
+      KeyClass hi_key = new StringKey(predicateFilter);
       return new BTStream(
           orderType,
           numBuf,

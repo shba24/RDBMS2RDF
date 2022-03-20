@@ -16,7 +16,7 @@ public interface IEID {
 
   boolean equals(EID eid);
 
-  ILID returnLID();
+  LID returnLID();
 
   void writeToByteArray(byte[] array, int offset) throws IOException;
 

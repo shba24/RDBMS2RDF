@@ -42,7 +42,7 @@ public class SystemDefs {
         bufpoolsize, replacement_policy);
   }
 
-  public void init(
+  public static void init(
       String dbname, String logname,
       int num_pgs, int maxlogsize,
       int bufpoolsize, String replacement_policy) {
