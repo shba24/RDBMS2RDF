@@ -15,7 +15,7 @@ public interface GlobalConst {
    * the database, we need at least 200MB
    * to run it properly.
    */
-  public static final int DEFAULT_DB_PAGES = 1024;
+  public static final int DEFAULT_DB_PAGES = 1024 * 10;
 
   /**
    * Size of page.
@@ -78,6 +78,9 @@ public interface GlobalConst {
   public static String SUBJECT_IDENTIFIER = "subject";
   public static String OBJECT_IDENTIFIER = "object";
   public static String CONFIDENCE_IDENTIFIER = "confidence";
+  public static String JSON_FILE = "telemetry.json";
+  public static String READS = "Reads";
+  public static String WRITES = "Writes";
 
   /**
    * Global constants for basics

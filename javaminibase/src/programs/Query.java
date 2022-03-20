@@ -23,5 +23,6 @@ public class Query {
     SelectQuery query = (SelectQuery) QueryFactory.getQuery(QueryType.SELECT, String.join(" ", args));
     RDFDatabase db = new RDFDatabase(query.getDbName(), query.getIndexOption());
     db.select(query);
+    db.close();
   }
 }

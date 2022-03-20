@@ -46,6 +46,10 @@ public class Quadruple extends Tuple {
     super(fromQuadruple);
   }
 
+  public Quadruple(Tuple fromTuple) {
+    super(fromTuple);
+  }
+
   /**
    * Constructor for the quadruple class from the byte array
    *

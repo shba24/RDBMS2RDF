@@ -2,6 +2,7 @@ package global;
 
 import bufmgr.BufMgr;
 import catalog.Catalog;
+import db.Telemetry;
 import diskmgr.DB;
 
 public class SystemDefs {
@@ -14,6 +15,8 @@ public class SystemDefs {
   public static String JavabaseLogName;
   public static boolean MINIBASE_RESTART_FLAG = false;
   public static String MINIBASE_DBNAME;
+
+  public static Telemetry telemetry;
 
   public SystemDefs() {
   }

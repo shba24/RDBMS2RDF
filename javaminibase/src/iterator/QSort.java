@@ -10,7 +10,6 @@ import heap.Tuple;
 import java.io.IOException;
 
 public class QSort extends Sort {
-  private pnodeSplayPQ Q;
 
   /**
    * Class constructor, take information about the tuples, and set up
@@ -30,7 +29,7 @@ public class QSort extends Sort {
     super(Quadruple.getDefaultAttrType(), (short) 4, Quadruple.getDefaultAttrSize(), am, sort_fld, new TupleOrder(TupleOrder.Ascending),
         (sort_fld>=1 && sort_fld<=3)?MAX_EID_OBJ_SIZE:4, n_pages);
 
-    this.Q = new tpnodeSplayPQ(sort_fld, _in[sort_fld - 1], order);
+    Q = new tpnodeSplayPQ(sort_fld, _in[sort_fld - 1], order);
   }
 
   /**
