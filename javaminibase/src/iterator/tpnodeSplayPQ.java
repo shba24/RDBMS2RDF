@@ -22,7 +22,7 @@ public class tpnodeSplayPQ extends pnodeSplayPQ{
   public int pnodeCMP(pnode a, pnode b)
       throws IOException, UnknowAttrType, TupleUtilsException {
     int ans = QuadrupleUtils.CompareQuadrupleWithQuadruple(
-        fld_type, (Quadruple) a.tuple, fld_no, (Quadruple) b.tuple, fld_no);
+        fld_type, new Quadruple(a.tuple), fld_no, new Quadruple(b.tuple), fld_no);
     return ans;
   }
 }
