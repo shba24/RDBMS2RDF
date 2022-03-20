@@ -947,10 +947,15 @@ class DBHeaderPage implements PageUsedBytes, GlobalConst {
       throws IOException {
 
     int position = START_FILE_ENTRIES + entryNo * SIZE_OF_FILE_ENTRY;
-    if (pageNo.pid==751) {
-      System.out.println("Something is wrong " + entryNo + " position: " + position);
-    }
     pageNo.pid = Convert.getIntValue(position, data);
+    /**
+     * Invalid pages are not initialized so it might cause problem
+     * while reading the file entry in the next step as it has to be
+     * a valid UTF-8 string which may not be always possible.
+     */
+    if (pageNo.pid==INVALID_PAGE) {
+      return null;
+    }
     return (Convert.getStrValue(position + 4, data, MAX_NAME + 2));
   }
 }

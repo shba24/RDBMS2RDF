@@ -76,6 +76,13 @@ public class SpoofIbuf implements GlobalConst {
   }
 
   /**
+   * Clean up Spoofbuf
+   */
+  public void close() {
+    hf_scan.closescan();
+  }
+
+  /**
    * get a tuple from current buffer,pass reference buf to this method
    * usage:temp_tuple = tuple.Get(buf);
    *

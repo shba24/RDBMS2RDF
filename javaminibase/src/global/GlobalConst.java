@@ -8,7 +8,7 @@ public interface GlobalConst {
    * more than 50 Buffer pages at a time, we
    * have increased it to 100.
    */
-  public static final int NUMBUF = 50;
+  public static final int NUMBUF = 200;
   /**
    * As the initial data for Phase 2 have
    * 178k quadruples to be inserted into

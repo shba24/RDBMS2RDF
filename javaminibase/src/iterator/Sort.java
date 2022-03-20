@@ -729,11 +729,20 @@ public class Sort extends Iterator implements GlobalConst {
         }
       }
 
+      /**
+       * As Spoofbuf opens the scan on the heapfile
+       * we need to clean it up when exiting.
+       */
+      for (int j = 0; j < i_buf.length; j++) {
+        i_buf[j].close();
+      }
+
       for (int i = 0; i < temp_files.length; i++) {
         if (temp_files[i] != null) {
           try {
             temp_files[i].deleteFile();
           } catch (Exception e) {
+            e.printStackTrace();
             throw new SortException(e, "Sort.java: Heapfile error");
           }
           temp_files[i] = null;

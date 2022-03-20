@@ -53,9 +53,6 @@ public class SubjectPredicateObjectScheme extends BaseIndexScheme {
     String subject = entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel();
     LID objectLid = quadruple.getObjectID().returnLID();
     Label objectLabel = entityHeapFile.getLabel(objectLid);
-    if (objectLabel == null) {
-      System.out.println("Something fishy");
-    }
     String object = objectLabel.getLabel();
     String predicate = predicateHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel();
     return new StringKey(subject+":"+predicate+":"+object);
