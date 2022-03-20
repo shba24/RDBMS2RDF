@@ -1,5 +1,9 @@
 package db;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import org.json.simple.parser.ParseException;
+
 public interface ITelemetry {
 
   /**
@@ -7,7 +11,7 @@ public interface ITelemetry {
    * by reading the already existing file
    * if it exits, otherwise by creating the file.
    */
-  void initialize();
+  void initialize() throws IOException, ParseException;
 
   /**
    * Increases the read counter (read from the file)
@@ -34,4 +38,6 @@ public interface ITelemetry {
    * @param dbName
    */
   int getWrite(String dbName);
+
+  void printFile();
 }

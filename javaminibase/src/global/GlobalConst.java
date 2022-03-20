@@ -79,6 +79,12 @@ public interface GlobalConst {
   public static String OBJECT_IDENTIFIER = "object";
   public static String CONFIDENCE_IDENTIFIER = "confidence";
 
+  public static String JSON_FILE = "telemetry.json";
+  public static String READS = "Reads";
+  public static String WRITES = "Writes";
+  public static String JSON_FILE_NAME = "data.telemetry.json";
+
+
   /**
    * Global constants for basics
    */
