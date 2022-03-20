@@ -64,12 +64,9 @@ public class Telemetry implements ITelemetry {
 
       dbJsonObject.put(dbName, dataObject);
 
-      String fileName = Paths.get(
-          GlobalConst.ROOT_FOLDER,
-          GlobalConst.JSON_FILE
-      ).toString();
 
-      try (FileWriter file = new FileWriter(fileName)) {
+
+      try (FileWriter file = new FileWriter(GlobalConst.JSON_FILE_NAME)) {
         file.write(dbJsonObject.toJSONString());
         file.flush();
       } catch (Exception e) {
@@ -90,11 +87,8 @@ public class Telemetry implements ITelemetry {
 
       dbJsonObject.put(dbName, dataObject);
 
-      String fileName = Paths.get(
-          GlobalConst.ROOT_FOLDER,
-          GlobalConst.JSON_FILE
-      ).toString();
-      try (FileWriter file = new FileWriter(fileName)) {
+
+      try (FileWriter file = new FileWriter(GlobalConst.JSON_FILE_NAME)) {
         file.write(dbJsonObject.toJSONString());
         file.flush();
       } catch (Exception e) {
@@ -110,11 +104,8 @@ public class Telemetry implements ITelemetry {
 
       dbJsonObject.put(dbName, dataObject);
 
-      String fileName = Paths.get(
-          GlobalConst.ROOT_FOLDER,
-          GlobalConst.JSON_FILE
-      ).toString();
-      try (FileWriter file = new FileWriter(fileName)) {
+
+      try (FileWriter file = new FileWriter(GlobalConst.JSON_FILE_NAME)) {
         file.write(dbJsonObject.toJSONString());
         file.flush();
       } catch (Exception e) {
