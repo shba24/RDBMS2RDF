@@ -6,10 +6,6 @@ import btree.GetFileEntryException;
 import btree.PinPageException;
 import btree.StringKey;
 import btree.quadbtree.BTreeFile;
-import bufmgr.HashEntryNotFoundException;
-import bufmgr.InvalidFrameNumberException;
-import bufmgr.PageUnpinnedException;
-import bufmgr.ReplacerException;
 import global.AttrType;
 import global.GlobalConst;
 import global.QID;
@@ -30,6 +26,19 @@ public abstract class BaseIndexScheme implements IndexScheme {
 
   public void close() throws Exception {
     bTreeFile.close();
+  }
+
+  /**
+   * Creates the file name for the btree file
+   * in which indexing is done.
+   * @return
+   */
+  protected static String getFilePath() {
+    String[] tokens = new String[]{
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.INDEX_IDENTIFIER
+    };
+    return generateFilePath(tokens);
   }
 
   /**

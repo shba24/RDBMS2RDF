@@ -28,22 +28,9 @@ public class SubjectIndexScheme extends BaseIndexScheme {
    * @throws AddFileEntryException
    * @throws IOException
    */
-  public SubjectIndexScheme()
+  public SubjectIndexScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
-  }
-
-  /**
-   * Returns the file path of the btree index file
-   *
-   * @return
-   */
-  public static String getFilePath() {
-    String[] tokens = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.SUBJECT_IDENTIFIER
-    };
-    return generateFilePath(tokens);
+    super(bTreeFilePath);
   }
 
   /**

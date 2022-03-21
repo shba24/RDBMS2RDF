@@ -21,19 +21,9 @@ import java.io.IOException;
 
 public class SubjectPredicateObjectScheme extends BaseIndexScheme {
 
-  public SubjectPredicateObjectScheme()
+  public SubjectPredicateObjectScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
-  }
-
-  public static String getFilePath() {
-    String[] tokens = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.SUBJECT_IDENTIFIER,
-        GlobalConst.PREDICATE_IDENTIFIER,
-        GlobalConst.OBJECT_IDENTIFIER
-    };
-    return generateFilePath(tokens);
+    super(bTreeFilePath);
   }
 
   /**
@@ -51,9 +41,7 @@ public class SubjectPredicateObjectScheme extends BaseIndexScheme {
   public StringKey getKey(
       Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
     String subject = entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel();
-    LID objectLid = quadruple.getObjectID().returnLID();
-    Label objectLabel = entityHeapFile.getLabel(objectLid);
-    String object = objectLabel.getLabel();
+    String object = entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel();
     String predicate = predicateHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel();
     return new StringKey(subject+":"+predicate+":"+object);
   }

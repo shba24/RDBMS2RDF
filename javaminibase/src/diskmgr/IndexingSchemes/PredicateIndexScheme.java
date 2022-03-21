@@ -9,7 +9,6 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
-import global.GlobalConst;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
@@ -19,24 +18,16 @@ import java.io.IOException;
 
 public class PredicateIndexScheme extends BaseIndexScheme {
 
-  public PredicateIndexScheme()
+  public PredicateIndexScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
-  }
-
-  public static String getFilePath() {
-    String[] tokens = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.PREDICATE_IDENTIFIER
-    };
-    return generateFilePath(tokens);
+    super(bTreeFilePath);
   }
 
   @Override
   public StringKey getKey(
       Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
     return new StringKey(
-        entityHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel());
+        predicateHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel());
   }
 
   /**

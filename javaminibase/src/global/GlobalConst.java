@@ -1,5 +1,7 @@
 package global;
 
+import btree.DeleteFashion;
+
 public interface GlobalConst {
 
   public static final int MINIBASE_MAXARRSIZE = 50;
@@ -60,9 +62,9 @@ public interface GlobalConst {
    * pages available for usage which creates the problem
    * of use after free if asked for the deleted page.
    */
-  public static final int ALL_DELETE_FASHION = 1;
-  public static final int NAIVE_DELETE_FASHION = 0;
-  public static final int DEFAULT_KEY_SIZE = 300;
+  public static final int FULL_DELETE_FASHION = DeleteFashion.FULL_DELETE;
+  public static final int NAIVE_DELETE_FASHION = DeleteFashion.NAIVE_DELETE;
+  public static final int DEFAULT_KEY_SIZE = 200;
 
   /**
    * Global constants for directory, path, files and folder names
@@ -78,6 +80,7 @@ public interface GlobalConst {
   public static String SUBJECT_IDENTIFIER = "subject";
   public static String OBJECT_IDENTIFIER = "object";
   public static String CONFIDENCE_IDENTIFIER = "confidence";
+  public static String INDEX_IDENTIFIER = "index";
   public static String JSON_FILE = "telemetry.json";
   public static String READS = "Reads";
   public static String WRITES = "Writes";

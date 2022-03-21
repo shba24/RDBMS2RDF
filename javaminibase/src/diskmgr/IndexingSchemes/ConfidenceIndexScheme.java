@@ -9,7 +9,6 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
-import global.GlobalConst;
 import global.QID;
 import global.QuadOrder;
 import heap.FieldNumberOutOfBoundException;
@@ -29,22 +28,9 @@ public class ConfidenceIndexScheme extends BaseIndexScheme {
    * @throws AddFileEntryException
    * @throws IOException
    */
-  public ConfidenceIndexScheme()
+  public ConfidenceIndexScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
-  }
-
-  /**
-   * Creates the file name for the btree file
-   * in which indexing is done.
-   * @return
-   */
-  private static String getFilePath() {
-    String[] tokens = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.CONFIDENCE_IDENTIFIER
-    };
-    return generateFilePath(tokens);
+    super(bTreeFilePath);
   }
 
   /**
