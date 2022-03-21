@@ -21,9 +21,9 @@ import java.io.IOException;
 
 public class SubjectPredicateObjectScheme extends BaseIndexScheme {
 
-  public SubjectPredicateObjectScheme()
+  public SubjectPredicateObjectScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
+    super(bTreeFilePath);
   }
 
   /**

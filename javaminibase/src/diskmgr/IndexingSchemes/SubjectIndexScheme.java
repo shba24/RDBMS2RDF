@@ -28,9 +28,9 @@ public class SubjectIndexScheme extends BaseIndexScheme {
    * @throws AddFileEntryException
    * @throws IOException
    */
-  public SubjectIndexScheme()
+  public SubjectIndexScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
+    super(bTreeFilePath);
   }
 
   /**

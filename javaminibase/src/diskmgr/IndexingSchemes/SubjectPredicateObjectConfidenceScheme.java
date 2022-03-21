@@ -18,9 +18,9 @@ import java.io.IOException;
 
 public class SubjectPredicateObjectConfidenceScheme extends BaseIndexScheme {
 
-  public SubjectPredicateObjectConfidenceScheme()
+  public SubjectPredicateObjectConfidenceScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
+    super(bTreeFilePath);
   }
 
   /**

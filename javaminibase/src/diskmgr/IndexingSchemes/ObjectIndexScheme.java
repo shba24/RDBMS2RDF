@@ -27,9 +27,9 @@ public class ObjectIndexScheme extends BaseIndexScheme {
    * @throws AddFileEntryException
    * @throws IOException
    */
-  public ObjectIndexScheme()
+  public ObjectIndexScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
+    super(bTreeFilePath);
   }
 
   /**

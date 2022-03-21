@@ -28,9 +28,9 @@ public class ConfidenceIndexScheme extends BaseIndexScheme {
    * @throws AddFileEntryException
    * @throws IOException
    */
-  public ConfidenceIndexScheme()
+  public ConfidenceIndexScheme(String bTreeFilePath)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(getFilePath());
+    super(bTreeFilePath);
   }
 
   /**

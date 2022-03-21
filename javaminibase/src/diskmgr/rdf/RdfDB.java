@@ -280,12 +280,20 @@ public class RdfDB extends DB {
     /**
      * Create index on quadruples to check the duplicate quadruples
      */
-    quadIndexScheme = IndexSchemeFactory.createIndexScheme(IndexOption.SubjectPredicateObject);
+    String[] quadBtreeFileToken = new String[]{
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.QUADRUPLE_IDENTIFIER
+    };
+    quadIndexScheme = IndexSchemeFactory.createIndexScheme(IndexOption.SubjectPredicateObject, generateFilePath(quadBtreeFileToken));
 
     /**
      * Create BTreeFile According to Index Scheme
      */
-    indexScheme = IndexSchemeFactory.createIndexScheme(indexOption);
+    String[] indexBtreeFileToken = new String[]{
+        GlobalConst.BTREE_FILE_IDENTIFIER,
+        GlobalConst.INDEX_IDENTIFIER
+    };
+    indexScheme = IndexSchemeFactory.createIndexScheme(indexOption, generateFilePath(indexBtreeFileToken));
   }
 
   /**
