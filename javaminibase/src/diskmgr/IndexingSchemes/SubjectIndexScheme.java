@@ -34,19 +34,6 @@ public class SubjectIndexScheme extends BaseIndexScheme {
   }
 
   /**
-   * Returns the file path of the btree index file
-   *
-   * @return
-   */
-  public static String getFilePath() {
-    String[] tokens = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.SUBJECT_IDENTIFIER
-    };
-    return generateFilePath(tokens);
-  }
-
-  /**
    * Returns the key for the Quadruple according
    * to this scheme.
    *

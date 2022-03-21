@@ -9,13 +9,11 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
-import global.GlobalConst;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
-import heap.quadrupleheap.TScan;
 import java.io.IOException;
 
 public class ObjectIndexScheme extends BaseIndexScheme {
@@ -32,14 +30,6 @@ public class ObjectIndexScheme extends BaseIndexScheme {
   public ObjectIndexScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
     super(getFilePath());
-  }
-
-  public static String getFilePath() {
-    String[] tokens = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.OBJECT_IDENTIFIER
-    };
-    return generateFilePath(tokens);
   }
 
   /**

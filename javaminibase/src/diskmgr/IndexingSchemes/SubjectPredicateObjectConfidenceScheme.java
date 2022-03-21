@@ -9,7 +9,6 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
-import global.GlobalConst;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
@@ -22,17 +21,6 @@ public class SubjectPredicateObjectConfidenceScheme extends BaseIndexScheme {
   public SubjectPredicateObjectConfidenceScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
     super(getFilePath());
-  }
-
-  public static String getFilePath() {
-    String[] tokens = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.SUBJECT_IDENTIFIER,
-        GlobalConst.PREDICATE_IDENTIFIER,
-        GlobalConst.OBJECT_IDENTIFIER,
-        GlobalConst.CONFIDENCE_IDENTIFIER
-    };
-    return generateFilePath(tokens);
   }
 
   /**
