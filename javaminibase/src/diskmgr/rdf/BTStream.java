@@ -1,6 +1,8 @@
 package diskmgr.rdf;
 
 import btree.quadbtree.BTFileScan;
+import global.EID;
+import global.PID;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
@@ -15,13 +17,13 @@ public class BTStream extends BaseStream {
       QuadOrder _orderType,
       int _numBuf,
       BTFileScan _scan,
-      String _subjectFilter,
-      String _predicateFilter,
-      String _objectFilter,
+      EID _subjectID,
+      PID _predicateID,
+      EID _objectID,
       Float _confidenceFilter,
       QuadrupleHeapFile _quadrupleHeapFile)
       throws Exception {
-    SelectFilter selectFilter = new SelectFilter(_subjectFilter, _predicateFilter, _objectFilter, _confidenceFilter);
+    SelectFilter selectFilter = new SelectFilter(_subjectID, _predicateID, _objectID, _confidenceFilter);
     Iterator am = new QuadIndexScan(selectFilter, _scan, _quadrupleHeapFile);
     iter = init(_orderType, _numBuf, am);
   }

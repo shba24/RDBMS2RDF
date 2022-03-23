@@ -9,6 +9,8 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
+import global.EID;
+import global.PID;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
@@ -51,9 +53,9 @@ public class SubjectPredicateObjectScheme extends BaseIndexScheme {
    * - BTStream
    *
    * @param orderType
-   * @param subjectFilter
-   * @param predicateFilter
-   * @param objectFilter
+   * @param subjectID
+   * @param predicateID
+   * @param objectID
    * @param confidenceFilter
    * @param quadrupleHeapFile
    * @param entityHeapFile
@@ -65,36 +67,39 @@ public class SubjectPredicateObjectScheme extends BaseIndexScheme {
   public IStream getStream(
       QuadOrder orderType,
       int numBuf,
-      String subjectFilter,
-      String predicateFilter,
-      String objectFilter,
+      EID subjectID,
+      PID predicateID,
+      EID objectID,
       Float confidenceFilter,
       QuadrupleHeapFile quadrupleHeapFile,
       LabelHeapFile entityHeapFile,
       LabelHeapFile predicateHeapFile) throws Exception {
-    if (subjectFilter == null ||
-        predicateFilter == null ||
-        objectFilter == null) {
+    if (subjectID == null ||
+        predicateID == null ||
+        objectID == null) {
       return new TStream(
           orderType,
           numBuf,
           quadrupleHeapFile,
-          subjectFilter,
-          predicateFilter,
-          objectFilter,
+          subjectID,
+          predicateID,
+          objectID,
           confidenceFilter
       );
     } else {
-      String filterKey = subjectFilter+":"+predicateFilter+":"+objectFilter;
+      String subjectFilter = entityHeapFile.getLabel(subjectID.returnLID()).getLabel();
+      String predicateFilter = predicateHeapFile.getLabel(predicateID.returnLID()).getLabel();
+      String objectFilter = entityHeapFile.getLabel(objectID.returnLID()).getLabel();
+      String filterKey = subjectFilter +":"+ predicateFilter +":"+ objectFilter;
       KeyClass lo_key = new StringKey(filterKey);
       KeyClass hi_key = new StringKey(filterKey);
       return new BTStream(
           orderType,
           numBuf,
           bTreeFile.new_scan(lo_key, hi_key),
-          subjectFilter,
-          predicateFilter,
-          objectFilter,
+          subjectID,
+          predicateID,
+          objectID,
           confidenceFilter,
           quadrupleHeapFile
       );

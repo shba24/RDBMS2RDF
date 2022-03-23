@@ -3,6 +3,8 @@ package diskmgr.IndexingSchemes;
 import btree.StringKey;
 import btree.quadbtree.BTreeFile;
 import diskmgr.rdf.IStream;
+import global.EID;
+import global.PID;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
@@ -47,9 +49,9 @@ public interface IndexScheme {
    *  - BTStream
    *
    * @param orderType
-   * @param subjectFilter
-   * @param predicateFilter
-   * @param objectFilter
+   * @param subjectID
+   * @param predicateID
+   * @param objectID
    * @param confidenceFilter
    * @param quadrupleHeapFile
    * @param entityHeapFile
@@ -60,9 +62,9 @@ public interface IndexScheme {
   IStream getStream(
       QuadOrder orderType,
       int numBuf,
-      String subjectFilter,
-      String predicateFilter,
-      String objectFilter,
+      EID subjectID,
+      PID predicateID,
+      EID objectID,
       Float confidenceFilter,
       QuadrupleHeapFile quadrupleHeapFile,
       LabelHeapFile entityHeapFile,

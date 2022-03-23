@@ -380,6 +380,7 @@ public class RdfDB extends DB {
    */
   private EID getEntity(String entityLabelName)
       throws Exception {
+    if (entityLabelName==null) return null;
     StringKey lo_key = new StringKey(entityLabelName);
     StringKey hi_key = new StringKey(entityLabelName);
     btree.lablebtree.BTFileScan scan = entityBtreeFile.new_scan(lo_key, hi_key);
@@ -465,6 +466,7 @@ public class RdfDB extends DB {
    */
   private PID getPredicate(String predicateLabelName)
       throws Exception {
+    if (predicateLabelName==null) return null;
     StringKey lo_key = new StringKey(predicateLabelName);
     StringKey hi_key = new StringKey(predicateLabelName);
     btree.lablebtree.BTFileScan scan = predicateBtreeFile.new_scan(lo_key, hi_key);
@@ -622,12 +624,15 @@ public class RdfDB extends DB {
       String predicateFilter,
       String objectFilter,
       Float confidenceFilter) throws Exception {
+    EID subjectID = getEntity(subjectFilter);
+    PID predicateID = getPredicate(predicateFilter);
+    EID objectID = getEntity(objectFilter);
     return indexScheme.getStream(
         orderType,
         numBuf,
-        subjectFilter,
-        predicateFilter,
-        objectFilter,
+        subjectID,
+        predicateID,
+        objectID,
         confidenceFilter,
         quadrupleHeapFile,
         entityHeapFile,
