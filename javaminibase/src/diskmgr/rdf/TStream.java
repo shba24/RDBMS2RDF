@@ -1,5 +1,7 @@
 package diskmgr.rdf;
 
+import global.EID;
+import global.PID;
 import global.QuadOrder;
 import heap.Quadruple;
 import heap.quadrupleheap.QuadrupleHeapFile;
@@ -32,11 +34,11 @@ public class TStream extends BaseStream {
       QuadOrder _orderType,
       int _numBuf,
       QuadrupleHeapFile quadrupleHeapFile,
-      String _subjectFilter,
-      String _predicateFilter,
-      String _objectFilter,
+      EID _subjectID,
+      PID _predicateID,
+      EID _objectID,
       Float _confidenceFilter) throws Exception {
-    SelectFilter selectFilter = new SelectFilter(_subjectFilter, _predicateFilter, _objectFilter, _confidenceFilter);
+    SelectFilter selectFilter = new SelectFilter(_subjectID, _predicateID, _objectID, _confidenceFilter);
     Iterator am = new QuadFileScan(quadrupleHeapFile, selectFilter);
     iter = init(_orderType, _numBuf, am);
   }

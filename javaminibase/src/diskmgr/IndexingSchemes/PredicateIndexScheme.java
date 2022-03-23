@@ -9,6 +9,8 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
+import global.EID;
+import global.PID;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
@@ -38,9 +40,9 @@ public class PredicateIndexScheme extends BaseIndexScheme {
    * - BTStream
    *
    * @param orderType
-   * @param subjectFilter
-   * @param predicateFilter
-   * @param objectFilter
+   * @param subjectID
+   * @param predicateID
+   * @param objectID
    * @param confidenceFilter
    * @param quadrupleHeapFile
    * @param entityHeapFile
@@ -52,33 +54,34 @@ public class PredicateIndexScheme extends BaseIndexScheme {
   public IStream getStream(
       QuadOrder orderType,
       int numBuf,
-      String subjectFilter,
-      String predicateFilter,
-      String objectFilter,
+      EID subjectID,
+      PID predicateID,
+      EID objectID,
       Float confidenceFilter,
       QuadrupleHeapFile quadrupleHeapFile,
       LabelHeapFile entityHeapFile,
       LabelHeapFile predicateHeapFile) throws Exception {
-    if (predicateFilter == null) {
+    if (predicateID == null) {
       return new TStream(
           orderType,
           numBuf,
           quadrupleHeapFile,
-          subjectFilter,
-          predicateFilter,
-          objectFilter,
+          subjectID,
+          predicateID,
+          objectID,
           confidenceFilter
       );
     } else {
+      String predicateFilter = predicateHeapFile.getLabel(predicateID.returnLID()).getLabel();
       KeyClass lo_key = new StringKey(predicateFilter);
       KeyClass hi_key = new StringKey(predicateFilter);
       return new BTStream(
           orderType,
           numBuf,
           bTreeFile.new_scan(lo_key, hi_key),
-          subjectFilter,
-          predicateFilter,
-          objectFilter,
+          subjectID,
+          predicateID,
+          objectID,
           confidenceFilter,
           quadrupleHeapFile
       );

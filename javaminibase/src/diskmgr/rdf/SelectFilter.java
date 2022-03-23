@@ -1,20 +1,23 @@
 package diskmgr.rdf;
 
+import global.EID;
+import global.PID;
+
 /**
  * Hols the Select Filter
  */
 public class SelectFilter {
-  public String subjectFilter;
-  public String predicateFilter;
-  public String objectFilter;
+  public EID subjectID;
+  public PID predicateID;
+  public EID objectID;
   public Float confidenceFilter;
-  public SelectFilter(String _subjectFilter,
-      String _predicateFilter,
-      String _objectFilter,
+  public SelectFilter(EID _subjectID,
+      PID _predicateID,
+      EID _objectID,
       Float _confidenceFilter) {
-    subjectFilter = _subjectFilter;
-    predicateFilter = _predicateFilter;
-    objectFilter = _objectFilter;
+    subjectID = _subjectID;
+    predicateID = _predicateID;
+    objectID = _objectID;
     confidenceFilter = _confidenceFilter;
   }
 }
