@@ -62,9 +62,9 @@ public class RDFSystemDefs extends SystemDefs {
      * so that in-memory changes are persisted in files.
      * Also flushes telemetry to the file.
      */
-    telemetry.flush();
     ((RdfDB)SystemDefs.JavabaseDB).close();
     SystemDefs.JavabaseBM.printPinnedBuffer();
     SystemDefs.JavabaseBM.flushAllPages();
+    telemetry.flush();
   }
 }
