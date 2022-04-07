@@ -1,6 +1,8 @@
 package iterator;
 
 import diskmgr.rdf.SelectFilter;
+import global.EID;
+import global.PID;
 import heap.Quadruple;
 
 public class QuadPredEval extends PredEval {
@@ -14,13 +16,13 @@ public class QuadPredEval extends PredEval {
   public static boolean Eval(SelectFilter filter, Quadruple t1)
       throws PredEvalException {
       try {
-        String subject = t1.getSubjectLabel();
-        String predicate = t1.getPredicateLabel();
-        String object = t1.getObjectLabel();
+        EID subject = (EID) t1.getSubjectID();
+        PID predicate = (PID) t1.getPredicateID();
+        EID object = (EID) t1.getObjectID();
         Float confidence = t1.getConfidence();
-        if ((filter.subjectFilter==null || subject.equals(filter.subjectFilter)) &&
-            (filter.predicateFilter==null || predicate.equals(filter.predicateFilter)) &&
-            (filter.objectFilter==null || object.equals(filter.objectFilter)) &&
+        if ((filter.subjectID==null || subject.equals(filter.subjectID)) &&
+            (filter.predicateID==null || predicate.equals(filter.predicateID)) &&
+            (filter.objectID==null || object.equals(filter.objectID)) &&
             (filter.confidenceFilter==null || filter.confidenceFilter <= confidence)) {
           return true;
         }
