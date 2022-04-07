@@ -9,7 +9,6 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
-import global.GlobalConst;
 import global.QID;
 import global.QuadOrder;
 import heap.Quadruple;
@@ -28,9 +27,9 @@ public class SubjectIndexScheme extends BaseIndexScheme {
    * @throws AddFileEntryException
    * @throws IOException
    */
-  public SubjectIndexScheme(String bTreeFilePath)
+  public SubjectIndexScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(bTreeFilePath);
+    super();
   }
 
   /**

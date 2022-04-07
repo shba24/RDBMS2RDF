@@ -61,14 +61,18 @@ public class RdfDB extends DB {
    */
   private btree.lablebtree.BTreeFile predicateBtreeFile;
   private btree.lablebtree.BTreeFile entityBtreeFile;
-
   /**
    * quadIndexScheme is created to check the duplicate
    * quadruples in the database.
    * As mentioned in the project description, we will
    * have to detect duplicate quadruples.
    */
-  private IndexScheme quadIndexScheme;
+  private btree.quadbtree.BTreeFile quadBtreeFile;
+
+  /**
+   * indexScheme is the option provided for the database during
+   * the insert of the quadruples
+   */
   private IndexScheme indexScheme;
 
   /**
@@ -112,7 +116,7 @@ public class RdfDB extends DB {
       throws Exception {
     predicateBtreeFile.close();
     entityBtreeFile.close();
-    quadIndexScheme.close();
+    quadBtreeFile.close();
     indexScheme.close();
   }
 
@@ -284,16 +288,12 @@ public class RdfDB extends DB {
         GlobalConst.BTREE_FILE_IDENTIFIER,
         GlobalConst.QUADRUPLE_IDENTIFIER
     };
-    quadIndexScheme = IndexSchemeFactory.createIndexScheme(IndexOption.SubjectPredicateObject, generateFilePath(quadBtreeFileToken));
+    quadBtreeFile = createQuadBTreeFile(quadBtreeFileToken);
 
     /**
      * Create BTreeFile According to Index Scheme
      */
-    String[] indexBtreeFileToken = new String[]{
-        GlobalConst.BTREE_FILE_IDENTIFIER,
-        GlobalConst.INDEX_IDENTIFIER
-    };
-    indexScheme = IndexSchemeFactory.createIndexScheme(indexOption, generateFilePath(indexBtreeFileToken));
+    indexScheme = IndexSchemeFactory.createIndexScheme(indexOption);
   }
 
   /**
@@ -544,10 +544,10 @@ public class RdfDB extends DB {
    */
   private QID getQuadrupleWithoutConfidence(Quadruple quadruple)
       throws Exception {
-    String key = quadIndexScheme.getKey(quadruple, null, entityHeapFile, predicateHeapFile).getKey();
-    StringKey lo_key = new StringKey(key);
-    StringKey hi_key = new StringKey(key);
-    btree.quadbtree.BTFileScan scan = quadIndexScheme.getBtreeFile().new_scan(lo_key, hi_key);
+    byte[] key = quadruple.getQuadWithoutConfidence();
+    StringKey lo_key = new StringKey(new String(key));
+    StringKey hi_key = new StringKey(new String(key));
+    btree.quadbtree.BTFileScan scan = quadBtreeFile.new_scan(lo_key, hi_key);
     btree.quadbtree.KeyDataEntry entry = scan.get_next();
     if (entry != null) {
       QID qid = ((btree.quadbtree.LeafData) entry.data).getData();
@@ -555,24 +555,6 @@ public class RdfDB extends DB {
       return qid;
     }
     return null;
-  }
-
-  /**
-   * Deletes the quadruples from all places it exists.
-   * - quadrupleHeapFile
-   * - quadIndexScheme
-   * - indexScheme
-   *
-   * @param qid
-   * @param quadruple
-   * @throws Exception
-   */
-  private void deleteQuadrupleInternal(QID qid, Quadruple quadruple) throws Exception {
-    StringKey key1 = quadIndexScheme.getKey(quadruple, null, entityHeapFile, predicateHeapFile);
-    StringKey key2 = indexScheme.getKey(quadruple, null, entityHeapFile, predicateHeapFile);
-    quadrupleHeapFile.deleteQuadruple(qid);
-    quadIndexScheme.getBtreeFile().Delete(key1, qid);
-    indexScheme.getBtreeFile().Delete(key2, qid);
   }
 
   /**
@@ -585,8 +567,9 @@ public class RdfDB extends DB {
    * @throws Exception
    */
   private QID createQuadruple(Quadruple quadruple) throws Exception {
+    StringKey quadKey = new StringKey(new String(quadruple.getQuadWithoutConfidence()));
     QID newQid = quadrupleHeapFile.insertQuadruple(quadruple.getTupleByteArray());
-    quadIndexScheme.insert(quadruple, newQid, entityHeapFile, predicateHeapFile);
+    quadBtreeFile.insert(quadKey, newQid);
     indexScheme.insert(quadruple, newQid, entityHeapFile, predicateHeapFile);
     return newQid;
   }
@@ -607,34 +590,12 @@ public class RdfDB extends DB {
       Quadruple oldQuad = quadrupleHeapFile.getQuadruple(oldQid);
       oldQuad.setDefaultHeader();
       if (oldQuad.getConfidence() < quadruple.getConfidence()) {
-        deleteQuadrupleInternal(oldQid, oldQuad);
-        return createQuadruple(quadruple);
+        quadrupleHeapFile.updateQuadruple(oldQid, quadruple);
       }
       return oldQid;
     } else {
       return createQuadruple(quadruple);
     }
-  }
-
-  /**
-   * Deletes Quadruple from the Quadruple heap and
-   * current index
-   *
-   * @param quadrupleBytes
-   * @return
-   */
-  public boolean deleteQuadruple(byte[] quadrupleBytes) throws Exception {
-    Quadruple quadruple = new Quadruple(quadrupleBytes, 0, quadrupleBytes.length);
-    QID oldQid = getQuadrupleWithoutConfidence(quadruple);
-    if (oldQid != null) {
-      Quadruple oldQuad = quadrupleHeapFile.getQuadruple(oldQid);
-      // As there is only one tuple with same <Subject, Predicate, Object>
-      if (oldQuad.getConfidence() == quadruple.getConfidence()) {
-        deleteQuadrupleInternal(oldQid, oldQuad);
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

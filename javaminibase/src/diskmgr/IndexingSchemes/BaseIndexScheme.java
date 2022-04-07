@@ -19,9 +19,9 @@ import java.nio.file.Paths;
 public abstract class BaseIndexScheme implements IndexScheme {
   protected final BTreeFile bTreeFile;
 
-  public BaseIndexScheme(String bTreeFilePath)
+  public BaseIndexScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    bTreeFile = new BTreeFile(bTreeFilePath, AttrType.attrString, GlobalConst.DEFAULT_KEY_SIZE, GlobalConst.NAIVE_DELETE_FASHION);
+    bTreeFile = new BTreeFile(getFilePath(), AttrType.attrString, GlobalConst.DEFAULT_KEY_SIZE, GlobalConst.NAIVE_DELETE_FASHION);
   }
 
   public void close() throws Exception {

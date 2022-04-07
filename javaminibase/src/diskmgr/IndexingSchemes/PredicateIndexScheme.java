@@ -18,9 +18,9 @@ import java.io.IOException;
 
 public class PredicateIndexScheme extends BaseIndexScheme {
 
-  public PredicateIndexScheme(String bTreeFilePath)
+  public PredicateIndexScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(bTreeFilePath);
+    super();
   }
 
   @Override

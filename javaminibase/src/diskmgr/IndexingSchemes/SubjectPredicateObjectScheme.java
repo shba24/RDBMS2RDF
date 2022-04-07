@@ -9,11 +9,8 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
-import global.GlobalConst;
-import global.LID;
 import global.QID;
 import global.QuadOrder;
-import heap.Label;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
@@ -21,9 +18,9 @@ import java.io.IOException;
 
 public class SubjectPredicateObjectScheme extends BaseIndexScheme {
 
-  public SubjectPredicateObjectScheme(String bTreeFilePath)
+  public SubjectPredicateObjectScheme()
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
-    super(bTreeFilePath);
+    super();
   }
 
   /**

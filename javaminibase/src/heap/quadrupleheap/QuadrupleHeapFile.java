@@ -636,6 +636,7 @@ public class QuadrupleHeapFile extends Heapfile {
     }
     Quadruple quadruple = new Quadruple();
     quadruple = dataPage.returnQuadruple(qid);
+    quadruple.setDefaultHeader();
 
     // Assume update a Quadruple with a Quadruple whose length is equal to
     // the original Quadruple

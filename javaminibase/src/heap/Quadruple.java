@@ -292,6 +292,27 @@ public class Quadruple extends Tuple {
   }
 
   /**
+   * Gets the byte array of the quadruple without confidence
+   *
+   * @return
+   * @throws FieldNumberOutOfBoundException
+   */
+  public byte[] getQuadWithoutConfidence() throws FieldNumberOutOfBoundException {
+    byte[] buffer = new byte[3 * GlobalConst.MAX_EID_OBJ_SIZE];
+    try {
+      Convert.setBytesValue(this.getBytesFld(1), 0, buffer);
+      Convert.setBytesValue(this.getBytesFld(2), GlobalConst.MAX_EID_OBJ_SIZE, buffer);
+      Convert.setBytesValue(this.getBytesFld(3), 2 * GlobalConst.MAX_EID_OBJ_SIZE, buffer);
+    } catch (FieldNumberOutOfBoundException e) {
+      System.err.println("[Quadruple] Error in getting Quad byte array without confidence.");
+      e.printStackTrace();
+      throw e;
+    }
+
+    return buffer;
+  }
+
+  /**
    * Set the confidence
    *
    * @param confidence

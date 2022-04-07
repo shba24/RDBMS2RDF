@@ -11,32 +11,28 @@ import java.io.IOException;
  * Factory class for the Index Scheme.
  */
 public class IndexSchemeFactory {
-  public static IndexScheme createIndexScheme(IndexOption indexOption, String filename)
+  public static IndexScheme createIndexScheme(IndexOption indexOption)
       throws ConstructPageException, GetFileEntryException, PinPageException, AddFileEntryException, IOException {
     IndexScheme indexScheme = null;
     switch (indexOption) {
-      case Confidence: {
-        indexScheme = new ConfidenceIndexScheme(filename);
-        break;
-      }
       case Subject: {
-        indexScheme = new SubjectIndexScheme(filename);
+        indexScheme = new SubjectIndexScheme();
         break;
       }
       case Predicate: {
-        indexScheme = new PredicateIndexScheme(filename);
+        indexScheme = new PredicateIndexScheme();
         break;
       }
       case Object: {
-        indexScheme = new ObjectIndexScheme(filename);
+        indexScheme = new ObjectIndexScheme();
         break;
       }
       case SubjectPredicateObjectConfidence: {
-        indexScheme = new SubjectPredicateObjectConfidenceScheme(filename);
+        indexScheme = new SubjectPredicateObjectConfidenceScheme();
         break;
       }
       case SubjectPredicateObject: {
-        indexScheme = new SubjectPredicateObjectScheme(filename);
+        indexScheme = new SubjectPredicateObjectScheme();
         break;
       }
     };
