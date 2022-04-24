@@ -4,6 +4,6 @@ import db.Telemetry;
 
 public class Report {
   public static void main(String[] args) {
-    Telemetry.printAllTelemetry();
+    Telemetry.printAllTelemetry(null);
   }
 }

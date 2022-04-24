@@ -18,6 +18,8 @@ public class ParserFactory {
       return new InsertQueryParser();
     } else if (queryType == QueryType.SELECT) {
       return new SelectQueryParser();
+    } else if (queryType == QueryType.JOIN) {
+      return new JoinQueryParser();
     }
     return null;
   }

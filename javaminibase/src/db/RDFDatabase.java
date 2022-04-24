@@ -1,6 +1,7 @@
 package db;
 
 import global.GlobalConst;
+import global.JoinStrategy;
 import global.RDFSystemDefs;
 import java.nio.file.Paths;
 
@@ -13,13 +14,13 @@ public class RDFDatabase {
    * @param _dbName
    * @param _indexOption
    */
-  public RDFDatabase(String _dbName, IndexOption _indexOption) {
+  public RDFDatabase(String _dbName, IndexOption _indexOption, int numBuf) {
     /**
      * Given these quadruples, the name of the rdf database
      * that will be created in the database will be RDFDBNAME_INDEXOPTION.
      */
     dbPath = getFullDbName(_dbName, _indexOption);
-    RDFSystemDefs.init(dbPath, _indexOption, GlobalConst.NUMBUF);
+    RDFSystemDefs.init(dbPath, _indexOption, numBuf);
   }
 
   /**
@@ -64,6 +65,10 @@ public class RDFDatabase {
    */
   public void insert(InsertQuery query) throws Exception {
     query.execute();
+  }
+
+  public void join(JoinQuery query, JoinStrategy js) throws Exception {
+    query.execute(js);
   }
 
   /**

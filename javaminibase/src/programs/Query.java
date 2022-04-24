@@ -4,6 +4,8 @@ import db.QueryFactory;
 import db.QueryType;
 import db.RDFDatabase;
 import db.SelectQuery;
+import db.Telemetry;
+import global.SystemDefs;
 
 public class Query {
   public static void main(String[] args) throws Exception {
@@ -21,8 +23,11 @@ public class Query {
       System.out.println("8th argument is the number of buffer pages to read.");
     }
     SelectQuery query = (SelectQuery) QueryFactory.getQuery(QueryType.SELECT, String.join(" ", args));
-    RDFDatabase db = new RDFDatabase(query.getDbName(), query.getIndexOption());
+    RDFDatabase db = new RDFDatabase(query.getDbName(), query.getIndexOption(), query.getNumBuf());
     db.select(query);
     db.close();
+
+    // Print reads and writes
+    Telemetry.printAllTelemetry(SystemDefs.JavabaseDBName);
   }
 }

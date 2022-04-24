@@ -20,4 +20,6 @@ public interface IEID {
 
   void writeToByteArray(byte[] array, int offset) throws IOException;
 
+  byte[] returnByteArray() throws IOException;
+
 }

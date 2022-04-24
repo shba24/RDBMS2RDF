@@ -10,16 +10,20 @@ import btree.ScanIteratorException;
 import btree.StringKey;
 import btree.UnpinPageException;
 import db.IndexOption;
+import db.JoinQuery;
+import db.Telemetry;
 import diskmgr.DB;
 import diskmgr.IndexingSchemes.IndexScheme;
 import diskmgr.IndexingSchemes.IndexSchemeFactory;
 import global.AttrType;
 import global.EID;
 import global.GlobalConst;
+import global.JoinStrategy;
 import global.LID;
 import global.PID;
 import global.QID;
 import global.QuadOrder;
+import global.SystemDefs;
 import heap.FieldNumberOutOfBoundException;
 import heap.InvalidTupleSizeException;
 import heap.InvalidTypeException;
@@ -27,11 +31,16 @@ import heap.Label;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
+import iterator.BPUtils;
 import iterator.QuadrupleUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static global.JoinStrategy.BPLeftIndexRightIndexHashJoin;
+import static global.JoinStrategy.BPLeftIndexRightIndexNestedLoopJoin;
+import static global.JoinStrategy.BPLeftScanRightScanNestedLoopJoin;
 
 /**
  * This class is an abstraction of the RDF database.
@@ -91,6 +100,7 @@ public class RdfDB extends DB {
 
   /**
    * Opens the DB with num_pgs
+   *
    * @param num_pgs
    * @throws IOException
    */
@@ -114,6 +124,9 @@ public class RdfDB extends DB {
    */
   public void close()
       throws Exception {
+    SystemDefs.telemetry.setNoOfUniqueEntities(getEntityCount());
+    SystemDefs.telemetry.setNoOfUniquePredicates(getPredicateCount());
+    SystemDefs.telemetry.setNoOfTotalQuadruples(getQuadrupleCount());
     predicateBtreeFile.close();
     entityBtreeFile.close();
     quadBtreeFile.close();
@@ -133,6 +146,7 @@ public class RdfDB extends DB {
     initHeapFiles();
     initIndexFiles();
     QuadrupleUtils.init(entityHeapFile, predicateHeapFile);
+    BPUtils.init(entityHeapFile, predicateHeapFile);
   }
 
   /**
@@ -284,7 +298,7 @@ public class RdfDB extends DB {
     /**
      * Create index on quadruples to check the duplicate quadruples
      */
-    String[] quadBtreeFileToken = new String[]{
+    String[] quadBtreeFileToken = new String[] {
         GlobalConst.BTREE_FILE_IDENTIFIER,
         GlobalConst.QUADRUPLE_IDENTIFIER
     };
@@ -378,9 +392,11 @@ public class RdfDB extends DB {
    * @throws UnpinPageException
    * @throws ScanIteratorException
    */
-  private EID getEntity(String entityLabelName)
+  public EID getEntity(String entityLabelName)
       throws Exception {
-    if (entityLabelName==null) return null;
+    if (entityLabelName == null) {
+      return null;
+    }
     StringKey lo_key = new StringKey(entityLabelName);
     StringKey hi_key = new StringKey(entityLabelName);
     btree.lablebtree.BTFileScan scan = entityBtreeFile.new_scan(lo_key, hi_key);
@@ -464,9 +480,11 @@ public class RdfDB extends DB {
    * @throws UnpinPageException
    * @throws ScanIteratorException
    */
-  private PID getPredicate(String predicateLabelName)
+  public PID getPredicate(String predicateLabelName)
       throws Exception {
-    if (predicateLabelName==null) return null;
+    if (predicateLabelName == null) {
+      return null;
+    }
     StringKey lo_key = new StringKey(predicateLabelName);
     StringKey hi_key = new StringKey(predicateLabelName);
     btree.lablebtree.BTFileScan scan = predicateBtreeFile.new_scan(lo_key, hi_key);
@@ -572,7 +590,7 @@ public class RdfDB extends DB {
     StringKey quadKey = new StringKey(new String(quadruple.getQuadWithoutConfidence()));
     QID newQid = quadrupleHeapFile.insertQuadruple(quadruple.getTupleByteArray());
     quadBtreeFile.insert(quadKey, newQid);
-    indexScheme.insert(quadruple, newQid, entityHeapFile, predicateHeapFile);
+    indexScheme.insert(quadruple, newQid);
     return newQid;
   }
 
@@ -637,6 +655,55 @@ public class RdfDB extends DB {
         quadrupleHeapFile,
         entityHeapFile,
         predicateHeapFile);
+  }
+
+  public IJStream joinStream(JoinQuery joinQuery, JoinStrategy js) throws Exception {
+    EID sf1 = getEntity(joinQuery.getSf1());
+    PID pf1 = getPredicate(joinQuery.getPf1());
+    EID of1 = getEntity(joinQuery.getOf1());
+    Float cf1 = joinQuery.getCf1();
+    SelectFilter leftSelectFilter = new SelectFilter(sf1, pf1, of1, cf1);
+    EID rsf1 = getEntity(joinQuery.getRsf1());
+    PID rpf1 = getPredicate(joinQuery.getRpf1());
+    EID rof1 = getEntity(joinQuery.getRof1());
+    Float rcf1 = joinQuery.getRcf1();
+    SelectFilter rightSelectFilter1 = new SelectFilter(rsf1, rpf1, rof1, rcf1);
+    EID rsf2 = getEntity(joinQuery.getRsf2());
+    PID rpf2 = getPredicate(joinQuery.getRpf2());
+    EID rof2 = getEntity(joinQuery.getRof2());
+    Float rcf2 = joinQuery.getRcf1();
+    SelectFilter rightSelectFilter2 = new SelectFilter(rsf2, rpf2, rof2, rcf2);
+
+    switch (js.joinStrategy) {
+      case BPLeftScanRightScanNestedLoopJoin:
+        return new BPNestedLoopJoinLeftScanRightScanStream(
+            joinQuery,
+            leftSelectFilter,
+            rightSelectFilter1,
+            rightSelectFilter2,
+            quadrupleHeapFile
+        );
+      case BPLeftIndexRightIndexNestedLoopJoin:
+        return new BPNestedLoopJoinLeftIndexRightIndexStream(
+            joinQuery,
+            indexScheme,
+            leftSelectFilter,
+            rightSelectFilter1,
+            rightSelectFilter2,
+            quadrupleHeapFile
+        );
+      case BPLeftIndexRightIndexHashJoin:
+        return new BPHashJoinLeftIndexRightIndexStream(
+            joinQuery,
+            indexScheme,
+            leftSelectFilter,
+            rightSelectFilter1,
+            rightSelectFilter2,
+            quadrupleHeapFile
+        );
+    }
+
+    throw new IllegalArgumentException("Unexpected Join Strategy " + js);
   }
 
   private String generateFilePath(String[] identifiers) {

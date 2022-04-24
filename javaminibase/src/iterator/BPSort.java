@@ -2,34 +2,40 @@ package iterator;
 
 import global.AttrType;
 import global.TupleOrder;
+import heap.BasicPatternClass;
 import heap.Heapfile;
-import heap.InvalidTupleSizeException;
-import heap.InvalidTypeException;
-import heap.Quadruple;
 import heap.Tuple;
 import java.io.IOException;
 
-public class QSort extends Sort {
-
+public class BPSort extends Sort {
+  private final int numNodes;
   /**
-   * Class constructor, take information about the tuples, and set up
+   * Class constructor, take information about the BP, and set up
    * the sorting
    *
-   * @param am             an iterator for accessing the tuples
-   * @param sort_fld       the field number of the field to sort on
-   * @param n_pages        amount of memory (in pages) available for sorting
-   * @throws IOException   from lower layers
-   * @throws SortException something went wrong in the lower layer.
+   * @param  am              an iterator for accessing the BP
+   * @param  sortOrder       sorting order of the output
+   * @param  sortNodeIdPos   the field number of the field to sort on
+   * @param  nPages          amount of memory (in pages) available for sorting
+   * @throws IOException     from lower layers
+   * @throws SortException   something went wrong in the lower layer.
    */
-  public QSort(
-      Iterator am,
-      int sort_fld,
-      int n_pages
-  ) throws IOException, SortException, InvalidTupleSizeException, InvalidTypeException {
-    super(Quadruple.getDefaultAttrType(), (short) 4, Quadruple.getDefaultAttrSize(), am, sort_fld, new TupleOrder(TupleOrder.Ascending),
-        (sort_fld>=1 && sort_fld<=3)?MAX_EID_OBJ_SIZE:4, n_pages);
+  public BPSort(
+      BPIterator am,
+      int _numNodes,
+      TupleOrder sortOrder,
+      int sortNodeIdPos,
+      int nPages
+  ) throws IOException, SortException {
+    super(
+        BasicPatternClass.getDefaultAttrTypes(_numNodes),
+        (short) _numNodes,
+        BasicPatternClass.getDefaultAttrSizes(_numNodes),
+        am, sortNodeIdPos, sortOrder,
+        (sortNodeIdPos==1)?4:MAX_EID_OBJ_SIZE, nPages);
 
-    Q = new tpnodeSplayPQ(sort_fld, _in[sort_fld - 1], order);
+    numNodes = _numNodes;
+    Q = new bppnodeSplayPQ(sortNodeIdPos, _in[sortNodeIdPos - 1], sortOrder, numNodes);
   }
 
   /**
@@ -40,24 +46,23 @@ public class QSort extends Sort {
    * @param sortFldType attribute type of the sort field
    * @param sortFldLen  length of the sort field
    * @return number of runs generated
-   * @throws IOException    from lower layers
-   * @throws SortException  something went wrong in the lower layer.
-   * @throws JoinsException from <code>Iterator.get_next()</code>
+   * @throws Exception    from lower layers
    */
   @Override
   protected int generate_runs(int max_elems, AttrType sortFldType, int sortFldLen)
       throws Exception {
-    Quadruple quad;
+    BasicPatternClass bp;
     pnode cur_node;
-    pnodeSplayPQ Q1 = new tpnodeSplayPQ(_sort_fld, sortFldType, order);
-    pnodeSplayPQ Q2 = new tpnodeSplayPQ(_sort_fld, sortFldType, order);
+    pnodeSplayPQ Q1 = new bppnodeSplayPQ(_sort_fld, sortFldType, order, numNodes);
+    pnodeSplayPQ Q2 = new bppnodeSplayPQ(_sort_fld, sortFldType, order, numNodes);
     pnodeSplayPQ pcurr_Q = Q1;
     pnodeSplayPQ pother_Q = Q2;
-    Quadruple lastElem = new Quadruple(tuple_size);  // need tuple.java
+    BasicPatternClass lastElem = new BasicPatternClass(tuple_size);  // need tuple.java
+    lastElem.setDefaultHeader(numNodes);
     try {
       lastElem.setHdr(n_cols, _in, str_lens);
     } catch (Exception e) {
-      throw new SortException(e, "Sort.java: setHdr() failed");
+      throw new SortException(e, "BPSort.java: setHdr() failed");
     }
 
     int run_num = 0;  // keeps track of the number of runs
@@ -92,17 +97,17 @@ public class QSort extends Sort {
     // maintain a fixed maximum number of elements in the heap
     while ((p_elems_curr_Q + p_elems_other_Q) < max_elems) {
       try {
-        quad = (Quadruple) _am.get_next();  // according to Iterator.java
+        bp = (BasicPatternClass) _am.get_next();  // according to Iterator.java
       } catch (Exception e) {
         e.printStackTrace();
         throw new SortException(e, "Sort.java: get_next() failed");
       }
 
-      if (quad == null) {
+      if (bp == null) {
         break;
       }
       cur_node = new pnode();
-      cur_node.tuple = new Quadruple(quad); // tuple copy needed --  Bingjie 4/29/98
+      cur_node.tuple = new BasicPatternClass(bp); // tuple copy needed --  Bingjie 4/29/98
 
       pcurr_Q.enq(cur_node);
       p_elems_curr_Q++;
@@ -119,8 +124,8 @@ public class QSort extends Sort {
       p_elems_curr_Q--;
 
       comp_res =
-          QuadrupleUtils.CompareQuadrupleWithValue(sortFldType, (Quadruple) cur_node.tuple, _sort_fld, (Quadruple) lastElem);
-          // need
+          BPUtils.CompareBPWithValue(sortFldType, (BasicPatternClass) cur_node.tuple, _sort_fld, lastElem);
+      // need
       // tuple_utils.java
 
       if ((comp_res < 0 && order.tupleOrder == TupleOrder.Ascending) ||
@@ -135,7 +140,7 @@ public class QSort extends Sort {
       } else {
         // set lastElem to have the value of the current quadruple,
         // need quadruple_utils.java
-        QuadrupleUtils.SetValue((Quadruple) lastElem, (Quadruple) cur_node.tuple, _sort_fld, sortFldType);
+        BPUtils.SetValue(lastElem, (BasicPatternClass) cur_node.tuple, _sort_fld, sortFldType);
         // write tuple to output file, need io_bufs.java, type cast???
         //	System.out.println("Putting tuple into run " + (run_num + 1));
         //	cur_node.tuple.print(_in);
@@ -207,16 +212,16 @@ public class QSort extends Sort {
       else if (p_elems_curr_Q == 0) {
         while ((p_elems_curr_Q + p_elems_other_Q) < max_elems) {
           try {
-            quad = (Quadruple) _am.get_next();  // according to Iterator.java
+            bp = (BasicPatternClass) _am.get_next();  // according to Iterator.java
           } catch (Exception e) {
             throw new SortException(e, "get_next() failed");
           }
 
-          if (quad == null) {
+          if (bp == null) {
             break;
           }
           cur_node = new pnode();
-          cur_node.tuple = new Quadruple(quad); // tuple copy needed --  Bingjie 4/29/98
+          cur_node.tuple = new BasicPatternClass(bp); // tuple copy needed --  Bingjie 4/29/98
 
           try {
             pcurr_Q.enq(cur_node);
@@ -304,11 +309,11 @@ public class QSort extends Sort {
   }
 
   /**
-   * Returns the next tuple in sorted order.
-   * Note: You need to copy out the content of the tuple, otherwise it
+   * Returns the next BP in sorted order.
+   * Note: You need to copy out the content of the BP, otherwise it
    * will be overwritten by the next <code>get_next()</code> call.
    *
-   * @return the next tuple, null if all tuples exhausted
+   * @return the next BP, null if all BP exhausted
    * @throws IOException     from lower layers
    * @throws SortException   something went wrong in the lower layer.
    * @throws JoinsException  from <code>generate_runs()</code>.
@@ -316,7 +321,7 @@ public class QSort extends Sort {
    * @throws LowMemException memory low exception
    * @throws Exception       other exceptions
    */
-  public Quadruple get_next()
+  public BasicPatternClass get_next()
       throws IOException,
       SortException,
       UnknowAttrType,
@@ -325,10 +330,9 @@ public class QSort extends Sort {
       Exception {
     Tuple tuple = super.get_next();
     if (tuple!=null) {
-      byte[] data = tuple.getTupleByteArray();
-      Quadruple quad = new Quadruple(data, 0, data.length);
-      quad.setDefaultHeader();
-      return quad;
+      BasicPatternClass bp = new BasicPatternClass(tuple);
+      bp.setDefaultHeader(numNodes);
+      return bp;
     }
     return null;
   }

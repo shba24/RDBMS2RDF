@@ -4,6 +4,9 @@ import db.InsertQuery;
 import db.QueryFactory;
 import db.QueryType;
 import db.RDFDatabase;
+import db.Telemetry;
+import global.GlobalConst;
+import global.SystemDefs;
 
 public class BatchInsert {
   public static void main(String[] args) throws Exception {
@@ -16,9 +19,12 @@ public class BatchInsert {
       System.out.println("3rd argument is the RDF DB name.");
     }
     InsertQuery query = (InsertQuery) QueryFactory.getQuery(QueryType.INSERT, String.join(" ", args));
-    RDFDatabase db = new RDFDatabase(query.getDbName(), query.getIndexOption());
+    RDFDatabase db = new RDFDatabase(query.getDbName(), query.getIndexOption(), GlobalConst.NUMBUF);
     db.insert(query);
     db.close();
+
+    // Print reads and writes
+    Telemetry.printAllTelemetry(SystemDefs.JavabaseDBName);
   }
 }
 

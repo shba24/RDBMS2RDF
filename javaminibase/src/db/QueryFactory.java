@@ -1,5 +1,7 @@
 package db;
 
+import java.io.IOException;
+
 /**
  * Factory design pattern for Query
  * <p>
@@ -9,7 +11,7 @@ package db;
  * 2. SelectQuery
  */
 public class QueryFactory {
-  public static IQuery getQuery(QueryType queryType, String query) {
+  public static IQuery getQuery(QueryType queryType, String query) throws IOException {
     if (queryType == null) {
       return null;
     }
@@ -18,6 +20,8 @@ public class QueryFactory {
     if (queryType == QueryType.INSERT) {
       return parser.parse(query);
     } else if (queryType == QueryType.SELECT) {
+      return parser.parse(query);
+    } else if (queryType == QueryType.JOIN) {
       return parser.parse(query);
     }
     return null;

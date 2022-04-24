@@ -9,14 +9,18 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
+import global.Convert;
 import global.EID;
+import global.GlobalConst;
 import global.PID;
 import global.QID;
 import global.QuadOrder;
+import heap.FieldNumberOutOfBoundException;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class SubjectIndexScheme extends BaseIndexScheme {
 
@@ -39,17 +43,20 @@ public class SubjectIndexScheme extends BaseIndexScheme {
    * to this scheme.
    *
    * @param quadruple
-   * @param qid
-   * @param entityHeapFile
-   * @param predicateHeapFile
    * @return
    * @throws Exception
    */
   @Override
-  public StringKey getKey(
-      Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
-    return new StringKey(
-        entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel());
+  public StringKey getKey(Quadruple quadruple) throws Exception {
+    byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
+    try {
+      Convert.setBytesValue(quadruple.getSubjectID().returnByteArray(), 0, buffer);
+      return new StringKey(new String(buffer));
+    } catch (FieldNumberOutOfBoundException e) {
+      System.err.println("[SubjectIndexScheme] Error in getting key.");
+      e.printStackTrace();
+      throw e;
+    }
   }
 
   /**
@@ -93,9 +100,10 @@ public class SubjectIndexScheme extends BaseIndexScheme {
           confidenceFilter
       );
     } else {
-      String subjectFilter = entityHeapFile.getLabel(subjectID.returnLID()).getLabel();
-      KeyClass lo_key = new StringKey(subjectFilter);
-      KeyClass hi_key = new StringKey(subjectFilter);
+      Quadruple quad = new Quadruple();
+      quad.setSubjectID(subjectID);
+      StringKey lo_key = getKey(quad);
+      KeyClass hi_key = new StringKey(lo_key.getKey());
       return new BTStream(
           orderType,
           numBuf,

@@ -9,10 +9,13 @@ import btree.StringKey;
 import diskmgr.rdf.BTStream;
 import diskmgr.rdf.IStream;
 import diskmgr.rdf.TStream;
+import global.Convert;
 import global.EID;
+import global.GlobalConst;
 import global.PID;
 import global.QID;
 import global.QuadOrder;
+import heap.FieldNumberOutOfBoundException;
 import heap.Quadruple;
 import heap.labelheap.LabelHeapFile;
 import heap.quadrupleheap.QuadrupleHeapFile;
@@ -30,19 +33,22 @@ public class SubjectPredicateObjectScheme extends BaseIndexScheme {
    * to this scheme.
    *
    * @param quadruple
-   * @param qid
-   * @param entityHeapFile
-   * @param predicateHeapFile
    * @return
    * @throws Exception
    */
   @Override
-  public StringKey getKey(
-      Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) throws Exception {
-    String subject = entityHeapFile.getLabel(quadruple.getSubjectID().returnLID()).getLabel();
-    String object = entityHeapFile.getLabel(quadruple.getObjectID().returnLID()).getLabel();
-    String predicate = predicateHeapFile.getLabel(quadruple.getPredicateID().returnLID()).getLabel();
-    return new StringKey(subject+":"+predicate+":"+object);
+  public StringKey getKey(Quadruple quadruple) throws Exception {
+    byte[] buffer = new byte[3* GlobalConst.MAX_EID_OBJ_SIZE];
+    try {
+      Convert.setBytesValue(quadruple.getSubjectID().returnByteArray(), 0, buffer);
+      Convert.setBytesValue(quadruple.getPredicateID().returnByteArray(), GlobalConst.MAX_EID_OBJ_SIZE, buffer);
+      Convert.setBytesValue(quadruple.getObjectID().returnByteArray(), 2*GlobalConst.MAX_EID_OBJ_SIZE, buffer);
+      return new StringKey(new String(buffer));
+    } catch (FieldNumberOutOfBoundException e) {
+      System.err.println("[SubjectPredicateObjectIndexScheme] Error in getting key.");
+      e.printStackTrace();
+      throw e;
+    }
   }
 
   /**
@@ -87,12 +93,10 @@ public class SubjectPredicateObjectScheme extends BaseIndexScheme {
           confidenceFilter
       );
     } else {
-      String subjectFilter = entityHeapFile.getLabel(subjectID.returnLID()).getLabel();
-      String predicateFilter = predicateHeapFile.getLabel(predicateID.returnLID()).getLabel();
-      String objectFilter = entityHeapFile.getLabel(objectID.returnLID()).getLabel();
-      String filterKey = subjectFilter +":"+ predicateFilter +":"+ objectFilter;
-      KeyClass lo_key = new StringKey(filterKey);
-      KeyClass hi_key = new StringKey(filterKey);
+      Quadruple quad = new Quadruple();
+      quad.setSubjectID(subjectID).setPredicateID(predicateID).setObjectID(objectID);
+      StringKey lo_key = getKey(quad);
+      KeyClass hi_key = new StringKey(lo_key.getKey());
       return new BTStream(
           orderType,
           numBuf,

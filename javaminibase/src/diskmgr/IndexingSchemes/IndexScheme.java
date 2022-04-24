@@ -16,10 +16,8 @@ public interface IndexScheme {
    * Inserts a single quadruple to the BTree Index file according to the schema
    * @param quadruple
    * @param qid
-   * @param entityHeapFile
-   * @param predicateHeapFile
    */
-  void insert(Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile);
+  void insert(Quadruple quadruple, QID qid);
   /**
    * Inserts all quadruples from QuadrupleHeapFile to the
    * BTree Index file according to the schema
@@ -29,8 +27,7 @@ public interface IndexScheme {
    */
   void batchInsert(QuadrupleHeapFile quadrupleHeapFile, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile);
 
-  StringKey getKey(Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile,
-      LabelHeapFile predicateHeapFile) throws Exception;
+  StringKey getKey(Quadruple quadruple) throws Exception;
 
   /**
    * Returns the btree file.

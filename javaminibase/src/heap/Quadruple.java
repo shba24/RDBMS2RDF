@@ -114,8 +114,8 @@ public class Quadruple extends Tuple {
    * @throws FieldNumberOutOfBoundException
    * @throws IOException
    */
-  public IEID getSubjectID() throws FieldNumberOutOfBoundException, IOException {
-    IEID subject = new EID();
+  public EID getSubjectID() throws FieldNumberOutOfBoundException, IOException {
+    EID subject = new EID();
     byte[] buffer;
     try {
       buffer = this.getBytesFld(1);
@@ -169,6 +169,7 @@ public class Quadruple extends Tuple {
    * @throws FieldNumberOutOfBoundException
    */
   public Quadruple setSubjectID(IEID subjectId) throws IOException, FieldNumberOutOfBoundException {
+    if (subjectId==null) return this;
     byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
       Convert.setIntValue(subjectId.getPageNo().pid, 0, buffer);
@@ -213,6 +214,7 @@ public class Quadruple extends Tuple {
    * @throws IOException
    */
   public Quadruple setPredicateID(IPID predicateId) throws FieldNumberOutOfBoundException, IOException {
+    if (predicateId==null) return this;
     byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
       Convert.setIntValue(predicateId.getPageNo().pid, 0, buffer);
@@ -233,8 +235,8 @@ public class Quadruple extends Tuple {
    * @throws FieldNumberOutOfBoundException
    * @throws IOException
    */
-  public IEID getObjectID() throws FieldNumberOutOfBoundException, IOException {
-    IEID object = new EID();
+  public EID getObjectID() throws FieldNumberOutOfBoundException, IOException {
+    EID object = new EID();
     byte[] buffer;
     try {
       buffer = this.getBytesFld(3);
@@ -258,6 +260,7 @@ public class Quadruple extends Tuple {
    * @throws IOException
    */
   public Quadruple setObjectID(IEID objectId) throws FieldNumberOutOfBoundException, IOException {
+    if (objectId==null) return this;
     byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
     try {
       Convert.setIntValue(objectId.getPageNo().pid, 0, buffer);
@@ -320,7 +323,8 @@ public class Quadruple extends Tuple {
    * @throws FieldNumberOutOfBoundException
    * @throws IOException
    */
-  public Quadruple setConfidence(float confidence) throws FieldNumberOutOfBoundException, IOException {
+  public Quadruple setConfidence(Float confidence) throws FieldNumberOutOfBoundException, IOException {
+    if (confidence==null) return this;
     try {
       this.setFloFld(4, confidence);
     } catch (Exception e) {

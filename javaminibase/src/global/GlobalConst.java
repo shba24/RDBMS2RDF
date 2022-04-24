@@ -10,7 +10,7 @@ public interface GlobalConst {
    * more than 50 Buffer pages at a time, we
    * have increased it to 100.
    */
-  public static final int NUMBUF = 200;
+  public static final int NUMBUF = 500;
   /**
    * As the initial data for Phase 2 have
    * 178k quadruples to be inserted into
@@ -77,13 +77,18 @@ public interface GlobalConst {
   public static String QUADRUPLE_IDENTIFIER = "quadruple";
   public static String ENTITY_IDENTIFIER = "entity";
   public static String PREDICATE_IDENTIFIER = "predicate";
-  public static String SUBJECT_IDENTIFIER = "subject";
-  public static String OBJECT_IDENTIFIER = "object";
-  public static String CONFIDENCE_IDENTIFIER = "confidence";
+  public static String PID_IDENTIFIER = "PID";
+  public static String SID_IDENTIFIER = "SID";
+  public static String OID_IDENTIFIER = "OID";
   public static String INDEX_IDENTIFIER = "index";
   public static String JSON_FILE = "telemetry.json";
   public static String READS = "Reads";
   public static String WRITES = "Writes";
+  public static String PAGE_SIZE = "PageSize";
+  public static String BUFF_SIZE = "BuffSize";
+  public static String UNIQUE_ENTITIES = "UniqueEntities";
+  public static String UNIQUE_PREDICATES = "UniquePredicates";
+  public static String TOTAL_QUADRUPLES = "TotalQuadruples";
 
   /**
    * Global constants for basics

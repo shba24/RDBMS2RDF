@@ -4,7 +4,11 @@ import bufmgr.BufMgr;
 import db.IndexOption;
 import db.Telemetry;
 import diskmgr.rdf.RdfDB;
+import java.io.IOException;
 import java.nio.file.Paths;
+import org.json.simple.parser.ParseException;
+
+import static global.GlobalConst.MINIBASE_PAGESIZE;
 
 /**
  * Implements the RDFSystemDefs using the Builder
@@ -28,7 +32,12 @@ public class RDFSystemDefs extends SystemDefs {
       String rdfDbPath,
       IndexOption _indexOption,
       int _bufPoolSize) {
-    telemetry = new Telemetry(rdfDbPath);
+    telemetry = new Telemetry(rdfDbPath, MINIBASE_PAGESIZE, _bufPoolSize);
+    try {
+      telemetry.flush();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     bufPoolSize = _bufPoolSize;
     JavabaseDBName = rdfDbPath;
     indexOption = _indexOption;

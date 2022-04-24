@@ -131,6 +131,13 @@ public class EID implements IEID {
     return new LID(pageNo,slotNo);
   }
 
+  @Override
+  public byte[] returnByteArray() throws IOException {
+    byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
+    writeToByteArray(buffer, 0);
+    return buffer;
+  }
+
   /**
    * Write the Entity ID into a byte array at the specified offset. The first 4 bytes after the
    * offset will store the slot number and the next 4 bytes will store the page ID.

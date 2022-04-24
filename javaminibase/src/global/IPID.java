@@ -21,7 +21,7 @@ public interface IPID {
 
   void writeToByteArray(byte[] array, int offset) throws IOException;
 
-  // Additional public attribute manipulation methods
+  byte[] returnByteArray() throws IOException;
 
 
 }

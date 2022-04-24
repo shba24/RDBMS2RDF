@@ -4,6 +4,8 @@
 
 package global;
 
+import java.io.IOException;
+
 import static global.GlobalConst.INVALID_PAGE;
 
 public class PID implements IPID {
@@ -130,6 +132,13 @@ public class PID implements IPID {
   @Override
   public LID returnLID() {
     return new LID(pageNo,slotNo);
+  }
+
+  @Override
+  public byte[] returnByteArray() throws IOException {
+    byte[] buffer = new byte[GlobalConst.MAX_EID_OBJ_SIZE];
+    writeToByteArray(buffer, 0);
+    return buffer;
   }
 
   /**

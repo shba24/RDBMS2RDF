@@ -50,9 +50,9 @@ public abstract class BaseIndexScheme implements IndexScheme {
   }
 
   @Override
-  public void insert(Quadruple quadruple, QID qid, LabelHeapFile entityHeapFile, LabelHeapFile predicateHeapFile) {
+  public void insert(Quadruple quadruple, QID qid) {
     try {
-      StringKey key = getKey(quadruple, qid, entityHeapFile, predicateHeapFile);
+      StringKey key = getKey(quadruple);
       bTreeFile.insert(key, qid);
     } catch (Exception e) {
       System.err.println("Error creating Index for Quadruple.");
@@ -67,7 +67,7 @@ public abstract class BaseIndexScheme implements IndexScheme {
       Quadruple quadruple = null;
       QID qid = new QID();
       while ((quadruple = scan.getNext(qid)) != null) {
-        insert(quadruple, qid, entityHeapFile, predicateHeapFile);
+        insert(quadruple, qid);
       }
       scan.closescan();
     } catch (Exception e) {

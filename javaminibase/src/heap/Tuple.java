@@ -34,7 +34,7 @@ public class Tuple implements GlobalConst {
      * private field
      * Number of fields in this tuple
      */
-    private short fldCnt;
+    protected short fldCnt;
 
     /**
      * private field
