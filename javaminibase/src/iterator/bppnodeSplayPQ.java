@@ -24,9 +24,15 @@ public class bppnodeSplayPQ extends pnodeSplayPQ{
 
   @Override
   public int pnodeCMP(pnode a, pnode b)
-      throws IOException, TupleUtilsException {
-    BasicPatternClass bpa = (BasicPatternClass) a.tuple;
-    BasicPatternClass bpb = (BasicPatternClass) b.tuple;
+      throws TupleUtilsException {
+    BasicPatternClass bpa = new BasicPatternClass(a.tuple);
+    BasicPatternClass bpb = new BasicPatternClass(b.tuple);
+    try {
+      bpa.setDefaultHeader(num_fields);
+      bpb.setDefaultHeader(num_fields);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return BPUtils.CompareBPWithBP(fld_type, bpa, fld_no, bpb, fld_no);
   }
 }
