@@ -15,8 +15,12 @@ public class Telemetry {
 
   private int readCnt;
   private int writeCnt;
+  private int readQCnt;
   private int pageSize;
   private int bufferSize;
+  private int pageFaults;
+  private int lookupCnt;
+  private int bufferReads;
   private int noOfUniqueEntities;
   private int noOfUniquePredicates;
   private int noOfTotalQuadruples;
@@ -25,6 +29,7 @@ public class Telemetry {
   public Telemetry(String _dbName, int _pageSize, int _bufferSize) {
     readCnt = 0;
     writeCnt = 0;
+    readQCnt = 0;
     noOfUniqueEntities = 0;
     noOfUniquePredicates = 0;
     noOfTotalQuadruples = 0;
@@ -87,6 +92,10 @@ public class Telemetry {
     dataObject.put(GlobalConst.UNIQUE_ENTITIES, noOfUniqueEntities);
     dataObject.put(GlobalConst.UNIQUE_PREDICATES, noOfUniquePredicates);
     dataObject.put(GlobalConst.TOTAL_QUADRUPLES, noOfTotalQuadruples);
+    dataObject.put(GlobalConst.QUAD_READS, readQCnt);
+    dataObject.put(GlobalConst.BUFFER_READ_PAGES, bufferReads);
+    dataObject.put(GlobalConst.LOOKUP_COUNT, lookupCnt);
+    dataObject.put(GlobalConst.PAGE_FAULTS, pageFaults);
     dbJsonObject.put(dbName, dataObject);
     putTelemetry(dbJsonObject);
   }
@@ -97,7 +106,8 @@ public class Telemetry {
       String dbName = (String) iterator.next();
       if (db!=null && !db.equalsIgnoreCase(dbName)) continue;
       JSONObject dataObject = (JSONObject) telemetry.get(dbName);
-      int rCount = 0, wCount = 0, pSize = 0, bSize = 0, entSize = 0, predSize = 0, quadSize = 0;
+      int rCount = 0, wCount = 0, pSize = 0, bSize = 0, entSize = 0, predSize = 0, quadSize = 0, quadReads = 0;
+      int bufferReadCnt = 0, indexLookupCnt = 0, noOfPageFaults = 0;
       if (dataObject.containsKey(GlobalConst.READS)) {
         rCount = Integer.parseInt(dataObject.get(GlobalConst.READS).toString());
       }
@@ -119,9 +129,22 @@ public class Telemetry {
       if (dataObject.containsKey(GlobalConst.TOTAL_QUADRUPLES)) {
         quadSize = Integer.parseInt(dataObject.get(GlobalConst.TOTAL_QUADRUPLES).toString());
       }
+      if (dataObject.containsKey(GlobalConst.QUAD_READS)) {
+        quadReads = Integer.parseInt(dataObject.get(GlobalConst.QUAD_READS).toString());
+      }
+      if (dataObject.containsKey(GlobalConst.BUFFER_READ_PAGES)) {
+        bufferReadCnt = Integer.parseInt(dataObject.get(GlobalConst.BUFFER_READ_PAGES).toString());
+      }
+      if (dataObject.containsKey(GlobalConst.LOOKUP_COUNT)) {
+        indexLookupCnt = Integer.parseInt(dataObject.get(GlobalConst.LOOKUP_COUNT).toString());
+      }
+      if (dataObject.containsKey(GlobalConst.PAGE_FAULTS)) {
+        noOfPageFaults = Integer.parseInt(dataObject.get(GlobalConst.PAGE_FAULTS).toString());
+      }
       System.out.println("DB Name: " + dbName + " Reads: " + rCount + " Writes: " + wCount + " PageSize: " + pSize +
           " BuffSize: " + bSize + " noOfUniqueEntities: " + entSize + " noOfUniquePredicates: " + predSize + " " +
-          "noOfTotalQuadruples: " + quadSize);
+          "noOfTotalQuadruples: " + quadSize + " Total Quadruple Read: " + quadReads + " Total Buffer Page Reads: " + bufferReadCnt +
+          " Total Index Lookup Count: " + indexLookupCnt + " Total Page Faults : " + noOfPageFaults);
     }
   }
 
@@ -129,13 +152,33 @@ public class Telemetry {
    * Increases the read counter by 1.
    *
    */
-  public void addRead() { readCnt++; try { flush(); } catch (Exception e) {} }
+  public void addRead() { readCnt++; }
 
   /**
    * Increases the write counter by 1.
    *
    */
-  public void addWrite() { writeCnt++; try { flush(); } catch (Exception e) {} }
+  public void addWrite() { writeCnt++; }
+
+  /**
+   *
+   */
+  public void readQuad() { readQCnt++; }
+
+  /**
+   *
+   */
+  public void readBufferPage() { bufferReads++; }
+
+  /**
+   *
+   */
+  public void indexLookupCnt() { lookupCnt++; }
+
+  /**
+   *
+   */
+  public void addPageFault() { pageFaults++; }
 
   /**
    * Returns the read counter.

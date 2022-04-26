@@ -207,7 +207,7 @@ public class JoinQuery extends BaseQuery implements IQuery {
       stream = ((RdfDB) SystemDefs.JavabaseDB).joinStream(this, js);
       BasicPatternClass bp = stream.getNext();
       while (bp != null) {
-        //bp.print();
+        bp.print();
         bp = stream.getNext();
       }
     } catch (Exception e) {

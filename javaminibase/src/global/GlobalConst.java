@@ -89,6 +89,10 @@ public interface GlobalConst {
   public static String UNIQUE_ENTITIES = "UniqueEntities";
   public static String UNIQUE_PREDICATES = "UniquePredicates";
   public static String TOTAL_QUADRUPLES = "TotalQuadruples";
+  public static String QUAD_READS = "TotalQuadReads";
+  public static String BUFFER_READ_PAGES = "TotalBufferReads";
+  public static String LOOKUP_COUNT = "TotalIndexLookupCnt";
+  public static String PAGE_FAULTS = "TotalPageFaults";
 
   /**
    * Global constants for basics

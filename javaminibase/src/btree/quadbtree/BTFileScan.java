@@ -49,7 +49,7 @@ public class BTFileScan extends IndexFileScan
    */
   public KeyDataEntry get_next()
       throws ScanIteratorException {
-
+    SystemDefs.telemetry.indexLookupCnt();
     KeyDataEntry entry;
     PageId nextpage;
     try {

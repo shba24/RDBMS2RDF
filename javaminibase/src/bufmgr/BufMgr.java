@@ -523,9 +523,10 @@ public class BufMgr implements GlobalConst {
     int needwrite = 0;
 
     frameNo = hashTable.lookup(pin_pgid);
+    SystemDefs.telemetry.readBufferPage();
 
     if (frameNo < 0) {           // Not in the buffer pool
-
+      SystemDefs.telemetry.addPageFault();
       frameNo = replacer.pick_victim(); // frameNo is pinned
       if (frameNo < 0) {
         page = null;

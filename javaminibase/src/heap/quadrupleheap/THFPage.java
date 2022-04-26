@@ -1,8 +1,10 @@
 package heap.quadrupleheap;
 
 import diskmgr.Page;
+import diskmgr.rdf.RdfDB;
 import global.QID;
 import global.RID;
+import global.SystemDefs;
 import heap.HFPage;
 import heap.InvalidSlotNumberException;
 import heap.Quadruple;
@@ -165,6 +167,7 @@ public class THFPage extends HFPage {
 
     // tuple will not be null. When it will be, exception is thrown.
     if (tuple != null) {
+      SystemDefs.telemetry.readQuad();
       return new Quadruple(tuple.getTupleByteArray(), tuple.getOffset(), tuple.getLength());
     } else {
       return null;
