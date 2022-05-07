@@ -203,17 +203,22 @@ public class JoinQuery extends BaseQuery implements IQuery {
 
   public void execute(JoinStrategy js) throws Exception {
     IJStream stream = null;
+    int count = 0;
     try {
       stream = ((RdfDB) SystemDefs.JavabaseDB).joinStream(this, js);
-      BasicPatternClass bp = stream.getNext();
-      while (bp != null) {
-        bp.print();
-        bp = stream.getNext();
+      if (stream!=null) {
+        BasicPatternClass bp = stream.getNext();
+        while (bp != null) {
+          //bp.print();
+          count++;
+          bp = stream.getNext();
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
     finally {
+      System.out.println("Total count: " + count);
       if (stream!=null) {
         stream.closeStream();
         stream = null;

@@ -124,10 +124,6 @@ public class BPLeftIndexRightIndexHashJoin extends BPIterator {
 
         try {
           Quadruple quad = new Quadruple();
-          quad.setSubjectID(rightSelectFilter.subjectID)
-              .setPredicateID(rightSelectFilter.predicateID)
-              .setObjectID(rightSelectFilter.objectID)
-              .setConfidence(rightSelectFilter.confidenceFilter);
           if (joinOnSubjectOrObject==0) {
             quad.setSubjectID(outerBp.getNodeId(bpJoinNodePosition));
           } else {

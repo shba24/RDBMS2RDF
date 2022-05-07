@@ -659,19 +659,31 @@ public class RdfDB extends DB {
 
   public IJStream joinStream(JoinQuery joinQuery, JoinStrategy js) throws Exception {
     EID sf1 = getEntity(joinQuery.getSf1());
+    if (joinQuery.getSf1()!=null && sf1==null) return null;
     PID pf1 = getPredicate(joinQuery.getPf1());
+    if (joinQuery.getPf1()!=null && pf1==null) return null;
     EID of1 = getEntity(joinQuery.getOf1());
+    if (joinQuery.getOf1()!=null && of1==null) return null;
     Float cf1 = joinQuery.getCf1();
+    if (joinQuery.getCf1()!=null && cf1==null) return null;
     SelectFilter leftSelectFilter = new SelectFilter(sf1, pf1, of1, cf1);
     EID rsf1 = getEntity(joinQuery.getRsf1());
+    if (joinQuery.getRsf1()!=null && rsf1==null) return null;
     PID rpf1 = getPredicate(joinQuery.getRpf1());
+    if (joinQuery.getRpf1()!=null && rpf1==null) return null;
     EID rof1 = getEntity(joinQuery.getRof1());
+    if (joinQuery.getRof1()!=null && rof1==null) return null;
     Float rcf1 = joinQuery.getRcf1();
+    if (joinQuery.getRcf1()!=null && rcf1==null) return null;
     SelectFilter rightSelectFilter1 = new SelectFilter(rsf1, rpf1, rof1, rcf1);
     EID rsf2 = getEntity(joinQuery.getRsf2());
+    if (joinQuery.getRsf2()!=null && rsf2==null) return null;
     PID rpf2 = getPredicate(joinQuery.getRpf2());
+    if (joinQuery.getRpf2()!=null && rpf2==null) return null;
     EID rof2 = getEntity(joinQuery.getRof2());
-    Float rcf2 = joinQuery.getRcf1();
+    if (joinQuery.getRof2()!=null && rof2==null) return null;
+    Float rcf2 = joinQuery.getRcf2();
+    if (joinQuery.getRcf2()!=null && rcf2==null) return null;
     SelectFilter rightSelectFilter2 = new SelectFilter(rsf2, rpf2, rof2, rcf2);
 
     switch (js.joinStrategy) {
